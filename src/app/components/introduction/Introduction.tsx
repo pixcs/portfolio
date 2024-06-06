@@ -19,11 +19,11 @@ const Introduction = async ({ session }: Props) => {
     >
       <div className=" max-w-screen-lg md:w-1/2 flex flex-col gap-y-4 mt-16 ">
         <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-white transition-theme">
-          Hi, I'm Patrick <p className="inline-block shake-effect">👋</p>
+          Hi, I&apos;m Patrick <p className="inline-block shake-effect">👋</p>
         </h1>
         <p className="dark:text-gray-300 transition-theme">
           A front-end developer (React.js) who aspires to produce visually beautiful and responsive applications.
-          Working on  personal projects is my favorite way to put what I've learned to enhance my skills,
+          Working on  personal projects is my favorite way to put what I&apos;ve learned to enhance my skills,
           and my goal is to reach the stage where I can eventually work as a full stack developer.
         </p>
 

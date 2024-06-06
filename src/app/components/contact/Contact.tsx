@@ -45,7 +45,7 @@ const Contact = () => {
             </p>
             <div className="flex flex-col md:flex-row gap-8 items-center md:max-w-7xl mx-auto my-5">
                 <p className="block md:hidden md:text-xl text-center mt-5 mb-4 md:mb-12 dark:text-gray-300">
-                    What's next? Feel free to reach out to me if you are looking <span className='md:block'> for a developer,  have a query, or simply want to connect.</span>
+                    What&apos;s next? Feel free to reach out to me if you are looking <span className='md:block'> for a developer,  have a query, or simply want to connect.</span>
                 </p>
                 <ContactForm
                     status={status}
@@ -53,7 +53,7 @@ const Contact = () => {
                 />
                 <div className="flex-1 flex flex-col items-center justify-start">
                     <p className="hidden md:block  md:text-xl text-center md:mb-12 dark:text-gray-300">
-                        What's next? Feel free to reach out to me if you are looking <span className='md:block'> for a developer,  have a query, or simply want to connect.</span>
+                        What&apos;s next? Feel free to reach out to me if you are looking <span className='md:block'> for a developer,  have a query, or simply want to connect.</span>
                     </p>
 
                     <div className="flex items-center justify-center space-x-2 md:space-x-5 my-2">

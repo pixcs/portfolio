@@ -62,7 +62,7 @@ const NavAndDrawerLayout = ({ session }: Props) => {
         if (session?.isLoggedIn && session?.isAdmin) {
             getAllMessages();
         }
-    }, [session?.isLoggedIn, reRender, showInbox, showDrawer])
+    }, [reRender, showInbox, showDrawer])
 
     return (
         <Fragment>

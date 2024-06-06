@@ -94,6 +94,7 @@ const Drawer = ({
                                 {listOfMessage.length > 0 ? (
                                     listOfMessage.map((message) => (
                                         <MessageList
+                                            key={message._id}
                                             message={message}
                                             setListOfMessage={setListOfMessage}
                                             setReRender={setReRender}

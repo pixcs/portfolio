@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 
-
 const About = () => {
     return (
         <section
@@ -25,27 +24,26 @@ const About = () => {
 
                 <div className="md:w-1/2">
                     <h2 className="text-xl md:text-3xl font-bold mb-5 mt-20 md:mt-0">Curious about me? Here you have it:</h2>
-                    <p className="dark:text-gray-300">I'm a passionate, <span className=" underline">self-proclaimed frontend developer</span> who
-                        specialized in front end  development (React.js). i am  very enthusiatic about bringing the technical and visual aspects
-                        of digital product to life. User experience, and writing  clear, readable, highly performant code matters to me.
+                    <p className="dark:text-gray-300">I&apos;m a passionate, <span className=" underline">self-proclaimed frontend developer</span> who
+                        specialized in front end  development (React.js). I am very enthusiatic about bringing the technical and visual aspects
+                        of digital product to life. User experience, and writing clear, readable, highly performant code matters to me.
                     </p>
                     <br />
                     <p className="dark:text-gray-300">
-                        I began my curiosity about programming when i was on a 2nd year in college in 2022 during that time i have a basic knowledge about
-                        programming, my focused is writing java code mostly on terminal after learning about GUIs (Graphical User Interfaces) that's where i enjoyed 
-                        programming and build my very first interactive solo project as a challenges to myself after that I decided to learn web development from the start to learn new technologies since then, I've
+                        I began my curiosity about programming when I was in my 2nd year in college in 2022. During that time, I had basic knowledge about
+                        programming, my focus was writing Java code mostly on terminal. After learning about GUIs (Graphical User Interfaces), that&apos;s where I enjoyed 
+                        programming and built my very first interactive solo project as a challenge to myself. After that, I decided to learn web development from the start to learn new technologies. Since then, I&apos;ve
                         continued to grow and evolve as an aspiring developer, taking on new challenges and learning the latest technologies along the way. Now,
-                        im building cutting edge web applications mostly on personal project using modern technologies such as Next.js Typescript, Tailwindcss, Firebase and much more.
+                        I&apos;m building cutting edge web applications, mostly personal projects using modern technologies such as Next.js, TypeScript, Tailwind CSS, Firebase, and much more.
                     </p>
                     <br />
                     <p className="dark:text-gray-300">
-                        When i'm not in developer-mode, you can find me doing things i like such as watching anime, and movies or playing computer games.
+                        When I&apos;m not in developer-mode, you can find me doing things I like such as watching anime and movies, or playing computer games.
                         You can add me on  <Link href="https://www.facebook.com/td.nano" target="_blank">
                             <span className="underline">Facebook</span>
                         </Link> or you can follow me on <Link href="https://github.com/pixcs" target="_blank">
-                            <span className="underline">Github</span>
-                        </Link>
-                        .
+                            <span className="underline">GitHub</span>
+                        </Link>.
                     </p>
                     <br />
                     <p className="dark:text-gray-300">Finally, some quick bits about me.</p>
@@ -58,7 +56,7 @@ const About = () => {
                 </div>
             </div>
         </section>
-    )
+    );
 }
 
 export default About;

@@ -16,18 +16,96 @@
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+html {
+  scroll-behavior: smooth;
+}
+
+body {}
+
+@layer components {
+  @media(prefers-reduced-motion: no-preference) {
+    .fade-in-effect {
+        animation: fade-in linear forwards;
+        animation-timeline: view();   /* view(top-offset, bottom-offset), */ 
+        /* how far away are we from the top should be finish */
+        /* how far away from the bottom are we to be finish */
+        animation-range: entry 50px; /* cover, contain, entry, exit */
+    }
+  
+    @keyframes fade-in {
+      from { scale: .8; opacity: 0; } 
+      to { scale: 1; opacity: 1; } 
+    }
+
+    .fade-out-effect {
+      animation: fade-out linear forwards;
+      animation-timeline: view();
+      animation-range: exit;
+    }
+
+    @keyframes fade-out {
+      from { opacity: 1; } 
+      to { opacity: 0; } 
+    }
+
+    .shake-effect {
+      animation: shake 3s infinite linear forwards;
+
+    }
+
+    @keyframes shake {
+      0%   {transform: rotate(0deg); }
+      25%  {transform: rotate(10deg); }
+      50%  {transform: rotate(0deg); }
+      75%  {transform: rotate(10deg); }
+      100% {transform: rotate(0deg); }
+    }
+
+    .rotate-effect {
+      animation: rotate 3s linear infinite forwards;
+    }
+
+    @keyframes rotate {
+      0%   {transform: rotateY(0deg); }
+      25%  {transform: rotateY(45deg); }
+      50%  {transform: rotateY(90deg); }
+      75%  {transform: rotateY(160deg); }
+      100% {transform: rotateY(360deg); }
+    }
+
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+
+  .transition-theme {
+    @apply transition-all duration-100;
+  }
+
+  .hovered {
+    @apply hover:bg-gray-200 dark:hover:bg-slate-700/90 transition duration-300 rounded-md cursor-pointer;
+  }
+
+  .hover-scale {
+    @apply hover:scale-110 transition duration-300 cursor-pointer
+  }
+
+  .background-blur {
+    backdrop-filter: blur(15px);
+  }
+
+  .hide-scroll {
+    @apply overflow-y-hidden
+  }
+
+  .mobile-height {
+    height: calc(100vh - 88px);
+  }
+  .desktop-height {
+    height: calc(100vh - 72px);
+  }
+  
 }

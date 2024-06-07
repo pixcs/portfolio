@@ -33,7 +33,7 @@ const ContactForm = ({ status, setStatus }: Props) => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const res = await fetch("http://localhost:3000/api/get-in-touch", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/get-in-touch`, {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json"

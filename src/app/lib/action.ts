@@ -2,7 +2,6 @@ import { getIronSession } from "iron-session";
 import { sessionOptions } from "./lib"
 import { cookies } from "next/headers"; //this one is sensitive all of the codes here should be in server side
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 
 export const getSession = async () => {
    "use server";

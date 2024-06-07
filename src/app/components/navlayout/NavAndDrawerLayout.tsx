@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "@/app/components/navbar/Navbar";
 import Drawer from "@/app/components/drawer/Drawer";
 import { IronSession } from "iron-session";
@@ -65,7 +65,7 @@ const NavAndDrawerLayout = ({ session }: Props) => {
     }, [reRender, showInbox, showDrawer])
 
     return (
-        <Fragment>
+        <>
             <Navbar
                 darkMode={darkMode}
                 setDarkMode={setDarkMode}
@@ -88,7 +88,7 @@ const NavAndDrawerLayout = ({ session }: Props) => {
                 setListOfMessage={setListOfMessage}
                 setReRender={setReRender}
             />
-        </Fragment>
+        </>
     )
 }
 

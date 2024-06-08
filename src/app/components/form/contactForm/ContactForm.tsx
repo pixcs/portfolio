@@ -1,7 +1,12 @@
 "use client";
 
-import { ChangeEvent, Dispatch, FormEvent, SetStateAction, useState } from "react";
-import { useRouter } from "next/navigation";
+import {
+    ChangeEvent,
+    Dispatch,
+    FormEvent,
+    SetStateAction,
+    useState
+} from "react";
 
 type Props = {
     status: string,
@@ -17,7 +22,6 @@ const ContactForm = ({ status, setStatus }: Props) => {
     });
     const { name, email, subject, message } = formData;
     const [isLoading, setIsLoading] = useState(false);
-    const router = useRouter();
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         e.preventDefault();
@@ -61,7 +65,6 @@ const ContactForm = ({ status, setStatus }: Props) => {
                 subject: "",
                 message: ""
             })
-            router.refresh();
 
         } catch (err) {
             if (err instanceof Error) {
@@ -84,7 +87,7 @@ const ContactForm = ({ status, setStatus }: Props) => {
                 placeholder="Name"
                 name="name"
                 required
-                className="py-4 rounded outline-none text-slate-700 dark:text-white border-b border-gray-400 bg-transparent"
+                className="py-4 pl-2 rounded outline-none text-slate-700 dark:text-white border-b border-gray-400 bg-transparent"
                 onChange={handleChange}
                 value={name}
             />
@@ -93,7 +96,7 @@ const ContactForm = ({ status, setStatus }: Props) => {
                 placeholder="Email"
                 name="email"
                 required
-                className="py-4 rounded outline-none text-slate-700 dark:text-white border-b border-gray-400 bg-transparent"
+                className="py-4 pl-2 rounded outline-none text-slate-700 dark:text-white border-b border-gray-400 bg-transparent"
                 onChange={handleChange}
                 value={email}
             />
@@ -102,7 +105,7 @@ const ContactForm = ({ status, setStatus }: Props) => {
                 placeholder="Subject"
                 name="subject"
                 required
-                className="py-4 rounded outline-none text-slate-700 dark:text-white border-b border-gray-400 bg-transparent"
+                className="py-4 pl-2 rounded outline-none text-slate-700 dark:text-white border-b border-gray-400 bg-transparent"
                 onChange={handleChange}
                 value={subject}
             />
@@ -110,13 +113,13 @@ const ContactForm = ({ status, setStatus }: Props) => {
                 name="message"
                 placeholder="Message"
                 required
-                className="py-4 rounded w-full outline-none text-slate-700 dark:text-white border-b border-gray-400 max-h-36 md:min-h-52 bg-transparent"
+                className="py-4 pl-2 rounded w-full outline-none text-slate-700 dark:text-white border-b border-gray-400 max-h-36 md:min-h-52 bg-transparent"
                 onChange={handleChange}
                 value={message}
             />
-            <button 
-               className="scale-90 py-4 text-white font-semibold dark:text-black bg-slate-900 dark:bg-white dark:hover:bg-gray-200 rounded-lg w-44 hover:bg-black hover:scale-95 duration-300 mb-5 md:mb-0"
-               disabled={isLoading}
+            <button
+                className="scale-90 py-4  text-white font-semibold dark:text-black bg-slate-900 dark:bg-white dark:hover:bg-gray-200 rounded-lg  md:w-44 hover:bg-black hover:scale-95 duration-300 mb-5 md:mb-0"
+                disabled={isLoading}
             >
                 {isLoading ? "Processing..." : "Send message"}
             </button>

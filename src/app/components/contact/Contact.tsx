@@ -58,7 +58,7 @@ const Contact = () => {
 
                     <div className="flex items-center justify-center space-x-2 md:space-x-5 my-2">
                         <MdOutlineEmail size={35} className=" h-5 md:h-9" />
-                        <h2 className=" text-base md:text-2xl dark:text-white font-bold">johnpatrickpapa20@gmail.com</h2>
+                        <h2 className=" text-sm md:text-2xl dark:text-white font-bold">johnpatrickpapa20@gmail.com</h2>
                         <div className="relative">
                             <IoCopyOutline
                                 size={40}
@@ -73,7 +73,7 @@ const Contact = () => {
 
                     <div className="flex items-center justify-center space-x-2 md:space-x-5 my-2">
                         <IoCallOutline size={30} className=" h-5 md:h-9" />
-                        <h2 className=" text-base md:text-2xl dark:text-white font-bold">+63 9152967010</h2>
+                        <h2 className=" text-sm md:text-2xl dark:text-white font-bold">+63 9152967010</h2>
                         <div className="relative">
                             <IoCopyOutline
                                 size={40}

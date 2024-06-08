@@ -122,7 +122,7 @@ const Navbar = ({
                         </div>
                         <button className="px-4 py-2 font-medium text-white bg-slate-900 rounded-xl hover:bg-gray-700 dark:hover:bg-slate-200 active:bg-slate-700 active:scale-95 dark:bg-white dark:text-slate-900 dark:active:bg-slate-200 transition-theme">
                             <Link
-                                href="https://drive.google.com/file/d/1AO4ku_k4bDoY-2ajV4OlCTKmTpOHR1Qq/view?usp=sharing"
+                                href="https://drive.google.com/file/d/1J3eWiOOyvD6gTr622iMkQIC-JI7Vzevj/view?usp=sharing"
                                 target="_blank">
                                 Download CV
                             </Link>

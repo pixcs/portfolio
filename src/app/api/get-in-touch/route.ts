@@ -20,12 +20,12 @@ export const POST = async (request: Request) => {
     })
     await messageToAdmin.save();
 
-    return NextResponse.json({ success: "Successfully sent the message" })
+    return NextResponse.json({ success: "Sent successfully" })
 }
 
 export const GET = async () => {
     await connectToDB();
-    const messages: GetInTouch[] = await GetInTouchModel.find();
+    const messages: GetInTouch[] = await GetInTouchModel.find().sort({ createdAt: -1 });
 
     return NextResponse.json({ messages });
 }

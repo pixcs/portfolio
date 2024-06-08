@@ -24,21 +24,21 @@ const About = () => {
 
                 <div className="md:w-1/2">
                     <h2 className="text-xl md:text-3xl font-bold mb-5 mt-20 md:mt-0">Curious about me? Here you have it:</h2>
-                    <p className="dark:text-gray-300">I&apos;m a passionate, <span className=" underline">self-proclaimed frontend developer</span> who
+                    <p className="dark:text-gray-300">I&apos;m a passionate, self-proclaimed frontend developer who
                         specialized in front end  development (React.js). I am very enthusiatic about bringing the technical and visual aspects
                         of digital product to life. User experience, and writing clear, readable, highly performant code matters to me.
                     </p>
                     <br />
                     <p className="dark:text-gray-300">
-                        I began my curiosity about programming when I was in my 2nd year in college in 2022. During that time, I had basic knowledge about
-                        programming, my focus was writing Java code mostly on terminal. After learning about GUIs (Graphical User Interfaces), that&apos;s where I enjoyed 
+                        I began my curiosity about programming when I was in my 2nd year in college in 2022. During that time, I have basic knowledge about
+                        programming and writing java code on terminal was my focus. After learning about GUIs (Graphical User Interfaces), that&apos;s where I enjoyed 
                         programming and built my very first interactive solo project as a challenge to myself. After that, I decided to learn web development from the start to expand my knowledge. Since then, I&apos;ve
                         continued to grow and evolve as an aspiring developer, taking on new challenges and learning the latest technologies along the way. Now,
-                        I&apos;m building cutting edge web applications, mostly personal projects using modern technologies such as Next.js, TypeScript, Tailwind CSS, Firebase, and much more.
+                        I&apos;m building cutting edge web applications, mostly for my personal projects using modern technologies such as Next.js, TypeScript, Tailwind CSS, Firebase, and much more.
                     </p>
                     <br />
                     <p className="dark:text-gray-300">
-                        When I&apos;m not in developer-mode, you can find me doing things I like such as watching anime and movies, or playing computer games.
+                        When I&apos;m not in developer-mode, you can expect me doing things i like such as watching anime and movies, or playing computer games.
                         You can add me on  <Link href="https://www.facebook.com/td.nano" target="_blank">
                             <span className="underline">Facebook</span>
                         </Link> or you can follow me on <Link href="https://github.com/pixcs" target="_blank">

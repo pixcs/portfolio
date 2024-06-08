@@ -21,11 +21,6 @@ export default function RootLayout({
       <link rel="icon" href="https://avatars.githubusercontent.com/u/121350861?s=400&u=e183ab30fa88f3ff949d997fdb717e38593d367e&v=4" />
       <body className={`${inter.className} text-gray-600  dark:text-white dark:bg-slate-950 transition-theme`}>
         {children}
-        <footer>
-          <p className=" text-sm md:text-base flex items-center justify-center text-wrap dark:text-gray-400 px-8 py-6">
-            © 2024 | Designed by Sagar Shah and coded by ❤️ John Patrick Papa
-          </p>
-        </footer>
       </body>
     </html>
   );

@@ -7,43 +7,63 @@ import { LuGithub } from "react-icons/lu";
 import { SlSocialFacebook } from "react-icons/sl";
 import { IronSession } from "iron-session";
 import { logout } from "@/app/lib/action";
+import { FiEdit } from "react-icons/fi";
 
 type Props = {
   session: IronSession<SessionData> | undefined
 }
 
 const Introduction = async ({ session }: Props) => {
+  const alternative = session?.userId ? session?.userId : "666b094dab43a459a391d327";
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/login/${alternative}`, { cache: "no-store" });
+  const { admin: { info } }: { admin: UserInfo } = await res.json();
+  console.log("Introduction:", info);
+
+  if(!res.ok) {
+    console.error("something went wrong");
+  }
+
   return (
     <section
       className="flex flex-col-reverse justify-center items-center md:flex-row md:justify-evenly mt-20 md:mt-24 relative px-5 md:mx-auto md:max-w-[1500px]"
     >
       <div className=" max-w-screen-lg md:w-1/2 flex flex-col gap-y-4 mt-16 ">
         <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-white transition-theme">
-          Hi, I&apos;m Patrick <p className="inline-block shake-effect">👋</p>
+          {info?.name} <p className="inline-block shake-effect">👋</p>
         </h1>
         <p className="dark:text-gray-300 transition-theme">
-          A front-end developer (React.js) who aspires to produce visually beautiful and responsive applications.
-          Working on  personal projects is my favorite way to put what I&apos;ve learned to enhance my skills,
-          and my goal is to reach the stage where I can eventually work as a full stack developer.
+          {info?.about}
         </p>
 
         <div className="flex items-center space-x-3">
           <RiMapPinLine size={24} />
-          <p className="dark:text-gray-300"> Caloocan, Philippines</p>
+          <p className="dark:text-gray-300">{info?.address}</p>
         </div>
         <div className="flex items-center space-x-3">
-          <div className=" w-3 h-3 rounded-full bg-green-500 animate-pulse" />
-          <p className="dark:text-gray-300">Available for new projects</p>
+          <div 
+            className=" w-3 h-3 rounded-full  animate-pulse" 
+            style={{ backgroundColor: info?.colorStatus }}
+          />
+          <p className="dark:text-gray-300">{info?.status}</p>
         </div>
 
         <div className="flex space-x-1 items-center my-6">
-          <Link href="https://github.com/pixcs" target="_blank">
+          <Link href={info?.githubUrl} target="_blank">
             <LuGithub size={38} className="px-2 p-1 hovered" />
           </Link>
 
-          <Link href="https://www.facebook.com/td.nano" target="_blank">
+          <Link href={info?.facebookUrl} target="_blank">
             <SlSocialFacebook size={38} className="px-2 py-1 hovered" />
           </Link>
+
+          {session?.isLoggedIn && session?.isAdmin && (
+            <Link href="edit-info">
+              <FiEdit
+                size={38}
+                className="px-2 py-1 hovered"
+              />
+            </Link>
+          )}
 
           {session?.isLoggedIn && (
             <form action={logout}>
@@ -58,7 +78,7 @@ const Introduction = async ({ session }: Props) => {
       <div className="container relative h-[250px] w-[200px] md:h-[300px] md:w-[250px]  md:max-w-xs px-3">
         <Link href={`${session?.isLoggedIn ? "/" : "login"}`}>
           <Image
-            src="https://avatars.githubusercontent.com/u/121350861?s=400&u=e183ab30fa88f3ff949d997fdb717e38593d367e&v=4"
+            src={info?.profileUrl}
             alt="profile-image"
             fill
             className="rounded-sm"

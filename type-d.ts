@@ -73,5 +73,22 @@ type GetInTouch = {
     createdAt: string
 }
 
+type AdminInfo = {
+    name: string,
+    about: string,
+    address: string,
+    colorStatus: string,
+    status: string,
+    githubUrl: string,
+    facebookUrl: string,
+    profileUrl: string,
+    resumeUrl: string
+}
+
+type UserInfo = {
+    info: AdminInfo,
+    _id: string
+}
+
 
 

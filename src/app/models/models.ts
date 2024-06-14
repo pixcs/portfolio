@@ -3,7 +3,8 @@ import mongoose, { Schema } from "mongoose";
 type AdminSchema = {
     username: string,
     password: string,
-    isAdmin: boolean
+    isAdmin: boolean,
+    info: AdminInfo
 }
 
 type WorkExpSchema = {
@@ -41,6 +42,35 @@ const adminSchema = new Schema<AdminSchema>({
     isAdmin: {
         type: Boolean,
         default: true
+    },
+    info: {
+        name: {
+            type: String
+        },
+        about: {
+            type: String
+        },
+        address: {
+            type: String
+        },
+        colorStatus: {
+            type: String
+        },
+        status: {
+            type: String
+        },
+        githubUrl: {
+            type: String
+        },
+        facebookUrl: {
+            type: String
+        },
+        profileUrl: {
+            type: String
+        },
+        resumeUrl: {
+            type: String
+        }
     }
 }, { timestamps: true })
 

@@ -16,7 +16,8 @@ type Props = {
     session: IronSession<SessionData> | undefined,
     listOfMessage: GetInTouch[],
     setListOfMessage: Dispatch<SetStateAction<GetInTouch[]>>,
-    setReRender: Dispatch<SetStateAction<boolean>>
+    setReRender: Dispatch<SetStateAction<boolean>>,
+    resumeUrl: string
 }
 
 const Drawer = ({
@@ -27,7 +28,8 @@ const Drawer = ({
     session,
     listOfMessage,
     setListOfMessage,
-    setReRender
+    setReRender,
+    resumeUrl
 }: Props) => {
     return (
         < div
@@ -84,7 +86,7 @@ const Drawer = ({
                 <div className="p-4">
                     <button className="w-full px-4 py-2 font-medium text-white bg-slate-900 rounded-xl hover:bg-gray-700 dark:hover:bg-slate-200 active:bg-slate-700 active:scale-95 dark:bg-white dark:text-slate-900 dark:active:bg-slate-200 transition-theme">
                         <Link
-                            href="https://drive.google.com/file/d/1J3eWiOOyvD6gTr622iMkQIC-JI7Vzevj/view?usp=sharing"
+                            href={resumeUrl}
                             target="_blank"
                         >
                             Download CV

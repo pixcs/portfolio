@@ -9,6 +9,7 @@ import {
 import { IoLogoCss3 } from "react-icons/io";
 import { RiNextjsFill, RiTailwindCssFill } from "react-icons/ri";
 import { IoLogoFirebase } from "react-icons/io5";
+import { GrGraphQl } from "react-icons/gr";
 
 const Skills = () => {
     const containerStyle = "flex flex-col justify-center items-center gap-y-2";
@@ -67,6 +68,10 @@ const Skills = () => {
                 <div className={containerStyle}>
                     <IoLogoFirebase size={80} className="text-amber-500 hover-scale" />
                     <p className={titleStyle}>Firebase</p>
+                </div>
+                <div className={containerStyle}>
+                    <GrGraphQl size={80} className="text-pink-500 hover-scale" />
+                    <p className={titleStyle}>GraphQL</p>
                 </div>
                 <div className={containerStyle}>
                     <FaGitAlt size={80} className="text-orange-600 hover-scale" />

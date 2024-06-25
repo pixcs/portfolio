@@ -1,5 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
+import ProfileImage from "@/app/components/about/profileImage/ProfileImage";
+
 
 const About = () => {
     return (
@@ -11,17 +12,7 @@ const About = () => {
                 About me
             </p>
             <div className="flex flex-col md:flex-row md:justify-between items-start gap-x-20 mt-10 px-5 md:px-20 md:mx-auto md:max-w-[1500px]">
-                <div className="container relative h-[300px] md:h-[500px] w-[250px]  md:w-1/2 lg:w-3/12 px-3 mx-auto justify-center">
-                    <Image
-                        src="/assets/images/pic.jpg"
-                        alt="profile-image"
-                        fill
-                        className="rounded-sm object-cover md:object-fill"
-                    />
-                    <div className="absolute top-12 -bottom-6 -left-6 md:-left-12 w-4 md:w-9   bg-gray-200 dark:bg-slate-700 transition-theme" />{/* left */}
-                    <div className="absolute -bottom-6 md:-bottom-12 -left-4 md:-left-12 h-4 md:h-9 right-12 bg-gray-200 dark:bg-slate-700 transition-theme" /> {/* bottom */}
-                </div>
-
+                <ProfileImage />
                 <div className="md:w-1/2">
                     <h2 className="text-xl md:text-3xl font-bold mb-5 mt-20 md:mt-0">Curious about me? Here you have it:</h2>
                     <p className="dark:text-gray-300">I&apos;m a passionate, self-proclaimed frontend developer who

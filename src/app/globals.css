@@ -107,5 +107,9 @@ body {}
   .desktop-height {
     height: calc(100vh - 72px);
   }
+
+  .my-sql {
+    color: rgb(0, 117, 143);
+  }
   
 }

@@ -87,12 +87,13 @@ const Navbar = ({
                             ) : (
                                 <IoNotificationsOutline
                                     className="cursor-pointer rounded-md p-2 hover:bg-gray-200 dark:hover:bg-slate-700/90 transition duration-300"
-                                    size={35}
+                                    size={35}                     
                                     onClick={() => setShowInbox(!showInbox)}
                                 />
                             )}
-                            <div className={`absolute  ${session?.isLoggedIn && session?.isAdmin ? " -bottom-auto" : "-bottom-48"} right-1/4 max-h-96 overflow-y-auto min-w-96 bg-white/80 p-3 dark:bg-slate-900/80 border border-gray-300 dark:border-slate-700 rounded-lg transition-all duration-100
-                            ${showInbox ? "visible opacity-100" : "invisible opacity-0"}`}>
+                            <div className={`absolute  ${session?.isLoggedIn && session?.isAdmin ? " -bottom-auto" : "-bottom-48"} right-1/4 max-h-96 overflow-y-auto min-w-96 bg-white/80 p-3 background-blur dark:bg-slate-900/80  border border-gray-300 dark:border-slate-700 rounded-lg transition-all duration-100 backdrop-blur
+                                ${showInbox ? "visible opacity-100" : "invisible opacity-0"}`}
+                            >
                                 <h1 className="font-medium text-gray-400 dark:text-white">Inbox</h1>
                                 {session?.isLoggedIn && session?.isAdmin ? (
                                     <>
@@ -118,8 +119,6 @@ const Navbar = ({
                                         </Link>
                                     </div>
                                 )}
-
-
                             </div>
                         </div>
                         <button className="px-4 py-2 font-medium text-white bg-slate-900 rounded-xl hover:bg-gray-700 dark:hover:bg-slate-200 active:bg-slate-700 active:scale-95 dark:bg-white dark:text-slate-900 dark:active:bg-slate-200 transition-theme">

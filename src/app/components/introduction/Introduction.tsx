@@ -8,6 +8,7 @@ import { SlSocialFacebook } from "react-icons/sl";
 import { IronSession } from "iron-session";
 import { logout } from "@/app/lib/action";
 import { FiEdit } from "react-icons/fi";
+import { GrLinkedinOption } from "react-icons/gr";
 
 type Props = {
   session: IronSession<SessionData> | undefined
@@ -54,6 +55,10 @@ const Introduction = async ({ session }: Props) => {
 
           <Link href={info?.facebookUrl} target="_blank">
             <SlSocialFacebook size={38} className="px-2 py-1 hovered" />
+          </Link>
+
+          <Link href="https://www.linkedin.com/in/john-patrick-papa-62a04a314/" target="_blank">
+            <GrLinkedinOption size={38} className="px-2 py-1 hovered" />
           </Link>
 
           {session?.isLoggedIn && session?.isAdmin && (

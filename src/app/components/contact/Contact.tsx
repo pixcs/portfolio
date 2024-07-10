@@ -7,6 +7,7 @@ import { SlSocialFacebook } from "react-icons/sl";
 import Link from "next/link";
 import { useState } from "react";
 import ContactForm from "@/app/components/form/contactForm/ContactForm"
+import { GrLinkedinOption } from "react-icons/gr";
 
 const Contact = () => {
     const [emailCopied, setEmailCopied] = useState(false);
@@ -93,6 +94,9 @@ const Contact = () => {
                         </Link>
                         <Link href="https://www.facebook.com/td.nano" target="_blank">
                             <SlSocialFacebook size={40} className=" hovered p-2" />
+                        </Link>
+                        <Link href="https://www.linkedin.com/in/john-patrick-papa-62a04a314/" target="_blank">
+                            <GrLinkedinOption size={38} className="px-2 py-1 hovered" />
                         </Link>
                     </div>
                 </div>

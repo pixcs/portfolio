@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <link rel="icon" href="https://avatars.githubusercontent.com/u/121350861?s=400&u=e183ab30fa88f3ff949d997fdb717e38593d367e&v=4" />
-      <body className={`${inter.className} text-gray-600  dark:text-white dark:bg-slate-950 transition-theme`}>
+      <body className={`${inter.className} text-gray-600 dark:text-white dark:bg-slate-950 transition-theme`}>
         {children}
       </body>
     </html>

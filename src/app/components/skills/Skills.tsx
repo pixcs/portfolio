@@ -10,6 +10,7 @@ import { IoLogoCss3 } from "react-icons/io";
 import { RiNextjsFill, RiTailwindCssFill } from "react-icons/ri";
 import { IoLogoFirebase } from "react-icons/io5";
 import { GrGraphQl, GrMysql } from "react-icons/gr";
+import { FaPhp } from "react-icons/fa6";
 
 const Skills = () => {
     const containerStyle = "flex flex-col justify-center items-center gap-y-2";
@@ -80,6 +81,10 @@ const Skills = () => {
                 <div className={containerStyle}>
                     <GrMysql size={80} className="my-sql dark:text-blue-400 hover-scale" />
                     <p className={titleStyle}>MySQL</p>
+                </div>
+                <div className={containerStyle}>
+                    <FaPhp size={80} className=" text-indigo-500 dark:text-indigo-400  hover-scale" />
+                    <p className={titleStyle}>PHP</p>
                 </div>
             </div>
         </section>

@@ -101,6 +101,19 @@ body {}
     @apply overflow-y-hidden
   }
 
+  .circle {
+    height: 24px;
+    width: 24px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,165,0,1) 0%, rgba(255,69,0,1) 60%, rgba(0,0,0,0) 100%);
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    box-shadow: 0 0 10px rgba(255,165,0,0.7), 0 0 20px rgba(255,69,0,0.5), 0 0 30px rgba(255,0,0,0.3);
+    transition: transform 0.1s ease, opacity 0.1s ease, background-color 0.1s ease;
+  }
+
   .mobile-height {
     height: calc(100vh - 88px);
   }

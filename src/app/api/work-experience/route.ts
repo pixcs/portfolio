@@ -27,7 +27,7 @@ export const POST = async (request: Request) => {
 
 export const GET = async () => {
     await connectToDB();
-    const list_of_experience: WorkExperience[] = await WorkExperience.find();
+    const list_of_experience: WorkExperience[] = await WorkExperience.find().sort({ createdAt: -1 });
 
     return NextResponse.json({ list_of_experience });
 }

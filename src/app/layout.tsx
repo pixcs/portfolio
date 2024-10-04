@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "John Patrick Papa | Front End Developer",
-  description: "Portfolio of John Patrick Papa, front end developer",
+  title: "John Patrick Papa | Web Developer",
+  description: "Portfolio of John Patrick Papa, Web developer",
   icons: "https://i.pinimg.com/564x/99/96/c8/9996c806c207dbc3028038d54c72420d.jpg"
 };
 

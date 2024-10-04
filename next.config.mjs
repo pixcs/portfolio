@@ -14,6 +14,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: "i.pinimg.com"
       },
+      {
+        protocol: 'https',
+        hostname: "acacia-soft.com"
+      },
     ]
   }
 };

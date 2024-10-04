@@ -9,7 +9,7 @@ const ProfileImage = () => {
     return (
         <div className="container relative h-[300px] md:h-[500px] w-[250px]  md:w-1/2 lg:w-3/12 px-3 mx-auto justify-center">
             <Image
-                src={`/assets/images/pic.jpg`}
+                src={`/assets/images/toga.jpg`}
                 alt="profile-image"
                 fill
                 className={`rounded-sm object-cover md:object-fill transition-all duration-300 ${hover ? "opacity-0 scale-95 translate-y-10" : " opacity-100"} transition-all duration-700`}
@@ -17,10 +17,10 @@ const ProfileImage = () => {
                 onMouseLeave={() => setHover(false)}
             />
             <Image
-                src={`/assets/images/grad.jpg`}
+                src={`/assets/images/barong.jpg`}
                 alt="profile-image"
                 fill
-                className={`rounded-sm object-cover md:object-fill transition-all duration-300 ${hover ? "opacity-100" : " opacity-0 scale-95 translate-y-10"} transition-all duration-700`}
+                className={`rounded-sm object-cover md:object-fill transition-all duration-300 ${hover ? "opacity-100" : " opacity-0 scale-95 translate-y-10"} transition-all  duration-700`}
                 onMouseEnter={() => setHover(true)}
                 onMouseLeave={() => setHover(false)}
             />

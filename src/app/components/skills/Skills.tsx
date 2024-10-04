@@ -1,21 +1,28 @@
 import { IoLogoJavascript } from "react-icons/io5";
-import { SiTypescript, SiMongodb } from "react-icons/si";
+import { 
+    SiTypescript, 
+    SiMongodb, 
+    SiJquery, 
+} from "react-icons/si";
 import {
     FaHtml5,
     FaReact,
     FaJava,
-    FaGitAlt
+    FaGitAlt,
+    FaLaravel,
+    FaUbuntu 
 } from "react-icons/fa";
 import { IoLogoCss3 } from "react-icons/io";
 import { RiNextjsFill, RiTailwindCssFill } from "react-icons/ri";
 import { IoLogoFirebase } from "react-icons/io5";
 import { GrGraphQl, GrMysql } from "react-icons/gr";
-import { FaPhp } from "react-icons/fa6";
+import { FaPhp, FaVuejs } from "react-icons/fa6";
 
 const Skills = () => {
     const containerStyle = "flex flex-col justify-center items-center gap-y-2";
     const titleStyle = "dark:text-gray-300 font-semibold";
 
+    //Static For Now
     return (
         <section className="py-20 fade-in-effect">
             <p className='text-sm text-center font-medium px-2 py-1 mt-5 rounded-full bg-gray-200 max-w-[150px] mx-auto dark:bg-slate-700 transition-theme'>
@@ -86,6 +93,23 @@ const Skills = () => {
                     <FaPhp size={80} className=" text-indigo-500 dark:text-indigo-400  hover-scale" />
                     <p className={titleStyle}>PHP</p>
                 </div>
+                <div className={containerStyle}>
+                    <FaVuejs size={80} className=" text-green-500 hover-scale" />
+                    <p className={titleStyle}>Vue</p>
+                </div>
+                <div className={containerStyle}>
+                    <FaUbuntu size={80} className=" text-orange-500  hover-scale" />
+                    <p className={titleStyle}>Ubuntu</p>
+                </div>
+                <div className={containerStyle}>
+                    <FaLaravel size={80} className=" text-red-500 dark:text-rose-600  hover-scale" />
+                    <p className={titleStyle}>Laravel</p>
+                </div>
+                <div className={containerStyle}>
+                    <SiJquery size={80} className=" text-blue-500 dark:text-sky-600  hover-scale" />
+                    <p className={titleStyle}>JQuery</p>
+                </div>
+             
             </div>
         </section>
     )

@@ -74,8 +74,7 @@ const About = () => {
         <ProfileImage />
         <div className="md:w-1/2">
           <h2 className="text-xl md:text-3xl font-bold mb-5 mt-20 md:mt-0">Curious about me? Here you have it:</h2>
-          <p className="dark:text-gray-300">I&apos;m a passionate, self-proclaimed frontend developer who
-            specialized in front end  development (React.js). I am very enthusiatic about bringing the technical and visual aspects
+          <p className="dark:text-gray-300">I&apos;m a passionate, self-proclaimed web developer I am very enthusiatic about bringing the technical and visual aspects
             of digital product to life. User experience, and writing clear, readable, highly performant code matters to me.
           </p>
           <br />
@@ -101,7 +100,7 @@ const About = () => {
           <ul className="list-disc ml-5 grid  md:grid-cols-2 leading-7 md:leading-10 dark:text-gray-300">
             <li>B.S. in Computer Science</li>
             <li>Avid Learner</li>
-            <li>Aspiring full stack developer</li>
+            <li>Aspiring to be a great developer.</li>
           </ul>
         </div>
       </div>

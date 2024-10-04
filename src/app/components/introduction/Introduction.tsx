@@ -86,7 +86,7 @@ const Introduction = async ({ session }: Props) => {
             src={info?.profileUrl}
             alt="profile-image"
             fill
-            className="rounded-sm"
+            className="rounded-sm object-cover"
           />
         </Link>
         <div className="absolute top-6 md:top-12 -right-6 md:-right-11 w-4 md:w-9 min-h-full  bg-gray-200 dark:bg-slate-700 transition-theme" />{/* right */}

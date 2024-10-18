@@ -74,7 +74,7 @@ const About = () => {
         <ProfileImage />
         <div className="md:w-1/2">
           <h2 className="text-xl md:text-3xl font-bold mb-5 mt-20 md:mt-0">Curious about me? Here you have it:</h2>
-          <p className="dark:text-gray-300">I&apos;m a passionate, self-proclaimed web developer I am very enthusiatic about bringing the technical and visual aspects
+          <p className="dark:text-gray-300">I&apos;m a passionate software developer, I am very enthusiatic about bringing the technical and visual aspects
             of digital product to life. User experience, and writing clear, readable, highly performant code matters to me.
           </p>
           <br />

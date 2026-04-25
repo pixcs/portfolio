@@ -30,7 +30,7 @@ const Introduction = async ({ session }: Props) => {
     >
       <div className=" max-w-screen-lg md:w-1/2 flex flex-col gap-y-4 mt-16 ">
         <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-white transition-theme">
-          {info?.name} <p className="inline-block shake-effect">👋</p>
+          {info?.name} <p className="inline-block shake-effect">💡</p>
         </h1>
         <p className="dark:text-gray-300 transition-theme">
           {info?.about}

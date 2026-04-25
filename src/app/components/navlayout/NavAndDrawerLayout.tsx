@@ -62,7 +62,6 @@ const NavAndDrawerLayout = ({ session }: Props) => {
                 throw new Error("Error: failed to fetch messages");
             }
             setListOfMessage(messages);
-            //console.log("result messages:", messages);
 
         } catch (err) {
             if (err instanceof Error) {

@@ -20,7 +20,6 @@ export const POST = async (request: Request) => {
     }
 
     const result = await newWorkExperience.save();
-    console.log("result:", result);
 
     return NextResponse.json({ success: "Created successfully" })
 }

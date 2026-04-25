@@ -1,14 +1,14 @@
 "use client";
 
 import Link from 'next/link';
-import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
+import React, { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
 import { LuGithub } from 'react-icons/lu';
 import { RiMapPinLine, RiCheckLine } from 'react-icons/ri';
 import { SlSocialFacebook } from 'react-icons/sl';
 import Image from "next/image";
 import { IoMdArrowRoundBack } from 'react-icons/io';
-import { CgProfile } from "react-icons/cg";
-import { IronSession } from 'iron-session';
+import { LuUpload, LuX, LuLoader } from 'react-icons/lu';
+import type { ClientSession } from "@/app/models/models";
 
 type FormAdminInfo = {
     name: string;
@@ -23,11 +23,10 @@ type FormAdminInfo = {
 };
 
 type Props = {
-    session: IronSession<SessionData>;
+    session: ClientSession;
     info: AdminInfo;
 };
 
-/* ─── reusable field wrapper ─── */
 const Field = ({ label, children }: { label?: string; children: React.ReactNode }) => (
     <div className="flex flex-col gap-1.5">
         {label && (
@@ -42,10 +41,195 @@ const Field = ({ label, children }: { label?: string; children: React.ReactNode 
 const inputCls =
     "w-full px-3.5 py-2.5 rounded-lg text-sm bg-gray-50 dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-500 outline-none focus:border-slate-500 dark:focus:border-slate-500 focus:ring-2 focus:ring-slate-500/20 transition duration-200";
 
+const FALLBACK = "https://i.pinimg.com/564x/dd/af/0f/ddaf0f3a57413545d2c2b23568328b17.jpg";
+
+/* ─── Profile Image Uploader ─── */
+const ProfileUploader = ({
+    currentUrl,
+    onUploadSuccess,
+}: {
+    currentUrl: string;
+    onUploadSuccess: (url: string) => void;
+}) => {
+    const inputRef = useRef<HTMLInputElement>(null);
+    const [preview, setPreview] = useState<string | null>(null);
+    const [uploading, setUploading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [isDragging, setIsDragging] = useState(false);
+
+    const handleFile = async (file: File) => {
+        setError(null);
+
+        const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+        if (!allowedTypes.includes(file.type)) {
+            setError("Only JPEG, PNG, WEBP, or GIF files are allowed.");
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            setError("File must be under 5 MB.");
+            return;
+        }
+
+        // Show local preview immediately
+        const reader = new FileReader();
+        reader.onload = (e) => setPreview(e.target?.result as string);
+        reader.readAsDataURL(file);
+
+        // Upload immediately — pass currentUrl so server can delete the old blob
+        setUploading(true);
+        try {
+            const body = new FormData();
+            body.append("file", file);
+            if (currentUrl) {
+                // FIXED: Matched the key 'oldPathname' from your API route
+                body.append("oldPathname", currentUrl);
+            }
+
+            const res = await fetch("/api/upload-profile", { method: "POST", body });
+            // FIXED: Matched the response format from your API route ('url' instead of 'filename')
+            const data: { url?: string; pathname?: string; error?: string } = await res.json();
+
+            if (!res.ok || !data.url) {
+                setError(data.error ?? "Upload failed.");
+                setPreview(null);
+                return;
+            }
+
+            // data.url is now the full Vercel Blob URL returned by your backend
+            onUploadSuccess(data.url);
+        } catch {
+            setError("Upload failed. Please try again.");
+            setPreview(null);
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) handleFile(file);
+        e.target.value = "";
+    };
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        setIsDragging(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file) handleFile(file);
+    };
+
+    // preview (local base64) takes priority, then the stored Vercel Blob URL
+    const resolvedSrc = preview ?? (currentUrl || null);
+
+    const clearPreview = () => {
+        setPreview(null);
+        setError(null);
+    };
+
+    return (
+        <div className="flex flex-col gap-2">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-500 dark:text-slate-500">
+                Profile Image
+            </span>
+
+            <div
+                role="button"
+                tabIndex={0}
+                onClick={() => inputRef.current?.click()}
+                onKeyDown={(e) => e.key === "Enter" && inputRef.current?.click()}
+                onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={handleDrop}
+                className={`relative group cursor-pointer rounded-xl border-2 border-dashed transition-all duration-200 overflow-hidden
+                    ${isDragging
+                        ? "border-slate-400 dark:border-slate-400 bg-slate-100 dark:bg-slate-800"
+                        : "border-gray-300 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/40 hover:border-slate-400 dark:hover:border-slate-500 hover:bg-gray-100 dark:hover:bg-slate-800/70"
+                    }`}
+                style={{ minHeight: "96px" }}
+            >
+                {resolvedSrc ? (
+                    <div className="relative w-full h-40">
+                        <Image
+                            src={resolvedSrc}
+                            alt="Profile preview"
+                            fill
+                            className="object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-200 flex items-center justify-center">
+                            <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1.5 text-white text-xs font-medium">
+                                <LuUpload size={13} />
+                                Change photo
+                            </span>
+                        </div>
+                        {preview && (
+                            <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); clearPreview(); }}
+                                className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-colors duration-150 z-10"
+                            >
+                                <LuX size={11} />
+                            </button>
+                        )}
+                    </div>
+                ) : (
+                    <div className="flex flex-col items-center justify-center gap-2 py-7 px-4 text-center">
+                        {uploading ? (
+                            <LuLoader size={22} className="text-slate-400 dark:text-slate-500 animate-spin" />
+                        ) : (
+                            <>
+                                <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 flex items-center justify-center">
+                                    <LuUpload size={17} className="text-gray-400 dark:text-slate-500" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium text-gray-700 dark:text-slate-300">
+                                        Click or drag to upload
+                                    </p>
+                                    <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
+                                        JPEG, PNG, WEBP, GIF · max 5 MB
+                                    </p>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                )}
+
+                {uploading && resolvedSrc && (
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                        <LuLoader size={22} className="text-white animate-spin" />
+                    </div>
+                )}
+            </div>
+
+            <input
+                ref={inputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                className="hidden"
+                onChange={handleInputChange}
+            />
+
+            {error && (
+                <p className="text-xs text-red-500 dark:text-red-400 flex items-center gap-1">
+                    <LuX size={11} />
+                    {error}
+                </p>
+            )}
+        </div>
+    );
+};
+
+/* ─── Main form ─── */
 const EditInfoForm = ({ session, info }: Props) => {
     const [formData, setFormData] = useState<FormAdminInfo>({
-        name: "", about: "", address: "", colorStatus: "",
-        status: "", githubUrl: "", facebookUrl: "", profileUrl: "", resumeUrl: "",
+        name: "",
+        about: "",
+        address: "",
+        colorStatus: "",
+        status: "",
+        githubUrl: "",
+        facebookUrl: "",
+        profileUrl: "",
+        resumeUrl: "",
     });
     const [notifStatus, setNotifStatus] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -58,12 +242,17 @@ const EditInfoForm = ({ session, info }: Props) => {
 
     useEffect(() => {
         setFormData({
-            name: info?.name, about: info?.about, address: info?.address,
-            colorStatus: info?.colorStatus, status: info?.status,
-            githubUrl: info?.githubUrl, facebookUrl: info?.facebookUrl,
-            profileUrl: info?.profileUrl, resumeUrl: info?.resumeUrl,
+            name: info?.name || "",
+            about: info?.about || "",
+            address: info?.address || "",
+            colorStatus: info?.colorStatus || "",
+            status: info?.status || "",
+            githubUrl: info?.githubUrl || "",
+            facebookUrl: info?.facebookUrl || "",
+            profileUrl: info?.profileUrl || "",
+            resumeUrl: info?.resumeUrl || "",
         });
-    }, [session]);
+    }, [session, info]);
 
     const handleUpdateInfo = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -85,6 +274,9 @@ const EditInfoForm = ({ session, info }: Props) => {
             setTimeout(() => setNotifStatus(""), 2500);
         }
     };
+
+    // profileUrl is always a full Vercel Blob URL now
+    const previewSrc = profileUrl || FALLBACK;
 
     return (
         <section className="min-h-screen bg-gray-100 dark:bg-slate-950 px-4 py-8 md:px-8">
@@ -108,13 +300,12 @@ const EditInfoForm = ({ session, info }: Props) => {
                     <h1 className="text-lg font-bold tracking-tight text-gray-800 dark:text-slate-100">
                         Admin Info
                     </h1>
-                    <div className="w-20" />{/* spacer */}
+                    <div className="w-20" />
                 </div>
 
                 {/* Card */}
                 <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-gray-200/60 dark:border-slate-700/50 shadow-xl shadow-gray-200/40 dark:shadow-slate-950/60 overflow-hidden">
 
-                    {/* Top accent */}
                     <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-400/50 dark:via-slate-500/50 to-transparent" />
 
                     <form onSubmit={handleUpdateInfo} className="flex flex-col md:flex-row gap-0">
@@ -139,13 +330,18 @@ const EditInfoForm = ({ session, info }: Props) => {
 
                             <Field label="Status">
                                 <div className="flex items-center gap-3">
-                                    <div className="relative">
-                                        <input type="color" name="colorStatus" value={colorStatus} onChange={handleChange}
-                                            className="w-10 h-10 rounded-lg border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/60 cursor-pointer outline-none p-0.5" />
-                                    </div>
+                                    <input type="color" name="colorStatus" value={colorStatus} onChange={handleChange}
+                                        className="w-10 h-10 rounded-lg border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/60 cursor-pointer outline-none p-0.5" />
                                     <input type="text" name="status" value={status} onChange={handleChange} className={`${inputCls} flex-1`} placeholder="e.g. Available for work" />
                                 </div>
                             </Field>
+
+                            <ProfileUploader
+                                currentUrl={profileUrl}
+                                onUploadSuccess={(url) =>
+                                    setFormData(prev => ({ ...prev, profileUrl: url }))
+                                }
+                            />
 
                             {/* Social links */}
                             <div className="flex flex-col gap-3 pt-1">
@@ -154,14 +350,12 @@ const EditInfoForm = ({ session, info }: Props) => {
                                 {[
                                     { icon: <LuGithub size={15} />, name: "githubUrl", value: githubUrl, href: githubUrl, placeholder: "https://github.com/…" },
                                     { icon: <SlSocialFacebook size={15} />, name: "facebookUrl", value: facebookUrl, href: facebookUrl, placeholder: "https://facebook.com/…" },
-                                    { icon: <CgProfile size={15} />, name: "profileUrl", value: profileUrl, href: null, placeholder: "Profile image URL" },
                                 ].map(({ icon, name: n, value, href, placeholder }) => (
                                     <div key={n} className="flex items-center gap-2">
                                         <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 flex items-center justify-center text-gray-500 dark:text-slate-400">
-                                            {href
-                                                ? <Link href={href || "#"} target="_blank" className="flex items-center justify-center w-full h-full hovered rounded-lg">{icon}</Link>
-                                                : icon
-                                            }
+                                            <Link href={href || "#"} target="_blank" className="flex items-center justify-center w-full h-full hovered rounded-lg">
+                                                {icon}
+                                            </Link>
                                         </div>
                                         <input type="text" name={n} value={value} onChange={handleChange} className={`${inputCls} flex-1`} placeholder={placeholder} />
                                     </div>
@@ -172,7 +366,6 @@ const EditInfoForm = ({ session, info }: Props) => {
                                 </Field>
                             </div>
 
-                            {/* Save */}
                             <button
                                 type="submit"
                                 disabled={isLoading}
@@ -198,20 +391,17 @@ const EditInfoForm = ({ session, info }: Props) => {
                                 Preview
                             </span>
 
-                            {/* Profile image frame */}
                             <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 shadow-lg shadow-slate-900/20 bg-gray-100 dark:bg-slate-800">
                                 <Image
-                                    src={profileUrl || "https://i.pinimg.com/564x/dd/af/0f/ddaf0f3a57413545d2c2b23568328b17.jpg"}
+                                    src={previewSrc}
                                     alt="profile"
                                     fill
                                     className="object-cover"
                                 />
-                                {/* Decorative corner accents */}
                                 <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-slate-400/40 dark:border-slate-500/40 rounded-tr-xl" />
                                 <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-slate-400/40 dark:border-slate-500/40 rounded-bl-xl" />
                             </div>
 
-                            {/* Live preview snippet */}
                             <div className="w-full rounded-lg bg-gray-50 dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700 p-3.5 flex flex-col gap-2">
                                 <p className="text-sm font-semibold text-gray-800 dark:text-slate-100 truncate">{name || "—"}</p>
                                 <div className="flex items-center gap-1.5">
@@ -229,7 +419,6 @@ const EditInfoForm = ({ session, info }: Props) => {
 
                     </form>
 
-                    {/* Bottom accent */}
                     <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-400/40 dark:via-slate-600/40 to-transparent" />
                 </div>
             </div>

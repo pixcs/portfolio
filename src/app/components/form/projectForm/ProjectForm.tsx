@@ -84,7 +84,6 @@ const ProjectForm = ({
 
             formReset();
             router.refresh();
-            console.log(data);
 
         } catch (err) {
             if (err instanceof Error) {
@@ -113,7 +112,6 @@ const ProjectForm = ({
 
             formReset();
             router.refresh();
-            console.log("result", result);
 
         } catch (err) {
             if (err instanceof Error) {

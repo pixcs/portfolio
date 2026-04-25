@@ -9,10 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@vercel/blob": "^2.3.3",
     "iron-session": "^8.0.1",
     "mongoose": "^8.4.0",
     "next": "14.2.3",
     "next-themes": "^0.3.0",
+    "nextjs-toploader": "^3.9.17",
     "react": "^18",
     "react-dom": "^18",
     "react-icons": "^5.2.1"

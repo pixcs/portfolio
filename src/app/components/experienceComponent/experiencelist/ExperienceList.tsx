@@ -35,7 +35,6 @@ const ExperienceList = ({
 
             router.refresh();
             const data: { success: string } | { error: string } = await res.json();
-            console.log(data);
 
         } catch (err) {
             if (err instanceof Error) {

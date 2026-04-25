@@ -7,7 +7,6 @@ import { IoIosClose } from "react-icons/io";
 import { MdOutlineLightMode, MdOutlineDarkMode, MdOutlineAdminPanelSettings } from "react-icons/md";
 import MessageList from "../messageList/MessageList";
 
-
 type Props = {
     darkMode: boolean,
     setDarkMode: Dispatch<SetStateAction<boolean>>,

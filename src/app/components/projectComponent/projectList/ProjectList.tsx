@@ -35,7 +35,6 @@ const ProjectList = ({
             }
 
             router.refresh();
-            //console.log("result:", result);
 
         } catch (err) {
             if (err instanceof Error) {

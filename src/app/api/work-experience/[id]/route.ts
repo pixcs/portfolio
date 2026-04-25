@@ -28,7 +28,5 @@ export const PUT = async (request: Request, { params: { id } }: Params) => {
         }
     })
 
-    console.log(experience);
-
     return NextResponse.json({  success: "Updated successfully." });
 }

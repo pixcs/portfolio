@@ -1,6 +1,5 @@
 import { SessionOptions } from "iron-session";
 
-
 export const sessionOptions: SessionOptions = {
     password: process.env.SESSION_COOKIES_PASS as string,
     cookieName: "admin-session",

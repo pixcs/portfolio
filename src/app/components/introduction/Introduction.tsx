@@ -18,7 +18,6 @@ const Introduction = async ({ session }: Props) => {
   const alternative = session?.userId ? session?.userId : "666b094dab43a459a391d327";
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/login/${alternative}`, { cache: "no-store" });
   const { admin: { info } }: { admin: UserInfo } = await res.json();
-  console.log("Introduction:", info);
 
   if(!res.ok) {
     console.error("something went wrong");
@@ -82,12 +81,16 @@ const Introduction = async ({ session }: Props) => {
 
       <div className="container relative h-[250px] w-[200px] md:h-[300px] md:w-[250px]  md:max-w-xs px-3">
         <Link href={`${session?.isLoggedIn ? "/" : "login"}`}>
-          <Image
-            src={info?.profileUrl}
+       <Image
+            src={
+                info?.profileUrl?.startsWith("http")
+                    ? info.profileUrl
+                    : `/assets/images/profile/${info?.profileUrl}`
+            }
             alt="profile-image"
             fill
             className="rounded-sm object-cover"
-          />
+        />
         </Link>
         <div className="absolute top-6 md:top-12 -right-6 md:-right-11 w-4 md:w-9 min-h-full  bg-gray-200 dark:bg-slate-700 transition-theme" />{/* right */}
         <div className="absolute -bottom-6 md:-bottom-12 -right-4 md:-right-8 h-4 md:h-9 left-12 bg-gray-200 dark:bg-slate-700 transition-theme" /> {/* bottom */}

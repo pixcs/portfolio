@@ -82,11 +82,9 @@ const ExperienceForm = ({
                 }
                 return
             }
-
             setError(null);
             formReset();
             router.refresh();
-            console.log("received", data);
 
         } catch (err) {
             if (err instanceof Error) {
@@ -113,7 +111,6 @@ const ExperienceForm = ({
             }
 
             const data = await res.json();
-            console.log("result:", data);
             formReset();
             router.refresh();
 

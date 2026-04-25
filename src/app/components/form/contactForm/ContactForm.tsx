@@ -57,8 +57,7 @@ const ContactForm = ({ status, setStatus }: Props) => {
                     setStatus(data.error);
                 }
             }
-
-            console.log("result:", data);
+            
             setFormData({
                 name: "",
                 email: "",

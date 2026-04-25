@@ -7,6 +7,17 @@ type AdminSchema = {
     info: AdminInfo
 }
 
+type AboutContentSchema = {
+    heading: string;
+    intro: string;
+    journey: string;
+    hobbies: string;
+    quickFacts: string[];
+    facebookUrl: string;
+    githubUrl: string;
+    profileImage: string;
+}
+
 type WorkExpSchema = {
     companyName: string,
     companyLogo: string,
@@ -23,6 +34,14 @@ type ProjectSchema = {
     description: string,
     toolsAndTech: string[]
 }
+
+export type ClientSession = {
+  isLoggedIn: boolean;
+  userId?: string;
+  username?: string;
+  isAdmin: boolean;
+};
+
 
 const adminSchema = new Schema<AdminSchema>({
     username: {
@@ -73,6 +92,51 @@ const adminSchema = new Schema<AdminSchema>({
         }
     }
 }, { timestamps: true })
+
+const aboutContentSchema = new Schema<AboutContentSchema>(
+    {
+        heading: {
+        type: String,
+        required: true,
+        },
+
+        intro: {
+        type: String,
+        required: true,
+        },
+
+        journey: {
+        type: String,
+        required: true,
+        },
+
+        hobbies: {
+        type: String,
+        required: true,
+        },
+
+        quickFacts: {
+        type: [String],
+        required: true,
+        },
+
+        facebookUrl: {
+        type: String,
+        required: true,
+        },
+
+        githubUrl: {
+        type: String,
+        required: true,
+        },
+
+        profileImage: {
+        type: String,
+        required: true,
+        },
+    },
+    { timestamps: true }
+);
 
 const workExperience = new Schema<WorkExpSchema>({
     companyName: {
@@ -139,6 +203,7 @@ const getInTouch = new Schema<GetInTouch>({
 }, { timestamps: true })
 
 export const AdminModel = mongoose.models.Admin || mongoose.model("Admin", adminSchema);
+export const AboutMeModel = mongoose.models.AboutMe || mongoose.model("AboutMe", aboutContentSchema);
 export const WorkExperience = mongoose.models.WorkExp || mongoose.model("WorkExp", workExperience);
 export const ProjectModel = mongoose.models.Project || mongoose.model("Project", projectSchema);
 export const GetInTouchModel = mongoose.models.GetInTouch || mongoose.model("GetInTouch", getInTouch);

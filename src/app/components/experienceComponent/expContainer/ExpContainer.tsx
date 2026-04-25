@@ -21,7 +21,6 @@ const ExpContainer = ({ listOfExperience }: Props) => {
     const [tasks, setTasks] = useState<string[]>([]);
     const [selectEditWorkExp, setselectEditWorkExp] = useState<WorkExperience | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    //console.log("select edit work exp:", selectEditWorkExp);
 
     const editGetWorkExperience = async (id: string): Promise<void> => {
         setIsLoading(true);
@@ -33,7 +32,6 @@ const ExpContainer = ({ listOfExperience }: Props) => {
             }
 
             const { experience }: { experience: WorkExperience } = await res.json();
-            //console.log("Edit get work experience:", experience);
             setselectEditWorkExp(experience);
 
         } catch (err) {
@@ -60,7 +58,6 @@ const ExpContainer = ({ listOfExperience }: Props) => {
 
     useEffect(() => {
         if (selectEditWorkExp) {
-            //console.log("selectEditworkexp is truthy", selectEditWorkExp);
             setFormData(() => ({
                 companyName: selectEditWorkExp.companyName,
                 companyLogo: selectEditWorkExp.companyLogo,

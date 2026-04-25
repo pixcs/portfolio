@@ -7,11 +7,9 @@ export const POST = async (request: Request) => {
     const { username, password } = await request.json();
 
     const session = await getSession();
-    console.log("API SESSION:", session);
     await connectToDB();
 
     const user: Admin | null = await AdminModel.findOne({ username: username })
-    console.log(user);
 
     if (!user) {
         return NextResponse.json({ error: "Could not find the user" }, { status: 404 })
@@ -26,7 +24,6 @@ export const POST = async (request: Request) => {
         session.username = user?.username;
         session.isAdmin = user?.isAdmin;
         session.isLoggedIn = true;
-        console.log("Session:", session);
         
         await session.save();
     }

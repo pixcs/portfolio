@@ -1,3 +1,5 @@
+declare module "*.css";
+
 interface SessionData {
     userId?: string;
     username?: string;

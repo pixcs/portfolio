@@ -31,7 +31,6 @@ const MessageList = ({
             if (!res.ok) {
                 throw new Error("Error: failed to delete message inbox");
             }
-            //console.log("result:", success, "messages:", messages);
             setListOfMessage(messages);
             setReRender(true);
 

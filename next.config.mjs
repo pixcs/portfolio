@@ -18,6 +18,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: "acacia-soft.com"
       },
+      {
+        protocol: "https",
+        hostname: "**.public.blob.vercel-storage.com",
+      },
     ]
   }
 };

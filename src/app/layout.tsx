@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import NextTopLoader from "nextjs-toploader";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -18,8 +19,17 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <link rel="icon" href="https://avatars.githubusercontent.com/u/121350861?s=400&u=e183ab30fa88f3ff949d997fdb717e38593d367e&v=4" />
-      <body className={`${inter.className} text-gray-600 dark:text-white dark:bg-slate-950 transition-theme`}>
+      <body
+        className={`${inter.className} text-gray-600 dark:text-white dark:bg-slate-950 transition-theme`}
+      >
+        <NextTopLoader
+          color="linear-gradient(to right,#06b6d4,#3b82f6)"
+          height={3}
+          showSpinner={false}
+          crawl={true}
+          easing="ease"
+          speed={200}
+        />
         {children}
       </body>
     </html>

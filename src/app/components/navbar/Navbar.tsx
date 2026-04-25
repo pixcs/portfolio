@@ -43,7 +43,6 @@ const Navbar = ({
     setShowInbox,
     resumeUrl
 }: Props) => {
-    //console.log("list of message:", listOfMessage);
 
     return (
         <header>

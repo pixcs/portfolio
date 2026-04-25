@@ -20,9 +20,6 @@ const ProjectContainer = ({ projects }: Props) => {
     const [toolsAndTech, setToolsAndTech] = useState<string[]>([]);
     const [selectEditProject, setSelectEditProject] = useState<Project | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    //console.log("Project form:", formData);
-    //console.log(toolsAndTech);
-    //console.log("select edit project", selectEditProject);
 
     const getEditProject = async (id: string): Promise<void> => {
         setIsLoading(true);
@@ -32,9 +29,7 @@ const ProjectContainer = ({ projects }: Props) => {
             if (!res.ok) {
                 throw new Error(res.statusText);
             }
-
             const { project }: { project: Project } = await res.json();
-            //console.log("Edit get project", project);
             setSelectEditProject(project);
 
         } catch (err) {

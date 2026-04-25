@@ -73,34 +73,37 @@ const About = () => {
       <div className="flex flex-col md:flex-row md:justify-between items-start gap-x-20 mt-10 px-5 md:px-20 md:mx-auto md:max-w-[1500px]">
         <ProfileImage />
         <div className="md:w-1/2">
-          <h2 className="text-xl md:text-3xl font-bold mb-5 mt-20 md:mt-0">Curious about me? Here you have it:</h2>
-          <p className="dark:text-gray-300">I&apos;m a passionate software developer, I am very enthusiatic about bringing the technical and visual aspects
-            of digital product to life. User experience, and writing clear, readable, highly performant code matters to me.
+          <h2 className="text-xl md:text-3xl font-bold mb-5 mt-20 md:mt-0">A little bit about me:</h2>
+          <p className="dark:text-gray-300">
+            I&apos;m a software developer with a strong focus on bridging the gap between technical functionality and thoughtful visual design.
+            I care deeply about crafting intuitive user experiences, writing clean and maintainable code, and building digital products that perform at a high level.
           </p>
           <br />
           <p className="dark:text-gray-300">
-            I began my curiosity about programming when I was in my 2nd year in college in 2022. During that time, I have basic knowledge about
-            programming and writing java code on terminal was my focus. After learning about GUIs (Graphical User Interfaces), that&apos;s where I enjoyed
-            programming and built my very first interactive solo project as a challenge to myself. After that, I decided to learn web development from the start to expand my knowledge. Since then, I&apos;ve
-            continued to grow and evolve as an aspiring developer, taking on new challenges and learning the latest technologies along the way. Now,
-            I&apos;m building cutting edge web applications, mostly for my personal projects using modern technologies such as Next.js, TypeScript, Tailwind CSS, Firebase, and much more.
+            My journey into programming began in 2022 during my second year of college. Starting with the fundamentals and writing Java on the command line,
+            my perspective shifted the moment I discovered GUIs — that&apos;s when development truly came alive for me. I challenged myself to build my first
+            interactive solo project, which sparked a deeper commitment to the craft. From there, I expanded into web development, continuously growing my
+            skill set and keeping pace with emerging technologies. Today, I build modern, production-ready web applications for personal projects using
+            technologies such as Next.js, TypeScript, Tailwind CSS, Firebase, and more.
           </p>
           <br />
           <p className="dark:text-gray-300">
-            When I&apos;m not in developer-mode, you can expect me doing things i like such as watching anime and movies, or playing computer games.
-            You can add me on  <Link href="https://www.facebook.com/td.nano" target="_blank">
+            Outside of development, I enjoy unwinding with anime, films, and PC gaming. Feel free to connect with me on{" "}
+            <Link href="https://www.facebook.com/td.nano" target="_blank">
               <span className="underline">Facebook</span>
-            </Link> or you can follow me on <Link href="https://github.com/pixcs" target="_blank">
+            </Link>{" "}
+            or follow my work on{" "}
+            <Link href="https://github.com/pixcs" target="_blank">
               <span className="underline">GitHub</span>
             </Link>.
           </p>
           <br />
-          <p className="dark:text-gray-300">Finally, some quick bits about me.</p>
+          <p className="dark:text-gray-300">A few quick facts about me:</p>
           <br />
-          <ul className="list-disc ml-5 grid  md:grid-cols-2 leading-7 md:leading-10 dark:text-gray-300">
+          <ul className="list-disc ml-5 grid md:grid-cols-2 leading-7 md:leading-10 dark:text-gray-300">
             <li>B.S. in Computer Science</li>
-            <li>Avid Learner</li>
-            <li>Aspiring to be a great developer.</li>
+            <li>Lifelong learner</li>
+            <li>Committed to growth as a developer</li>
           </ul>
         </div>
       </div>

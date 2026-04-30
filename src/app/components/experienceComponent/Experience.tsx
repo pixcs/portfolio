@@ -34,13 +34,21 @@ const Experience = async ({ session }: Props) => {
                     className="fade-in-effect flex flex-col md:flex-row justify-between items-start md:gap-x-20  px-8 py-10 bg-white dark:bg-slate-800 shadow-xl max-w-4xl mx-5 mb-10 md:mx-10 lg:mx-auto rounded-lg  transition-theme"
                 >
                     <Link href={experience.companyUrl} target="_blank">
-                        <Image
-                            src={experience.companyLogo}
-                            alt={`${experience.companyName} logo`}
-                            width={150}
-                            height={28}
-                            className="mb-4 md:my-0"
-                        />
+                       <div
+                            className={`mb-4 md:my-0 p-2 rounded-md ${
+                                experience.companyName.toLowerCase().includes("acacia")
+                                    ? "bg-white"
+                                    : ""
+                            }`}
+                        >
+                            <Image
+                                src={experience.companyLogo}
+                                alt={`${experience.companyName} logo`}
+                                width={300}
+                                height={120}
+                                className="h-auto w-50 md:w-56 lg:w-64 object-contain rounded-md"
+                            />
+                        </div>
                     </Link>
                     <p className="dark:text-gray-300 md:hidden mb-5">{experience.range}</p>
                     <div>

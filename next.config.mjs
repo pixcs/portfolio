@@ -8,15 +8,23 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: "www.lophils.com"
-      },
-      {
-        protocol: 'https',
         hostname: "i.pinimg.com"
       },
       {
         protocol: 'https',
-        hostname: "acacia-soft.com"
+        hostname: "*.pagbilaoenergy.app"
+      },
+      {
+        protocol: "https",
+        hostname: "**.public.blob.vercel-storage.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.fbcdn.net",  // facebook
+      },
+      {
+        protocol: "https",
+        hostname: "media.licdn.com", // linkedIn
       },
       {
         protocol: "https",

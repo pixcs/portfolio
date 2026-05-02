@@ -18,7 +18,7 @@ export default async function Home() {
       <NavAndDrawerLayout session={session} />
       <main>
         <Introduction session={session} />
-        <About />
+        <About session={session} />
         <Skills />
         <Experience session={session} />
         <Project session={session} />

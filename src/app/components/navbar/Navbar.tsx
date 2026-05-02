@@ -15,6 +15,7 @@ import { BsFillBellFill } from "react-icons/bs";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { IronSession } from "iron-session";
 import MessageList from "@/app/components/messageList/MessageList";
+import { useEffect, useRef } from "react";
 
 type Props = {
     darkMode: boolean,
@@ -43,6 +44,24 @@ const Navbar = ({
     setShowInbox,
     resumeUrl
 }: Props) => {
+    const inboxRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+            if (
+                inboxRef.current &&
+                !inboxRef.current.contains(event.target as Node)
+            ) {
+                setShowInbox(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     return (
         <header>
@@ -76,7 +95,7 @@ const Navbar = ({
                                 onClick={() => setDarkMode(!darkMode)}
                             />
                         }
-                        <div className="relative">
+                        <div className="relative" ref={inboxRef}>
                             {showInbox ? (
                                 <BsFillBellFill
                                     className="cursor-pointer rounded-md p-2 hover:bg-gray-200 dark:hover:bg-slate-700/90 transition duration-300"

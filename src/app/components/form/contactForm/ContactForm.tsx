@@ -36,44 +36,68 @@ const ContactForm = ({ status, setStatus }: Props) => {
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
+
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/get-in-touch`, {
-                method: "POST",
-                headers: {
-                    "Content-type": "application/json"
-                },
-                body: JSON.stringify({ name, email, subject, message })
-            })
-            const data: { success: string } | { error: string } = await res.json();
-
-            if (!res.ok) {
-                throw new Error("Error: failed to insert new message");
-            }
-
-            if (data) {
-                if ('success' in data) {
-                    setStatus(data.success);
-                } else if ('error' in data) {
-                    setStatus(data.error);
+            // First request: save message
+            const contactRes = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URI}/api/get-in-touch`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-type": "application/json",
+                    },
+                    body: JSON.stringify({ name, email, subject, message }),
                 }
+            );
+
+            const contactData = await contactRes.json();
+
+            if (!contactRes.ok) {
+                throw new Error(contactData.error || "Failed to save message");
             }
-            
+
+            // Second request: send email
+            const emailRes = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URI}/api/send-email`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        name,
+                        email,
+                        subject,
+                        message,
+                    }),
+                }
+            );
+
+            const emailData = await emailRes.json();
+
+            if (!emailRes.ok) {
+                throw new Error(emailData.error || "Failed to send email");
+            }
+
+            setStatus("Message sent successfully!");
+
             setFormData({
                 name: "",
                 email: "",
                 subject: "",
-                message: ""
-            })
+                message: "",
+            });
 
         } catch (err) {
             if (err instanceof Error) {
-                console.error(err.message)
+                setStatus(err.message);
+                console.error(err.message);
             }
         } finally {
             setIsLoading(false);
             setTimeout(() => setStatus(""), 2000);
         }
-    }
+    };
 
     return (
         <form
@@ -117,10 +141,23 @@ const ContactForm = ({ status, setStatus }: Props) => {
                 value={message}
             />
             <button
-                className="scale-90 py-4  text-white font-semibold dark:text-black bg-slate-900 dark:bg-white dark:hover:bg-gray-200 rounded-lg  md:w-44 hover:bg-black hover:scale-95 duration-300 mb-5 md:mb-0"
+                className="relative mt-1 w-full py-3 rounded-lg text-sm font-semibold tracking-wide overflow-hidden
+                    bg-gradient-to-b from-slate-800 to-slate-900 dark:from-white dark:to-gray-200
+                    text-white dark:text-black border border-slate-700/50
+                    hover:from-slate-700 hover:to-slate-800 dark:hover:from-gray-100 dark:hover:to-gray-300
+                    disabled:opacity-60 disabled:cursor-not-allowed
+                    shadow-md shadow-slate-900/20
+                    transition duration-300"
                 disabled={isLoading}
             >
-                {isLoading ? "Processing..." : "Send message"}
+                {isLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                        <span className="w-3.5 h-3.5 rounded-full border-2 border-white/30 dark:border-black/30 border-t-white dark:border-t-black animate-spin" />
+                        Processing...
+                    </span>
+                ) : (
+                    "Send message"
+                )}
             </button>
         </form>
     )

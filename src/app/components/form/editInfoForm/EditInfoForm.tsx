@@ -47,9 +47,11 @@ const FALLBACK = "https://i.pinimg.com/564x/dd/af/0f/ddaf0f3a57413545d2c2b235683
 const ProfileUploader = ({
     currentUrl,
     onUploadSuccess,
+    userId,
 }: {
     currentUrl: string;
     onUploadSuccess: (url: string) => void;
+    userId: string;
 }) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const [preview, setPreview] = useState<string | null>(null);
@@ -85,7 +87,13 @@ const ProfileUploader = ({
                 body.append("oldPathname", currentUrl);
             }
 
-            const res = await fetch("/api/upload-profile", { method: "POST", body });
+            const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URI}/api/admin-info/${userId}`,
+                {
+                    method: "POST",
+                    body,
+                }
+            );
             // FIXED: Matched the response format from your API route ('url' instead of 'filename')
             const data: { url?: string; pathname?: string; error?: string } = await res.json();
 
@@ -254,21 +262,59 @@ const EditInfoForm = ({ session, info }: Props) => {
         });
     }, [session, info]);
 
+    useEffect(() => {
+        if (!session?.userId) return;
+
+        const fetchInfo = async () => {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URI}/api/admin-info/${session.userId}`
+            );
+
+            const data = await res.json();
+
+            if (res.ok && data.info) {
+                setFormData(data.info);
+            }
+        };
+
+        fetchInfo();
+    }, [session]);
+
     const handleUpdateInfo = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (!session?.userId) return;
+
         setIsLoading(true);
+
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/login/${session?.userId}`, {
-                method: "PUT",
-                headers: { "Content-type": "application/json" },
-                body: JSON.stringify({ name, about, address, colorStatus, status, githubUrl, facebookUrl, profileUrl, resumeUrl }),
-            });
-            const result: { message: string } | { error: string } = await res.json();
-            if (!res.ok) console.error("Error: failed to update info.");
-            if ("message" in result) setNotifStatus(result.message);
-            if ("error" in result) setNotifStatus(result.error);
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URI}/api/admin-info/${session.userId}`,
+                {
+                    method: "PUT",
+                    headers: { "Content-type": "application/json" },
+                    body: JSON.stringify({
+                        name,
+                        about,
+                        address,
+                        colorStatus,
+                        status,
+                        githubUrl,
+                        facebookUrl,
+                        profileUrl,
+                        resumeUrl,
+                    }),
+                }
+            );
+
+            const result = await res.json();
+
+            if (!res.ok) throw new Error(result.error);
+
+            setNotifStatus(result.message);
         } catch (err) {
-            if (err instanceof Error) console.error(err.message);
+            console.error(err);
+            setNotifStatus("Failed to update.");
         } finally {
             setIsLoading(false);
             setTimeout(() => setNotifStatus(""), 2500);
@@ -341,6 +387,7 @@ const EditInfoForm = ({ session, info }: Props) => {
                                 onUploadSuccess={(url) =>
                                     setFormData(prev => ({ ...prev, profileUrl: url }))
                                 }
+                                userId={session.userId!}
                             />
 
                             {/* Social links */}

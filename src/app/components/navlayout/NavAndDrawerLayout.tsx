@@ -27,10 +27,16 @@ const NavAndDrawerLayout = ({ session }: Props) => {
         }
 
         const getResumeUrl = async () => {
-            const alternative = session?.userId ? session?.userId : "666b094dab43a459a391d327";
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/login/${alternative}`, { cache: "no-store" });
-            const { admin: { info } }: { admin: UserInfo } = await res.json();
-            setResumeUrl(info.resumeUrl);
+            const alternative = session?.userId ?? "666b094dab43a459a391d327";
+
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/admin-info/${alternative}`,
+                { cache: "no-store" }
+            );
+            const data = await res.json();
+
+            if (res.ok && data.info) {
+                setResumeUrl(data.info.resumeUrl);
+            }
         }
         getResumeUrl();
     }, [])

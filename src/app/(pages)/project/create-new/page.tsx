@@ -18,7 +18,7 @@ const CreateNew = async () => {
 
   return (
     <main className='flex flex-col md:flex-row items-start gap-x-5'>
-      <ProjectContainer projects={projects} />
+      <ProjectContainer projects={projects} session={session} />
     </main>
   )
 }

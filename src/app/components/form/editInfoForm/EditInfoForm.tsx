@@ -24,7 +24,7 @@ type FormAdminInfo = {
 
 type Props = {
     session: ClientSession;
-    info: AdminInfo;
+    info: AdminInfo | null;  
 };
 
 const Field = ({ label, children }: { label?: string; children: React.ReactNode }) => (
@@ -72,29 +72,23 @@ const ProfileUploader = ({
             return;
         }
 
-        // Show local preview immediately
         const reader = new FileReader();
         reader.onload = (e) => setPreview(e.target?.result as string);
         reader.readAsDataURL(file);
 
-        // Upload immediately — pass currentUrl so server can delete the old blob
         setUploading(true);
         try {
             const body = new FormData();
             body.append("file", file);
             if (currentUrl) {
-                // FIXED: Matched the key 'oldPathname' from your API route
                 body.append("oldPathname", currentUrl);
             }
 
             const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URI}/api/admin-info/${userId}`,
-                {
-                    method: "POST",
-                    body,
-                }
+                `${process.env.NEXT_PUBLIC_API_URI}/api/admin-info/${userId}`,
+                { method: "POST", body }
             );
-            // FIXED: Matched the response format from your API route ('url' instead of 'filename')
+
             const data: { url?: string; pathname?: string; error?: string } = await res.json();
 
             if (!res.ok || !data.url) {
@@ -103,7 +97,6 @@ const ProfileUploader = ({
                 return;
             }
 
-            // data.url is now the full Vercel Blob URL returned by your backend
             onUploadSuccess(data.url);
         } catch {
             setError("Upload failed. Please try again.");
@@ -126,7 +119,6 @@ const ProfileUploader = ({
         if (file) handleFile(file);
     };
 
-    // preview (local base64) takes priority, then the stored Vercel Blob URL
     const resolvedSrc = preview ?? (currentUrl || null);
 
     const clearPreview = () => {
@@ -250,35 +242,17 @@ const EditInfoForm = ({ session, info }: Props) => {
 
     useEffect(() => {
         setFormData({
-            name: info?.name || "",
-            about: info?.about || "",
-            address: info?.address || "",
+            name:        info?.name        || "",
+            about:       info?.about       || "",
+            address:     info?.address     || "",
             colorStatus: info?.colorStatus || "",
-            status: info?.status || "",
-            githubUrl: info?.githubUrl || "",
+            status:      info?.status      || "",
+            githubUrl:   info?.githubUrl   || "",
             facebookUrl: info?.facebookUrl || "",
-            profileUrl: info?.profileUrl || "",
-            resumeUrl: info?.resumeUrl || "",
+            profileUrl:  info?.profileUrl  || "",
+            resumeUrl:   info?.resumeUrl   || "",
         });
     }, [session, info]);
-
-    useEffect(() => {
-        if (!session?.userId) return;
-
-        const fetchInfo = async () => {
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URI}/api/admin-info/${session.userId}`
-            );
-
-            const data = await res.json();
-
-            if (res.ok && data.info) {
-                setFormData(data.info);
-            }
-        };
-
-        fetchInfo();
-    }, [session]);
 
     const handleUpdateInfo = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -321,7 +295,6 @@ const EditInfoForm = ({ session, info }: Props) => {
         }
     };
 
-    // profileUrl is always a full Vercel Blob URL now
     const previewSrc = profileUrl || FALLBACK;
 
     return (

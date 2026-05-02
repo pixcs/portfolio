@@ -15,15 +15,16 @@ const EditInfoPage = async () => {
     }
 
     const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URI}/api/login/${session.userId}`,
+        `${process.env.NEXT_PUBLIC_API_URI}/api/admin-info/${session.userId}`,
         { cache: "no-store" }
     );
 
-    const { admin }: { admin: UserInfo } = await res.json();
+    const data: { info: AdminInfo | null } = res.ok ? await res.json() : { info: null };
+    const info: AdminInfo | null = data?.info ?? null;
 
     return (
         <div>
-        <EditInfoForm session={session} info={admin.info} />
+            <EditInfoForm session={session} info={info} />
         </div>
     );
 };

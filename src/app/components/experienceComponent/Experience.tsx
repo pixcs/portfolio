@@ -9,7 +9,12 @@ type Props = {
 }
 
 const Experience = async ({ session }: Props) => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/work-experience`, { cache: "no-store" });
+    const userId = session?.userId || "666b094dab43a459a391d327"; // fallback user
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/work-experience?userId=${userId}`,
+        { cache: "no-store" }
+    );
+
     const { list_of_experience }: ListOfExperience = await res.json();
 
     return (

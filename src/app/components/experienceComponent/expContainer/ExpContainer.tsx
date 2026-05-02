@@ -4,12 +4,14 @@ import { useEffect, useState } from 'react';
 import ExperienceForm from '@/app/components/form/experienceForm/ExperienceForm';
 import ExperienceList from '@/app/components/experienceComponent/experiencelist/ExperienceList';
 import { SiContentstack } from 'react-icons/si';
+import { IronSession } from 'iron-session';
 
 type Props = {
-    listOfExperience: WorkExperience[]
-}
+    listOfExperience: WorkExperience[];
+    session: IronSession<SessionData> | undefined 
+};
 
-const ExpContainer = ({ listOfExperience }: Props) => {
+const ExpContainer = ({ listOfExperience, session }: Props) => {
     const [formData, setFormData] = useState<FormExperience>({
         companyName: "",
         companyLogo: "",
@@ -22,26 +24,21 @@ const ExpContainer = ({ listOfExperience }: Props) => {
     const [selectEditWorkExp, setselectEditWorkExp] = useState<WorkExperience | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    const editGetWorkExperience = async (id: string): Promise<void> => {
+    const editGetWorkExperience = async (id: string) => {
         setIsLoading(true);
+
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/work-experience/${id}`);
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URI}/api/work-experience/${id}`
+            );
 
-            if (!res.ok) {
-                throw new Error(res.statusText);
-            }
-
-            const { experience }: { experience: WorkExperience } = await res.json();
+            const { experience } = await res.json();
             setselectEditWorkExp(experience);
 
-        } catch (err) {
-            if (err instanceof Error) {
-                console.error(err.message);
-            }
         } finally {
             setIsLoading(false);
         }
-    }
+    };
 
     const formReset = (): void => {
         setFormData({
@@ -79,6 +76,7 @@ const ExpContainer = ({ listOfExperience }: Props) => {
                 setTasks={setTasks}
                 selectEditWorkExp={selectEditWorkExp}
                 formReset={formReset}
+                session={session}  
             />
             <section className='flex-1 md:max-h-[700px] md:overflow-y-scroll relative'>
                 <h2 className='text-xl md:text-2xl font-medium p-8'>List of my previous experience</h2>

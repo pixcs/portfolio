@@ -3,33 +3,42 @@ import { connectToDB } from "@/app/lib/connectToDB";
 import { WorkExperience } from "@/app/models/models";
 
 export const POST = async (request: Request) => {
-    const { companyName, companyLogo, companyUrl, position, tasks, range }: FormExperience = await request.json();
+    const { userId, companyName, companyLogo, companyUrl, position, tasks, range } = await request.json();
 
     await connectToDB();
+
+    if (!userId) {
+        return NextResponse.json({ error: "Missing userId" }, { status: 400 });
+    }
+
     const newWorkExperience = new WorkExperience({
+        userId,
         companyName,
         companyLogo,
         companyUrl,
         position,
         tasks,
-        range
-    })
+        range,
+    });
 
-    if (!tasks.length) {
-        return NextResponse.json({ error: "You forgot to include the tasks" }, { status: 401 })
-    }
+    await newWorkExperience.save();
 
-    const result = await newWorkExperience.save();
+    return NextResponse.json({ success: "Created successfully" });
+};
 
-    return NextResponse.json({ success: "Created successfully" })
-}
 
-export const GET = async () => {
+export const GET = async (req: Request) => {
     await connectToDB();
-    const list_of_experience: WorkExperience[] = await WorkExperience.find().sort({ createdAt: -1 });
+
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId");
+
+    const query = userId ? { userId } : {};
+
+    const list_of_experience = await WorkExperience.find(query).sort({ createdAt: -1 });
 
     return NextResponse.json({ list_of_experience });
-}
+};
 
 export const DELETE = async (request: Request) => {
     const { id } = await request.json();

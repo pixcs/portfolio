@@ -16,7 +16,10 @@ const CreateNew = async () => {
   
   return (
     <main className='flex flex-col md:flex-row items-start gap-x-5'>
-      <ExpContainer listOfExperience={list_of_experience}/>
+      <ExpContainer 
+        listOfExperience={list_of_experience} 
+        session={session}
+      />
     </main>
   )
 }

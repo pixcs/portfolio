@@ -1,40 +1,52 @@
+// src/app/api/project/[id]/route.ts
 import { NextResponse } from "next/server";
 import { connectToDB } from "@/app/lib/connectToDB";
 import { ProjectModel } from "@/app/models/models";
-import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 
+type Params = { params: { id: string } };
 
-export const GET = async (request: Request, { params: { id } }: Params) => {
-    await connectToDB();
-    const project: Project | null = await ProjectModel.findOne({ _id: id });
-
-    if (!id) {
-        return NextResponse.json({ error: "You must include the id." }, { status: 401 })
+export const GET = async (_req: Request, { params }: Params) => {
+    if (!params.id) {
+        return NextResponse.json({ error: "You must include the id." }, { status: 400 });
     }
+
+    await connectToDB();
+
+    const project = await ProjectModel.findById(params.id);
 
     if (!project) {
-        return NextResponse.json({ error: `project ${id} not found,` }, { status: 401 })
+        return NextResponse.json({ error: `Project ${params.id} not found.` }, { status: 404 });
     }
 
-    return NextResponse.json({ project })
-}
+    return NextResponse.json({ project });
+};
 
-export const PUT = async (request: Request, { params: { id } }: Params) => {
-    const { projectName, projectImage, projectUrl, description, toolsAndTech }: Project = await request.json();
+export const PUT = async (request: Request, { params }: Params) => {
+    const { userId, projectName, projectImage, projectUrl, description, toolsAndTech } =
+        await request.json();
+
+    if (!params.id) {
+        return NextResponse.json({ error: "id not found." }, { status: 400 });
+    }
+
+    if (!userId) {
+        return NextResponse.json({ error: "Missing userId." }, { status: 400 });
+    }
+
     await connectToDB();
-    await ProjectModel.updateOne({ _id: id }, {
-        $set: {
-            projectName,
-            projectImage,
-            projectUrl,
-            description,
-            toolsAndTech
+
+    await ProjectModel.updateOne(
+        { _id: params.id, userId }, // prevents cross-user edits
+        {
+            $set: {
+                projectName,
+                projectImage,
+                projectUrl,
+                description,
+                toolsAndTech,
+            },
         }
-    })
+    );
 
-    if (!id) {
-        return NextResponse.json({ error: "id not found" }, { status: 401 })
-    }
-
-    return NextResponse.json({ success: "Updated Successfully" })
-}
+    return NextResponse.json({ success: "Updated successfully." });
+};

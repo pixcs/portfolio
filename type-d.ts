@@ -19,6 +19,7 @@ type Admin = {
 }
 
 type FormExperience = {
+    userId?: string
     companyName: string
     companyLogo: string
     companyUrl: string
@@ -60,6 +61,7 @@ type Project = {
 }
 
 type ContactForm = {
+    userId?: string,
     name: string,
     email: string,
     subject: string,
@@ -88,7 +90,6 @@ type AdminInfo = {
 }
 
 type UserInfo = {
-    info: AdminInfo,
     _id: string
 }
 

@@ -4,18 +4,20 @@ import ProjectForm from "@/app/components/form/projectForm/ProjectForm";
 import ProjectList from "@/app/components/projectComponent/projectList/ProjectList";
 import { useEffect, useState } from "react";
 import { SiContentstack } from "react-icons/si";
+import { IronSession } from "iron-session";
 
 type Props = {
-    projects: Project[]
-}
+    projects: Project[];
+    session: IronSession<SessionData> | undefined;
+};
 
-const ProjectContainer = ({ projects }: Props) => {
+const ProjectContainer = ({ projects, session }: Props) => {
     const [formData, setFormData] = useState<FormProject>({
         projectName: "",
         projectImage: "",
         projectUrl: "",
         description: "",
-        toolsAndTechInput: ""
+        toolsAndTechInput: "",
     });
     const [toolsAndTech, setToolsAndTech] = useState<string[]>([]);
     const [selectEditProject, setSelectEditProject] = useState<Project | null>(null);
@@ -25,21 +27,15 @@ const ProjectContainer = ({ projects }: Props) => {
         setIsLoading(true);
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/project/${id}`);
-
-            if (!res.ok) {
-                throw new Error(res.statusText);
-            }
+            if (!res.ok) throw new Error(res.statusText);
             const { project }: { project: Project } = await res.json();
             setSelectEditProject(project);
-
         } catch (err) {
-            if (err instanceof Error) {
-                console.error(err.message);
-            }
+            if (err instanceof Error) console.error(err.message);
         } finally {
             setIsLoading(false);
         }
-    }
+    };
 
     const formReset = (): void => {
         setFormData({
@@ -47,24 +43,24 @@ const ProjectContainer = ({ projects }: Props) => {
             projectImage: "",
             projectUrl: "",
             description: "",
-            toolsAndTechInput: ""
-        })
-        setToolsAndTech([])
+            toolsAndTechInput: "",
+        });
+        setToolsAndTech([]);
         setSelectEditProject(null);
-    }
+    };
 
     useEffect(() => {
         if (selectEditProject) {
-            setFormData(() => ({
-                projectName: selectEditProject.projectName,
-                projectImage: selectEditProject.projectImage,
-                projectUrl: selectEditProject.projectUrl,
-                description: selectEditProject.description,
-                toolsAndTechInput: ""
-            }))
+            setFormData({
+                projectName:       selectEditProject.projectName,
+                projectImage:      selectEditProject.projectImage,
+                projectUrl:        selectEditProject.projectUrl,
+                description:       selectEditProject.description,
+                toolsAndTechInput: "",
+            });
             setToolsAndTech(selectEditProject.toolsAndTech);
         }
-    }, [selectEditProject])
+    }, [selectEditProject]);
 
     return (
         <>
@@ -75,6 +71,7 @@ const ProjectContainer = ({ projects }: Props) => {
                 setToolsAndTech={setToolsAndTech}
                 selectEditProject={selectEditProject}
                 formReset={formReset}
+                session={session}
             />
             <section className="flex-1 md:max-h-[700px] md:overflow-y-scroll relative">
                 <h2 className='text-2xl font-medium p-8'>List of my projects</h2>
@@ -93,7 +90,7 @@ const ProjectContainer = ({ projects }: Props) => {
                 )}
             </section>
         </>
-    )
-}
+    );
+};
 
 export default ProjectContainer;

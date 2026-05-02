@@ -1,5 +1,12 @@
 import mongoose, { Schema, Types } from "mongoose";
 
+export type ClientSession = {
+    isLoggedIn: boolean;
+    userId?: string;
+    username?: string;
+    isAdmin: boolean;
+};
+
 type AdminSchema = {
     username: string;
     password: string;
@@ -27,7 +34,8 @@ export type AboutContentSchema = {
     profileImages: string[];
 };
 
-type WorkExpSchema = {
+export type WorkExpSchema = {
+    userId: Types.ObjectId;
     companyName: string;
     companyLogo: string;
     companyUrl: string;
@@ -36,19 +44,13 @@ type WorkExpSchema = {
     range: string;
 };
 
-type ProjectSchema = {
+export type ProjectSchema = {
+    userId: Types.ObjectId;
     projectName: string;
     projectImage: string;
     projectUrl: string;
     description: string;
     toolsAndTech: string[];
-};
-
-export type ClientSession = {
-    isLoggedIn: boolean;
-    userId?: string;
-    username?: string;
-    isAdmin: boolean;
 };
 
 const adminSchema = new Schema<AdminSchema>(
@@ -68,7 +70,6 @@ const adminProfileSchema = new Schema<AdminInfoSchema>(
             required: true,
             unique: true,
         },
-
         name:        { type: String },
         about:       { type: String },
         address:     { type: String },
@@ -114,10 +115,13 @@ const aboutContentSchema = new Schema<AboutContentSchema>(
     { timestamps: true }
 );
 
-aboutContentSchema.index({ userId: 1 });
-
 const workExperience = new Schema<WorkExpSchema>(
     {
+        userId: {
+            type: Schema.Types.ObjectId,
+            ref: "Admin",
+            required: true
+        },
         companyName: { type: String, required: true },
         companyLogo: { type: String },
         companyUrl:  { type: String },
@@ -130,6 +134,11 @@ const workExperience = new Schema<WorkExpSchema>(
 
 const projectSchema = new Schema<ProjectSchema>(
     {
+        userId: {
+            type: Schema.Types.ObjectId,
+            ref: "Admin",
+            required: true
+        },
         projectName:  { type: String, required: true },
         projectImage: { type: String, required: true },
         projectUrl:   { type: String, required: true },
@@ -149,12 +158,27 @@ const getInTouch = new Schema(
     { timestamps: true }
 );
 
-export const AdminModel        = mongoose.models.Admin        || mongoose.model("Admin", adminSchema);
-export const AdminInfoModel    = mongoose.models.AdminInfo    || mongoose.model("AdminInfo", adminProfileSchema);
-export const WorkExperience    = mongoose.models.WorkExp      || mongoose.model("WorkExp", workExperience);
-export const ProjectModel      = mongoose.models.Project      || mongoose.model("Project", projectSchema);
-export const GetInTouchModel   = mongoose.models.GetInTouch   || mongoose.model("GetInTouch", getInTouch);
 
-// Delete cache so schema changes always take effect in dev
+
+
+// Single index definitions — no duplicates
+aboutContentSchema.index({ userId: 1 });
+workExperience.index({ userId: 1 });
+projectSchema.index({ userId: 1 });
+
+
+
+
+export const AdminModel      = mongoose.models.Admin      || mongoose.model("Admin", adminSchema);
+export const AdminInfoModel  = mongoose.models.AdminInfo  || mongoose.model("AdminInfo", adminProfileSchema);
+export const GetInTouchModel = mongoose.models.GetInTouch || mongoose.model("GetInTouch", getInTouch);
+
+//  Delete cache so schema changes always take effect in dev hot reload
 delete (mongoose.models as Record<string, unknown>).AboutMe;
 export const AboutMeModel = mongoose.model<AboutContentSchema>("AboutMe", aboutContentSchema);
+
+delete (mongoose.models as Record<string, unknown>).WorkExp;
+export const WorkExperience = mongoose.model<WorkExpSchema>("WorkExp", workExperience);
+
+delete (mongoose.models as Record<string, unknown>).Project;
+export const ProjectModel = mongoose.model<ProjectSchema>("Project", projectSchema);

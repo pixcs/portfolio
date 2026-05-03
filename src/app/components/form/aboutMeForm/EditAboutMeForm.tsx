@@ -1,10 +1,10 @@
 "use client";
 
 import Link from 'next/link';
-import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react'
+import React, { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
 import { RiCheckLine } from 'react-icons/ri';
 import { IoMdArrowRoundBack } from 'react-icons/io';
-import { LuPlus, LuX, LuGripVertical } from 'react-icons/lu';
+import { LuPlus, LuX, LuGripVertical, LuUpload, LuImage, LuTrash2 } from 'react-icons/lu';
 import type { ClientSession } from "@/app/models/models";
 
 type QuickFact = {
@@ -18,12 +18,19 @@ type FormAboutMe = {
     quickFacts: QuickFact[];
 };
 
-// Mirrors AboutContentSchema (camelCase)
+type ProfileImageSlot = {
+    preview: string | null;   // object URL (new) or existing blob URL
+    file: File | null;        // null = unchanged
+    existing: string | null;  // current blob URL stored in DB
+    pathname: string | null;  // blob pathname for deletion
+};
+
 type AboutMeInfo = {
     heading?: string;
     paragraphs?: string[];
     quickFacts?: string[];
     profileImages?: string[];
+    profileImagePathnames?: string[];
 };
 
 type Props = {
@@ -47,9 +54,109 @@ const inputCls =
 
 const generateId = () => Math.random().toString(36).slice(2, 9);
 
-// DB stores plain string[] — give each a local id for React keying
 const toFactItems = (facts: string[]): QuickFact[] =>
     facts.map((v) => ({ id: generateId(), value: v }));
+
+const emptySlot = (): ProfileImageSlot => ({
+    preview: null,
+    file: null,
+    existing: null,
+    pathname: null,
+});
+
+/* ─── Image Slot Component ─── */
+const ImageSlot = ({
+    slot,
+    index,
+    onFileSelect,
+    onRemove,
+}: {
+    slot: ProfileImageSlot;
+    index: number;
+    onFileSelect: (index: number, file: File) => void;
+    onRemove: (index: number) => void;
+}) => {
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith("image/")) onFileSelect(index, file);
+    };
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) onFileSelect(index, file);
+    };
+
+    return (
+        <div className="flex flex-col gap-2">
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 dark:text-slate-500">
+                Image {index + 1}
+            </span>
+
+            {slot.preview ? (
+                <div className="relative group rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 aspect-[4/3] bg-gray-100 dark:bg-slate-800">
+                    <img
+                        src={slot.preview}
+                        alt={`Profile ${index + 1}`}
+                        className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-3">
+                        <button
+                            type="button"
+                            onClick={() => inputRef.current?.click()}
+                            className="flex items-center gap-1.5 text-xs font-medium text-white bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg backdrop-blur-sm transition"
+                        >
+                            <LuUpload size={12} />
+                            Replace
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => onRemove(index)}
+                            className="flex items-center gap-1.5 text-xs font-medium text-white bg-red-500/70 hover:bg-red-500/90 px-3 py-1.5 rounded-lg backdrop-blur-sm transition"
+                        >
+                            <LuTrash2 size={12} />
+                            Remove
+                        </button>
+                    </div>
+                    {slot.file && (
+                        <span className="absolute top-2 left-2 text-[10px] font-semibold uppercase tracking-wider bg-emerald-500 text-white px-2 py-0.5 rounded-full">
+                            New
+                        </span>
+                    )}
+                </div>
+            ) : (
+                <div
+                    onDrop={handleDrop}
+                    onDragOver={(e) => e.preventDefault()}
+                    onClick={() => inputRef.current?.click()}
+                    className="aspect-[4/3] rounded-xl border-2 border-dashed border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/40 hover:border-slate-400 dark:hover:border-slate-500 hover:bg-gray-100 dark:hover:bg-slate-800/70 transition-all duration-200 cursor-pointer flex flex-col items-center justify-center gap-2.5 group"
+                >
+                    <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-700/60 flex items-center justify-center group-hover:bg-gray-200 dark:group-hover:bg-slate-700 transition">
+                        <LuImage size={18} className="text-gray-400 dark:text-slate-500" />
+                    </div>
+                    <div className="text-center">
+                        <p className="text-xs font-medium text-gray-500 dark:text-slate-400">
+                            Click or drag & drop
+                        </p>
+                        <p className="text-[10px] text-gray-400 dark:text-slate-600 mt-0.5">
+                            PNG, JPG, WEBP
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            <input
+                ref={inputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="hidden"
+                onChange={handleChange}
+            />
+        </div>
+    );
+};
 
 /* ─── Main form ─── */
 const EditAboutMeForm = ({ session, info }: Props) => {
@@ -58,8 +165,14 @@ const EditAboutMeForm = ({ session, info }: Props) => {
         paragraphs: [""],
         quickFacts: [{ id: generateId(), value: "" }],
     });
+    const [imageSlots, setImageSlots] = useState<[ProfileImageSlot, ProfileImageSlot]>([
+        emptySlot(),
+        emptySlot(),
+    ]);
     const [notifStatus, setNotifStatus] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+
+    const [removedPathnames, setRemovedPathnames] = useState<string[]>([]);
 
     const { heading, paragraphs, quickFacts } = formData;
 
@@ -71,12 +184,51 @@ const EditAboutMeForm = ({ session, info }: Props) => {
                 ? toFactItems(info.quickFacts)
                 : [{ id: generateId(), value: "" }],
         });
+
+        const imgs      = info?.profileImages          ?? [];
+        const pathnames = info?.profileImagePathnames  ?? [];
+
+        setImageSlots([
+            imgs[0]
+                ? { preview: imgs[0], file: null, existing: imgs[0], pathname: pathnames[0] ?? null }
+                : emptySlot(),
+            imgs[1]
+                ? { preview: imgs[1], file: null, existing: imgs[1], pathname: pathnames[1] ?? null }
+                : emptySlot(),
+        ]);
     }, [session, info]);
 
-    /* ── Heading ── */
-    const handleHeadingChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setFormData(prev => ({ ...prev, heading: e.target.value }));
+    /* ── Image handlers ── */
+    const handleFileSelect = (index: number, file: File) => {
+        const preview = URL.createObjectURL(file);
+        setImageSlots(prev => {
+            const next = [...prev] as [ProfileImageSlot, ProfileImageSlot];
+            if (next[index].file) URL.revokeObjectURL(next[index].preview!);
+            next[index] = { ...next[index], preview, file };
+            return next;
+        });
     };
+
+    const handleRemoveImage = (index: number) => {
+        setImageSlots(prev => {
+            const next = [...prev] as [ProfileImageSlot, ProfileImageSlot];
+
+            if (next[index].pathname) {
+                setRemovedPathnames(prev => [...prev, next[index].pathname!]);
+            }
+
+            if (next[index].file) {
+                URL.revokeObjectURL(next[index].preview!);
+            }
+
+            next[index] = emptySlot();
+            return next;
+        });
+    };
+
+    /* ── Heading ── */
+    const handleHeadingChange = (e: ChangeEvent<HTMLInputElement>) =>
+        setFormData(prev => ({ ...prev, heading: e.target.value }));
 
     /* ── Paragraphs ── */
     const handleParagraphChange = (index: number, value: string) => {
@@ -87,67 +239,123 @@ const EditAboutMeForm = ({ session, info }: Props) => {
         });
     };
 
-    const addParagraph = () => {
+    const addParagraph = () =>
         setFormData(prev => ({ ...prev, paragraphs: [...prev.paragraphs, ""] }));
-    };
 
-    const removeParagraph = (index: number) => {
+    const removeParagraph = (index: number) =>
         setFormData(prev => ({
             ...prev,
             paragraphs: prev.paragraphs.filter((_, i) => i !== index),
         }));
-    };
 
     /* ── Quick Facts ── */
-    const handleFactChange = (id: string, value: string) => {
+    const handleFactChange = (id: string, value: string) =>
         setFormData(prev => ({
             ...prev,
             quickFacts: prev.quickFacts.map(f => f.id === id ? { ...f, value } : f),
         }));
-    };
 
-    const addFact = () => {
+    const addFact = () =>
         setFormData(prev => ({
             ...prev,
             quickFacts: [...prev.quickFacts, { id: generateId(), value: "" }],
         }));
-    };
 
-    const removeFact = (id: string) => {
+    const removeFact = (id: string) =>
         setFormData(prev => ({
             ...prev,
             quickFacts: prev.quickFacts.filter(f => f.id !== id),
         }));
-    };
 
     /* ── Submit ── */
     const handleUpdateAboutMe = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
+
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/about/${session?.userId}`, {
-                method: "PUT",
-                headers: { "Content-type": "application/json" },
-                body: JSON.stringify({
-                    heading,
-                    paragraphs: paragraphs.filter(p => p.trim() !== ""),
-                    // Strip local id — send plain string[] to match the schema
-                    quickFacts: quickFacts
-                        .map(f => f.value)
-                        .filter(v => v.trim() !== ""),
-                }),
-            });
+            const profileImages: string[]          = [];
+            const profileImagePathnames: string[]  = [];
+
+            // Step 1 — upload any newly selected files to Vercel Blob via POST /api/about/[userId]
+            for (let i = 0; i < imageSlots.length; i++) {
+                const slot = imageSlots[i];
+
+                if (slot.file) {
+                    const fd = new FormData();
+                    fd.append("file", slot.file);
+                    fd.append("slot", String(i));                          // "0" or "1"
+                    if (slot.pathname) fd.append("oldPathname", slot.pathname); // delete old blob
+
+                    const uploadRes = await fetch(
+                        `${process.env.NEXT_PUBLIC_API_URI}/api/about/${session?.userId}`,
+                        { method: "POST", body: fd }
+                    );
+
+                    if (!uploadRes.ok) {
+                        const { error } = await uploadRes.json();
+                        throw new Error(error ?? "Upload failed");
+                    }
+
+                    const { url, pathname }: { url: string; pathname: string } =
+                        await uploadRes.json();
+
+                    profileImages.push(url);
+                    profileImagePathnames.push(pathname);
+
+                    // Sync local slot — clear File so the "New" badge disappears
+                    setImageSlots(prev => {
+                        const next = [...prev] as [ProfileImageSlot, ProfileImageSlot];
+                        URL.revokeObjectURL(next[i].preview!);
+                        next[i] = { preview: url, file: null, existing: url, pathname };
+                        return next;
+                    });
+
+                } else if (slot.existing) {
+                    // Unchanged — forward existing URL + pathname
+                    profileImages.push(slot.existing ?? "");
+                    profileImagePathnames.push(slot.pathname ?? "");
+                }
+                // empty slot → omit (removed by user)
+            }
+
+            // Step 2 — persist text fields + resolved image URLs via PUT
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URI}/api/about/${session?.userId}`,
+                {
+                    method: "PUT",
+                    headers: { "Content-type": "application/json" },
+                    body: JSON.stringify({
+                        heading,
+                        paragraphs: paragraphs.filter(p => p.trim() !== ""),
+                        quickFacts: quickFacts.map(f => f.value).filter(v => v.trim() !== ""),
+                        profileImages,
+                        profileImagePathnames,
+                        removedPathnames,
+                    }),
+                }
+            );
+
             const result: { message: string } | { error: string } = await res.json();
-            if (!res.ok) console.error("Error: failed to update about me.");
+            if (!res.ok) console.error("Failed to update about me.");
             if ("message" in result) setNotifStatus(result.message);
-            if ("error" in result) setNotifStatus(result.error);
+            if ("error"   in result) setNotifStatus(result.error);
+
         } catch (err) {
-            if (err instanceof Error) console.error(err.message);
+            if (err instanceof Error) {
+                console.error(err.message);
+                setNotifStatus(err.message);
+            }
         } finally {
             setIsLoading(false);
+
+            // reset after successful/failed request cycle
+            setRemovedPathnames([]);
+
             setTimeout(() => setNotifStatus(""), 2500);
         }
     };
+
+    const hasNewImages = imageSlots.some(s => s.file !== null);
 
     return (
         <section className="min-h-screen bg-gray-100 dark:bg-slate-950 px-4 py-8 md:px-8">
@@ -183,6 +391,34 @@ const EditAboutMeForm = ({ session, info }: Props) => {
 
                         {/* ── Left: form fields ── */}
                         <div className="flex-1 p-7 flex flex-col gap-5 border-b md:border-b-0 md:border-r border-gray-200/60 dark:border-slate-700/40">
+
+                            {/* Profile Images */}
+                            <div className="flex flex-col gap-3">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-500 dark:text-slate-500">
+                                        Profile Images
+                                    </span>
+                                    {hasNewImages && (
+                                        <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                                            {imageSlots.filter(s => s.file).length} new selected
+                                        </span>
+                                    )}
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    {imageSlots.map((slot, i) => (
+                                        <ImageSlot
+                                            key={i}
+                                            slot={slot}
+                                            index={i}
+                                            onFileSelect={handleFileSelect}
+                                            onRemove={handleRemoveImage}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="h-px w-full bg-gray-100 dark:bg-slate-800" />
 
                             <Field label="Section Heading">
                                 <input
@@ -305,6 +541,29 @@ const EditAboutMeForm = ({ session, info }: Props) => {
                             </span>
 
                             <div className="rounded-xl border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800/40 p-4 flex flex-col gap-3 overflow-hidden">
+
+                                {imageSlots.some(s => s.preview) && (
+                                    <div className="grid grid-cols-2 gap-1.5">
+                                        {imageSlots.map((slot, i) =>
+                                            slot.preview ? (
+                                                <img
+                                                    key={i}
+                                                    src={slot.preview}
+                                                    alt={`Profile ${i + 1}`}
+                                                    className="w-full aspect-square object-cover rounded-md"
+                                                />
+                                            ) : (
+                                                <div
+                                                    key={i}
+                                                    className="w-full aspect-square rounded-md bg-gray-200 dark:bg-slate-700 flex items-center justify-center"
+                                                >
+                                                    <LuImage size={14} className="text-gray-400 dark:text-slate-500" />
+                                                </div>
+                                            )
+                                        )}
+                                    </div>
+                                )}
+
                                 <h2 className="text-base font-bold text-gray-800 dark:text-slate-100 leading-snug">
                                     {heading || "A little bit about me:"}
                                 </h2>
@@ -346,6 +605,8 @@ const EditAboutMeForm = ({ session, info }: Props) => {
                                 </span>
                                 <ul className="flex flex-col gap-1">
                                     {[
+                                        "Select up to 2 profile images shown side by side.",
+                                        "Replacing an image automatically deletes the old blob.",
                                         "Split long bios into multiple paragraphs for readability.",
                                         "Quick facts render in a 2-column grid on the live page.",
                                         "Empty paragraphs and facts are automatically excluded.",

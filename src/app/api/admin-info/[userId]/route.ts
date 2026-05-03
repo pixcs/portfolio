@@ -81,7 +81,7 @@ export async function POST(req: NextRequest, { params }: { params: { userId: str
         }
 
         const ext = file.name.split(".").pop() ?? "jpg";
-        const filename = `profile-${Date.now()}.${ext}`;
+        const filename = `${params.userId}/profile-${Date.now()}.${ext}`;
 
         const blob = await put(filename, file, {
             access: "public",

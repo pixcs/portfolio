@@ -14,8 +14,8 @@ type AboutMeInfo = {
 };
 
 type Props = {
-  session: IronSession<SessionData> | undefined
-}
+  session: IronSession<SessionData> | undefined;
+};
 
 const About = ({ session }: Props) => {
   const [about, setAbout] = useState<AboutMeInfo | null>(null);
@@ -24,7 +24,7 @@ const About = ({ session }: Props) => {
   useEffect(() => {
     const fetchAbout = async () => {
       try {
-        const userId = session?.userId || "666b094dab43a459a391d327"; // fallback user
+        const userId = session?.userId || "666b094dab43a459a391d327";
 
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URI}/api/about/${userId}`
@@ -64,14 +64,15 @@ const About = ({ session }: Props) => {
       </p>
 
       <div className="flex flex-col md:flex-row md:justify-between items-start gap-x-20 mt-10 px-5 md:px-20 md:mx-auto md:max-w-[1500px]">
-        <ProfileImage />
+
+        {/* Pass about so ProfileImage can use the uploaded images */}
+        {!loading && about && <ProfileImage about={about} />}
 
         <div className="md:w-1/2">
           <h2 className="text-xl md:text-3xl font-bold mb-5 mt-20 md:mt-0">
             {about?.heading || "A little bit about me:"}
           </h2>
 
-          {/* Paragraphs */}
           {loading ? (
             <p className="dark:text-gray-300">Loading...</p>
           ) : (
@@ -83,18 +84,14 @@ const About = ({ session }: Props) => {
                   </p>
                 ))
               ) : (
-                <p className="dark:text-gray-300">
-                  No bio available yet.
-                </p>
+                <p className="dark:text-gray-300">No bio available yet.</p>
               )}
 
-              {/* Quick Facts */}
               {about?.quickFacts?.length ? (
                 <>
                   <p className="dark:text-gray-300 mt-6 mb-3">
                     A few quick facts about me:
                   </p>
-
                   <ul className="list-disc ml-5 grid md:grid-cols-2 leading-7 md:leading-10 dark:text-gray-300">
                     {about.quickFacts.map((fact, i) => (
                       <li key={i}>{fact}</li>

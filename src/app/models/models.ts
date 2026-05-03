@@ -32,6 +32,7 @@ export type AboutContentSchema = {
     paragraphs: string[];
     quickFacts: string[];
     profileImages: string[];
+    profileImagePathnames: string[]
 };
 
 export type WorkExpSchema = {
@@ -111,6 +112,10 @@ const aboutContentSchema = new Schema<AboutContentSchema>(
             required: true,
             default: [],
         },
+        profileImagePathnames: {
+            type: [String],
+            required: true
+        }
     },
     { timestamps: true }
 );

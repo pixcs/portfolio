@@ -93,5 +93,12 @@ type UserInfo = {
     _id: string
 }
 
+type AboutMeInfo = {
+  heading?: string;
+  paragraphs?: string[];
+  quickFacts?: string[];
+  profileImages?: string[];
+};
+
 
 

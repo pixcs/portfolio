@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, Dispatch, FormEvent, SetStateAction, useState } from "react";
+import { ChangeEvent, Dispatch, FormEvent, SetStateAction, useState, useEffect } from "react";
 import { FaXmark } from "react-icons/fa6";
 import { RiCheckLine } from "react-icons/ri";
 import { useRouter } from "next/navigation";
@@ -38,6 +38,25 @@ const ExperienceForm = ({
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
+    const [logoPreview, setLogoPreview] = useState<string | null>(
+        selectEditWorkExp?.companyLogo ?? null
+    );
+    const [logoFile, setLogoFile] = useState<File | null>(null);
+
+    // Sync preview when switching to edit mode
+    useEffect(() => {
+        setLogoPreview(selectEditWorkExp?.companyLogo ?? null);
+        setLogoFile(null);
+    }, [selectEditWorkExp]);
+
+    // Add this new handler
+    const handleLogoChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.currentTarget.files?.[0];
+        if (!file) return;
+        setLogoFile(file);
+        setLogoPreview(URL.createObjectURL(file));
+    };
+
     const showSuccess = (msg: string) => {
         setSuccess(msg);
         setTimeout(() => setSuccess(null), 2500);
@@ -71,41 +90,37 @@ const ExperienceForm = ({
         setTasks(filteredTasks);
     };
 
+    // Shared helper to build the FormData payload
+    const buildFormData = () => {
+        const body = new FormData();
+        body.append("userId", session?.userId as string);
+        body.append("companyName", companyName);
+        body.append("companyUrl", companyUrl);
+        body.append("position", position);
+        body.append("range", range);
+        body.append("tasks", JSON.stringify(tasks));
+        if (logoFile) body.append("companyLogo", logoFile);
+        return body;
+    };
+
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
         try {
-            if (!session?.userId) {
-                setError("Not authenticated");
-                return;
-            }
+            if (!session?.userId) { setError("Not authenticated"); return; }
 
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/work-experience`, {
                 method: "POST",
-                headers: { "Content-type": "application/json" },
-                body: JSON.stringify({
-                    userId: session.userId,
-                    companyName,
-                    companyLogo,
-                    companyUrl,
-                    position,
-                    tasks,
-                    range,
-                }),
+                body: buildFormData(), // No Content-Type header — browser sets multipart boundary
             });
 
             const data = await res.json();
-
-            if (!res.ok) {
-                if (isErrorResponse(data)) {
-                    console.error("Error:", data.error);
-                    setError(data.error);
-                }
-                return;
-            }
+            if (!res.ok) { if (isErrorResponse(data)) setError(data.error); return; }
 
             setError(null);
             showSuccess("Work experience created successfully!");
+            setLogoPreview(null);
+            setLogoFile(null);
             formReset();
             router.refresh();
         } catch (err) {
@@ -118,33 +133,19 @@ const ExperienceForm = ({
     const updateWorkExperience = async (id: string) => {
         setLoading(true);
         try {
-            if (!session?.userId) {
-                setError("Not authenticated");
-                return;
-            }
+            if (!session?.userId) { setError("Not authenticated"); return; }
 
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/work-experience/${id}`, {
                 method: "PUT",
-                headers: { "Content-type": "application/json" },
-                body: JSON.stringify({
-                    userId: session.userId, 
-                    companyName,
-                    companyLogo,
-                    companyUrl,
-                    position,
-                    tasks,
-                    range,
-                }),
+                body: buildFormData(),
             });
 
-            if (!res.ok) {
-                const data = await res.json();
-                if (isErrorResponse(data)) setError(data.error);
-                throw new Error("Failed to update work experience");
-            }
+            if (!res.ok) { const data = await res.json(); if (isErrorResponse(data)) setError(data.error); return; }
 
             setError(null);
             showSuccess("Work experience updated successfully!");
+            setLogoPreview(null);
+            setLogoFile(null);
             formReset();
             router.refresh();
         } catch (err) {
@@ -186,15 +187,46 @@ const ExperienceForm = ({
                 <label htmlFor="company-logo" className={labelStyle}>
                     Company Logo <span className="text-gray-400">(optional)</span>
                 </label>
-                <input
-                    type="text"
-                    id="company-logo"
-                    name="companyLogo"
-                    placeholder='Enter url or file directory'
-                    className={inputStyle}
-                    onChange={handleFormChange}
-                    value={formData.companyLogo}
-                />
+                <div className="mx-8 flex flex-col gap-2">
+                    <label
+                        htmlFor="company-logo"
+                        className="flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed
+                            border-gray-300 dark:border-slate-600 rounded-lg cursor-pointer
+                            hover:border-gray-400 dark:hover:border-slate-500 transition-colors"
+                    >
+                        {logoPreview ? (
+                            <img
+                                src={logoPreview}
+                                alt="Company logo preview"
+                                className="h-16 w-16 object-contain rounded"
+                            />
+                        ) : (
+                            <>
+                                <span className="text-gray-400 dark:text-slate-500 text-2xl">🖼️</span>
+                                <span className="text-sm text-gray-500 dark:text-slate-400">
+                                    Click to upload logo
+                                </span>
+                            </>
+                        )}
+                        <input
+                            type="file"
+                            id="company-logo"
+                            name="companyLogo"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleLogoChange}
+                        />
+                    </label>
+                    {logoPreview && (
+                        <button
+                            type="button"
+                            onClick={() => { setLogoPreview(null); setLogoFile(null); }}
+                            className="text-xs text-red-400 hover:text-red-500 self-start"
+                        >
+                            Remove image
+                        </button>
+                    )}
+                </div>
 
                 <label htmlFor="companyUrl" className={labelStyle}>
                     Company Official page <span className="text-gray-400">(optional)</span>

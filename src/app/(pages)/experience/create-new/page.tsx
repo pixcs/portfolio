@@ -15,7 +15,7 @@ const CreateNew = async () => {
   const { list_of_experience }: ListOfExperience = await res.json();
   
   return (
-    <main className='flex flex-col md:flex-row items-stretch h-screen overflow-hidden'>
+    <main className='flex flex-col md:flex-row items-stretch h-screen'>
       <ExpContainer 
         listOfExperience={list_of_experience} 
         session={session}

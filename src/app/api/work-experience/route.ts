@@ -1,14 +1,36 @@
 import { NextResponse } from "next/server";
+import { put } from "@vercel/blob";
 import { connectToDB } from "@/app/lib/connectToDB";
 import { WorkExperience } from "@/app/models/models";
 
 export const POST = async (request: Request) => {
-    const { userId, companyName, companyLogo, companyUrl, position, tasks, range } = await request.json();
-
     await connectToDB();
+
+    const formData = await request.formData();
+    const userId      = formData.get("userId") as string;
+    const companyName = formData.get("companyName") as string;
+    const companyUrl  = formData.get("companyUrl") as string;
+    const position    = formData.get("position") as string;
+    const range       = formData.get("range") as string;
+    const tasks       = JSON.parse(formData.get("tasks") as string) as string[];
+    const logoFile    = formData.get("companyLogo") as File | null;
 
     if (!userId) {
         return NextResponse.json({ error: "Missing userId" }, { status: 400 });
+    }
+
+    let companyLogo: string | undefined;
+
+    if (logoFile && logoFile.size > 0) {
+        const blob = await put(
+            `${userId}/${Date.now()}-${logoFile.name}`,
+            logoFile,
+            {
+                access: "public",
+                token: process.env.BLOB_EXPERIENCE_READ_WRITE_TOKEN,
+            }
+        );
+        companyLogo = blob.url;
     }
 
     const newWorkExperience = new WorkExperience({
@@ -22,7 +44,6 @@ export const POST = async (request: Request) => {
     });
 
     await newWorkExperience.save();
-
     return NextResponse.json({ success: "Created successfully" });
 };
 

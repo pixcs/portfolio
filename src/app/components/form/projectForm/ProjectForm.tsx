@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, Dispatch, FormEvent, SetStateAction, useState } from "react";
+import { ChangeEvent, Dispatch, FormEvent, SetStateAction, useState, useEffect } from "react";
 import { FaXmark } from "react-icons/fa6";
 import { RiCheckLine } from "react-icons/ri";
 import { useRouter } from "next/navigation";
@@ -38,6 +38,16 @@ const ProjectForm = ({
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [imageFile, setImageFile] = useState<File | null>(null);
+
+    // Sync preview when editing
+    useEffect(() => {
+        setImagePreview(selectEditProject?.projectImage ?? null);
+        setImageFile(null);
+    }, [selectEditProject]);
+
+
     const showSuccess = (msg: string) => {
         setSuccess(msg);
         setTimeout(() => setSuccess(null), 2500);
@@ -64,37 +74,42 @@ const ProjectForm = ({
         setToolsAndTech(toolsAndTech.filter((t) => t !== id));
     };
 
+      const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.currentTarget.files?.[0];
+        if (!file) return;
+        setImageFile(file);
+        setImagePreview(URL.createObjectURL(file));
+    };
+
+    const buildFormData = () => {
+        const body = new FormData();
+        body.append("userId", session?.userId as string);
+        body.append("projectName", projectName);
+        body.append("projectUrl", projectUrl);
+        body.append("description", description);
+        body.append("toolsAndTech", JSON.stringify(toolsAndTech));
+        if (imageFile) body.append("projectImage", imageFile);
+        return body;
+    };
+
     const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
         setLoading(true);
         try {
-            if (!session?.userId) {
-                setError("Not authenticated.");
-                return;
-            }
+            if (!session?.userId) { setError("Not authenticated."); return; }
 
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/project`, {
                 method: "POST",
-                headers: { "Content-type": "application/json" },
-                body: JSON.stringify({
-                    userId: session.userId,
-                    projectName,
-                    projectImage,
-                    projectUrl,
-                    description,
-                    toolsAndTech,
-                }),
+                body: buildFormData(),
             });
 
             const data = await res.json();
-
-            if (!res.ok) {
-                if (isErrorResponse(data)) setError(data.error);
-                return;
-            }
+            if (!res.ok) { if (isErrorResponse(data)) setError(data.error); return; }
 
             setError(null);
             showSuccess("Project created successfully!");
+            setImagePreview(null);
+            setImageFile(null);
             formReset();
             router.refresh();
         } catch (err) {
@@ -107,32 +122,19 @@ const ProjectForm = ({
     const handleUpdateProject = async (id: string): Promise<void> => {
         setLoading(true);
         try {
-            if (!session?.userId) {
-                setError("Not authenticated.");
-                return;
-            }
+            if (!session?.userId) { setError("Not authenticated."); return; }
 
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/project/${id}`, {
                 method: "PUT",
-                headers: { "Content-type": "application/json" },
-                body: JSON.stringify({
-                    userId: session.userId, // 🔐 required by API filter
-                    projectName,
-                    projectImage,
-                    projectUrl,
-                    description,
-                    toolsAndTech,
-                }),
+                body: buildFormData(),
             });
 
-            if (!res.ok) {
-                const data = await res.json();
-                if (isErrorResponse(data)) setError(data.error);
-                throw new Error("Failed to update project.");
-            }
+            if (!res.ok) { const data = await res.json(); if (isErrorResponse(data)) setError(data.error); return; }
 
             setError(null);
             showSuccess("Project updated successfully!");
+            setImagePreview(null);
+            setImageFile(null);
             formReset();
             router.refresh();
         } catch (err) {
@@ -168,15 +170,49 @@ const ProjectForm = ({
                     onChange={handleFormChange} value={formData.projectName}
                 />
 
-                <label htmlFor="project-image-url" className={labelStyle}>
+                <label htmlFor="project-image" className={labelStyle}>
                     Project Image <span className="text-gray-400">(required)</span>
                 </label>
-                <input
-                    type="text" id="project-image-url" name="projectImage"
-                    placeholder='Enter image url or file directory' required
-                    className={inputStyle}
-                    onChange={handleFormChange} value={formData.projectImage}
-                />
+                <div className="mx-8 flex flex-col gap-2">
+                    <label
+                        htmlFor="project-image"
+                        className="flex flex-col items-center justify-center gap-2 p-6 border-2 border-dashed
+                            border-gray-300 dark:border-slate-600 rounded-lg cursor-pointer
+                            hover:border-gray-400 dark:hover:border-slate-500 transition-colors"
+                    >
+                        {imagePreview ? (
+                            <img
+                                src={imagePreview}
+                                alt="Project image preview"
+                                className="h-24 w-full object-contain rounded"
+                            />
+                        ) : (
+                            <>
+                                <span className="text-gray-400 dark:text-slate-500 text-2xl">🖼️</span>
+                                <span className="text-sm text-gray-500 dark:text-slate-400">
+                                    Click to upload project image
+                                </span>
+                            </>
+                        )}
+                        <input
+                            type="file"
+                            id="project-image"
+                            name="projectImage"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleImageChange}
+                        />
+                    </label>
+                    {imagePreview && (
+                        <button
+                            type="button"
+                            onClick={() => { setImagePreview(null); setImageFile(null); }}
+                            className="text-xs text-red-400 hover:text-red-500 self-start"
+                        >
+                            Remove image
+                        </button>
+                    )}
+                </div>
 
                 <label htmlFor="project-url" className={labelStyle}>
                     Project Official Page <span className="text-gray-400">(required)</span>

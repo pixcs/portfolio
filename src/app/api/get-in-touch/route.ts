@@ -25,7 +25,17 @@ export const POST = async (request: Request) => {
 
 export const GET = async () => {
     await connectToDB();
-    const messages: GetInTouch[] = await GetInTouchModel.find().sort({ createdAt: -1 });
+        const messages = await GetInTouchModel
+    .find()
+    .sort({ createdAt: -1 })
+    .lean();
+
+    const formatted = messages.map((m) => ({
+    ...m,
+    _id: m._id.toString(),
+    }));
+
+    return NextResponse.json({ messages: formatted });
 
     return NextResponse.json({ messages });
 }

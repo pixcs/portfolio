@@ -1,5 +1,3 @@
-// app/api/admin-info/[userId]/route.ts
-
 import { NextRequest, NextResponse } from "next/server";
 import { put, del } from "@vercel/blob";
 import mongoose from "mongoose";
@@ -8,7 +6,6 @@ import { AdminInfoModel } from "@/app/models/models";
 
 type Params = { params: { userId: string } };
 
-// Whitelist of allowed top-level fields for PUT
 const ALLOWED_FIELDS = [
     "name",
     "about",
@@ -18,10 +15,10 @@ const ALLOWED_FIELDS = [
     "githubUrl",
     "facebookUrl",
     "linkedInUrl",
-    "linkedUrl",       // new
+    "linkedUrl",
     "profileUrl",
     "resumeUrl",
-    "metadata",        // new
+    "metadata",
 ] as const;
 
 type AllowedField = (typeof ALLOWED_FIELDS)[number];
@@ -36,7 +33,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
         const info = await AdminInfoModel.findOne({
             userId: new mongoose.Types.ObjectId(params.userId),
-        }).lean();
+        }).lean(); // ✅ FIXED
 
         return NextResponse.json({ info }, { status: 200 });
     } catch (err) {
@@ -55,7 +52,6 @@ export async function PUT(req: NextRequest, { params }: Params) {
 
         const body = await req.json();
 
-        // Strip unknown fields — only persist what the schema expects
         const sanitized = ALLOWED_FIELDS.reduce<Partial<Record<AllowedField, unknown>>>(
             (acc, key) => {
                 if (key in body) acc[key] = body[key];
@@ -64,9 +60,10 @@ export async function PUT(req: NextRequest, { params }: Params) {
             {}
         );
 
-        // Validate metadata shape if provided
+        // metadata validation
         if (sanitized.metadata !== undefined) {
             const meta = sanitized.metadata as Record<string, unknown>;
+
             const isValidMeta =
                 typeof meta === "object" &&
                 meta !== null &&
@@ -76,7 +73,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
 
             if (!isValidMeta) {
                 return NextResponse.json(
-                    { error: "Invalid metadata shape. Expected { title?, description?, icons? }." },
+                    { error: "Invalid metadata shape." },
                     { status: 400 }
                 );
             }
@@ -88,17 +85,22 @@ export async function PUT(req: NextRequest, { params }: Params) {
             { userId },
             { ...sanitized, userId },
             { new: true, upsert: true }
-        );
+        ).lean(); 
 
-        return NextResponse.json({ message: "Info updated", info }, { status: 200 });
+        return NextResponse.json(
+            { message: "Info updated", info },
+            { status: 200 }
+        );
     } catch (err) {
         console.error(err);
         return NextResponse.json({ error: "Server error" }, { status: 500 });
     }
 }
 
-// upload profile
-export async function POST(req: NextRequest, { params }: { params: { userId: string } }) {
+export async function POST(
+    req: NextRequest,
+    { params }: Params
+) {
     try {
         await connectToDB();
 
@@ -112,11 +114,11 @@ export async function POST(req: NextRequest, { params }: { params: { userId: str
         }
 
         const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
         if (!allowedTypes.includes(file.type)) {
             return NextResponse.json({ error: "Invalid file type." }, { status: 400 });
         }
 
-        // Delete old blob if it exists
         if (oldPathname) {
             try {
                 await del(oldPathname);
@@ -133,7 +135,9 @@ export async function POST(req: NextRequest, { params }: { params: { userId: str
         });
 
         await AdminInfoModel.findOneAndUpdate(
-            { userId: params.userId },
+            {
+                userId: new mongoose.Types.ObjectId(params.userId), 
+            },
             { profileUrl: blob.url },
             { upsert: true }
         );
@@ -142,7 +146,6 @@ export async function POST(req: NextRequest, { params }: { params: { userId: str
             url: blob.url,
             pathname: blob.pathname,
         });
-
     } catch (err) {
         console.error(err);
         return NextResponse.json({ error: "Upload failed" }, { status: 500 });

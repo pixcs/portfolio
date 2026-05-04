@@ -1,118 +1,100 @@
-import { IoLogoJavascript } from "react-icons/io5";
-import { 
-    SiTypescript, 
-    SiMongodb, 
-    SiJquery, 
+"use client";
+
+import {
+  IoLogoJavascript,
+  IoLogoCss3,
+  IoLogoFirebase,
+} from "react-icons/io5";
+import {
+  SiTypescript,
+  SiMongodb,
+  SiJquery,
 } from "react-icons/si";
 import {
-    FaHtml5,
-    FaReact,
-    FaJava,
-    FaGitAlt,
-    FaLaravel,
-    FaUbuntu 
+  FaHtml5,
+  FaReact,
+  FaJava,
+  FaGitAlt,
+  FaLaravel,
+  FaUbuntu,
+  FaPhp,
+  FaVuejs,
 } from "react-icons/fa";
-import { IoLogoCss3 } from "react-icons/io";
 import { RiNextjsFill, RiTailwindCssFill } from "react-icons/ri";
-import { IoLogoFirebase } from "react-icons/io5";
 import { GrGraphQl, GrMysql } from "react-icons/gr";
-import { FaPhp, FaVuejs } from "react-icons/fa6";
+
+const skills = [
+  { icon: IoLogoJavascript, name: "JavaScript", color: "text-yellow-400" },
+  { icon: SiTypescript, name: "TypeScript", color: "text-sky-600" },
+  { icon: FaHtml5, name: "HTML5", color: "text-orange-500" },
+  { icon: IoLogoCss3, name: "CSS3", color: "text-sky-700" },
+  { icon: FaReact, name: "React", color: "text-sky-500" },
+  { icon: FaReact, name: "React Native", color: "text-sky-500" },
+  { icon: RiNextjsFill, name: "Next.js", color: "dark:text-white text-black" },
+  { icon: FaJava, name: "Java", color: "text-orange-500" },
+  { icon: SiMongodb, name: "MongoDB", color: "text-green-700" },
+  { icon: RiTailwindCssFill, name: "Tailwind", color: "text-sky-500" },
+  { icon: IoLogoFirebase, name: "Firebase", color: "text-amber-500" },
+  { icon: GrGraphQl, name: "GraphQL", color: "text-pink-500" },
+  { icon: FaGitAlt, name: "Git", color: "text-orange-600" },
+  { icon: GrMysql, name: "MySQL", color: "text-blue-500" },
+  { icon: FaPhp, name: "PHP", color: "text-indigo-500" },
+  { icon: FaVuejs, name: "Vue", color: "text-green-500" },
+  { icon: FaUbuntu, name: "Ubuntu", color: "text-orange-500" },
+  { icon: FaLaravel, name: "Laravel", color: "text-red-500" },
+  { icon: SiJquery, name: "jQuery", color: "text-blue-500" },
+];
 
 const Skills = () => {
-    const containerStyle = "flex flex-col justify-center items-center gap-y-2";
-    const titleStyle = "dark:text-gray-300 font-semibold";
+  return (
+    <section className="py-24 fade-in-effect">
+      {/* Header */}
+      <p className="text-sm text-center font-medium px-3 py-1 rounded-full bg-gray-200 max-w-[140px] mx-auto dark:bg-slate-700 transition-theme">
+        Skills
+      </p>
 
-    //Static For Now
-    return (
-        <section className="py-20 fade-in-effect">
-            <p className='text-sm text-center font-medium px-2 py-1 mt-5 rounded-full bg-gray-200 max-w-[150px] mx-auto dark:bg-slate-700 transition-theme'>
-                Skills
-            </p>
-            <p className=" text-lg md:text-xl text-center pt-5 pb-16 px-8 dark:text-gray-300">
-                The skills, tools and technologies i am using:
-            </p>
+      <p className="text-lg md:text-xl text-center pt-5 pb-14 px-8 dark:text-gray-300">
+        Tools, technologies & frameworks I work with
+      </p>
 
-            <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-y-10 justify-center mx-5 md:mx-auto md:max-w-7xl">
-                <div className={containerStyle}>
-                    <IoLogoJavascript size={80} className=" text-yellow-400 bg-slate-900 dark:bg-transparent hover-scale" />
-                    <p className={titleStyle}>Javascript</p>
-                </div>
-                <div className={containerStyle}>
-                    <SiTypescript size={75} className=" text-sky-600 dark:bg-white dark:rounded-md hover-scale" />
-                    <p className={titleStyle}>Typescript</p>
-                </div>
-                <div className={containerStyle}>
-                    <FaHtml5 size={80} className=" text-orange-500 dark:bg-white dark:rounded-md hover-scale" />
-                    <p className={titleStyle}>HTML5</p>
-                </div>
-                <div className={containerStyle}>
-                    <IoLogoCss3 size={80} className="text-sky-700 dark:bg-white dark:rounded-md hover-scale" />
-                    <p className={titleStyle}>CSS</p>
-                </div>
-                <div className={containerStyle}>
-                    <FaReact size={80} className="text-sky-500 hover-scale" />
-                    <p className={titleStyle}>React</p>
-                </div>
-                <div className={containerStyle}>
-                    <FaReact size={80} className="text-sky-500  bg-slate-800 p-2 rounded-md hover-scale" />
-                    <p className={titleStyle}>React Native</p>
-                </div>
-                <div className={containerStyle}>
-                    <RiNextjsFill size={80} className="text-black dark:text-white hover-scale" />
-                    <p className={titleStyle}>Next.js</p>
-                </div>
-                <div className={containerStyle}>
-                    <FaJava size={80} className="text-orange-500  hover-scale" />
-                    <p className={titleStyle}>Java</p>
-                </div>
-                <div className={containerStyle}>
-                    <SiMongodb size={80} className="text-green-800 dark:bg-white rounded-full hover-scale" />
-                    <p className={titleStyle}>MongoDB</p>
-                </div>
-                <div className={containerStyle}>
-                    <RiTailwindCssFill size={80} className="text-sky-500 hover-scale" />
-                    <p className={titleStyle}>Tailwindcss</p>
-                </div>
-                <div className={containerStyle}>
-                    <IoLogoFirebase size={80} className="text-amber-500 hover-scale" />
-                    <p className={titleStyle}>Firebase</p>
-                </div>
-                <div className={containerStyle}>
-                    <GrGraphQl size={80} className="text-pink-500 hover-scale" />
-                    <p className={titleStyle}>GraphQL</p>
-                </div>
-                <div className={containerStyle}>
-                    <FaGitAlt size={80} className="text-orange-600 hover-scale" />
-                    <p className={titleStyle}>Git</p>
-                </div>
-                <div className={containerStyle}>
-                    <GrMysql size={80} className="my-sql dark:text-blue-400 hover-scale" />
-                    <p className={titleStyle}>MySQL</p>
-                </div>
-                <div className={containerStyle}>
-                    <FaPhp size={80} className=" text-indigo-500 dark:text-indigo-400  hover-scale" />
-                    <p className={titleStyle}>PHP</p>
-                </div>
-                <div className={containerStyle}>
-                    <FaVuejs size={80} className=" text-green-500 hover-scale" />
-                    <p className={titleStyle}>Vue</p>
-                </div>
-                <div className={containerStyle}>
-                    <FaUbuntu size={80} className=" text-orange-500  hover-scale" />
-                    <p className={titleStyle}>Ubuntu</p>
-                </div>
-                <div className={containerStyle}>
-                    <FaLaravel size={80} className=" text-red-500 dark:text-rose-600  hover-scale" />
-                    <p className={titleStyle}>Laravel</p>
-                </div>
-                <div className={containerStyle}>
-                    <SiJquery size={80} className=" text-blue-500 dark:text-sky-600  hover-scale" />
-                    <p className={titleStyle}>JQuery</p>
-                </div>
-             
+      {/* Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-6 mx-auto max-w-6xl px-6">
+        {skills.map((skill, i) => {
+          const Icon = skill.icon;
+
+          return (
+            <div
+              key={i}
+              className="
+                group relative flex flex-col items-center justify-center
+                p-6 rounded-2xl
+                bg-white/60 dark:bg-slate-800/40
+                backdrop-blur-md
+                border border-gray-200 dark:border-slate-700
+                shadow-sm hover:shadow-xl
+                transition-all duration-300
+                hover:-translate-y-1
+              "
+            >
+              {/* Glow background */}
+              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-500 bg-gradient-to-br from-sky-500/10 to-purple-500/10" />
+
+              {/* Icon */}
+              <Icon
+                size={42}
+                className={`${skill.color} relative z-10 transition-transform duration-300 group-hover:scale-110`}
+              />
+
+              {/* Label */}
+              <p className="mt-3 text-sm font-medium dark:text-gray-200 relative z-10">
+                {skill.name}
+              </p>
             </div>
-        </section>
-    )
-}
+          );
+        })}
+      </div>
+    </section>
+  );
+};
 
 export default Skills;

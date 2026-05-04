@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type AboutMeInfo = {
   heading?: string;
@@ -14,18 +14,34 @@ type Props = {
   about: AboutMeInfo;
 };
 
+// 👇 responsive hook
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  return isMobile;
+};
+
 const ProfileImage = ({ about }: Props) => {
-  const [hover, setHover] = useState<boolean>(false);
+  const [hover, setHover] = useState(false);
+  const isMobile = useIsMobile();
 
   const img0 = about?.profileImages?.[0];
   const img1 = about?.profileImages?.[1];
 
-  const D   = 40;  // block thickness
-  const GAP = 14;  // gap between image and blocks
+  // ✅ responsive values
+  const D = isMobile ? 20 : 36;
+  const GAP = isMobile ? 10 : 14;
 
   const decoBlocks = (
     <>
-      {/* Vertical block — left side, partial height */}
+      {/* Vertical block */}
       <div
         className="intro-deco-v absolute bg-gray-200 dark:bg-slate-700 transition-theme"
         style={{
@@ -35,7 +51,8 @@ const ProfileImage = ({ about }: Props) => {
           width: D,
         }}
       />
-      {/* Horizontal block — bottom, partial width */}
+
+      {/* Horizontal block */}
       <div
         className="intro-deco-h absolute bg-gray-200 dark:bg-slate-700 transition-theme"
         style={{
@@ -49,7 +66,7 @@ const ProfileImage = ({ about }: Props) => {
   );
 
   const wrapperCls =
-    "intro-image-wrap relative flex-shrink-0 w-[280px] h-[380px] md:w-[380px] md:h-[520px]";
+    "intro-image-wrap relative flex-shrink-0 mx-auto md:mx-0 w-[220px] sm:w-[260px] md:w-[320px] lg:w-[380px] aspect-[3/4]";
 
   if (!img0 && !img1) {
     return (
@@ -75,6 +92,7 @@ const ProfileImage = ({ about }: Props) => {
           onMouseLeave={() => setHover(false)}
         />
       )}
+
       {img1 && (
         <Image
           src={img1}
@@ -87,6 +105,7 @@ const ProfileImage = ({ about }: Props) => {
           onMouseLeave={() => setHover(false)}
         />
       )}
+
       {decoBlocks}
     </div>
   );

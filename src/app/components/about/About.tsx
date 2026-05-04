@@ -60,7 +60,7 @@ const About = ({ session }: Props) => {
       {/* Match the same horizontal padding/max-width as the intro section */}
       <div className="flex flex-col md:flex-row md:items-center gap-x-16 gap-y-16 mt-16 px-5 md:px-20 md:mx-auto md:max-w-[1500px]">
 
-        <div className="about-image-col flex-shrink-0 pl-10 md:pl-16 mr-24">
+        <div className="about-image-col flex-shrink-0 pl-10 md:pl-16 mr-10">
           {!loading && about && <ProfileImage about={about} />}
         </div>
 

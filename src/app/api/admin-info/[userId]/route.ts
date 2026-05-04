@@ -7,6 +7,7 @@ import { AdminInfoModel } from "@/app/models/models";
 type Params = { params: { userId: string } };
 
 const ALLOWED_FIELDS = [
+    "title",
     "name",
     "about",
     "address",
@@ -18,6 +19,8 @@ const ALLOWED_FIELDS = [
     "linkedUrl",
     "profileUrl",
     "resumeUrl",
+    "email",
+    "contactNumber",
     "metadata",
 ] as const;
 
@@ -81,11 +84,15 @@ export async function PUT(req: NextRequest, { params }: Params) {
 
         const userId = new mongoose.Types.ObjectId(params.userId);
 
+        const updateData = {
+            ...sanitized,
+        };
+
         const info = await AdminInfoModel.findOneAndUpdate(
             { userId },
-            { ...sanitized, userId },
+            { $set: updateData },
             { new: true, upsert: true }
-        ).lean(); 
+        ).lean();
 
         return NextResponse.json(
             { message: "Info updated", info },

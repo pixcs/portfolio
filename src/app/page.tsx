@@ -22,7 +22,7 @@ export default async function Home() {
         <Skills />
         <Experience session={session} />
         <Project session={session} />
-        <Contact />
+        <Contact session={session} />
       </main>
       <footer>
         <p className=" text-sm md:text-base flex items-center justify-center text-wrap dark:text-gray-400 px-8 py-6">

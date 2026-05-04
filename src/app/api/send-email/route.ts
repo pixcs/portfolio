@@ -2,7 +2,8 @@ import nodemailer from 'nodemailer';
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-    const { name, email, subject, message } = await request.json();
+    const { name, email, subject, message, infoEmail, title } = await request.json();
+    console.log('send-email', infoEmail,  title);
 
     const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -14,7 +15,7 @@ export async function POST(request: NextRequest) {
 
     try {
         await transporter.sendMail({
-            from: `"PIC Portfolio" <${process.env.EMAIL_USER}>`,
+            from: `"(${title}) Portfolio Website" <${infoEmail}>`,
             to: process.env.EMAIL_USER,
             subject: `${subject} (from ${name})`,
             html: `
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
 
         // Auto-reply to USER (receipt)
         await transporter.sendMail({
-            from: `"PIC Portfolio" <${process.env.EMAIL_USER}>`,
+            from: `"(${title}) Portfolio Website" <${infoEmail}>`,
             to: email,
             subject: "We received your message",
             html: `
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
 
                         <p style="margin-top:20px;">
                             Best regards,<br/>
-                            <strong>PIC</strong>
+                            <strong>${title}</strong>
                         </p>
                     </div>
 

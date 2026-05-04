@@ -15,6 +15,7 @@ type AdminSchema = {
 
 export type AdminInfoSchema = {
     userId: Types.ObjectId;
+    title: string,
     name: string;
     about: string;
     address: string;
@@ -26,6 +27,10 @@ export type AdminInfoSchema = {
     linkedUrl: string;       
     profileUrl: string;
     resumeUrl: string;
+
+    email: string,
+    contactNumber: string;
+
     metadata: {             
         title: string;
         description: string;
@@ -78,6 +83,7 @@ const adminProfileSchema = new Schema<AdminInfoSchema>(
             required: true,
             unique: true,
         },
+        title:       { type: String },
         name:        { type: String },
         about:       { type: String },
         address:     { type: String },
@@ -89,6 +95,10 @@ const adminProfileSchema = new Schema<AdminInfoSchema>(
         linkedUrl:   { type: String },     
         profileUrl:  { type: String },
         resumeUrl:   { type: String },
+
+        email:       { type: String }, 
+        contactNumber: { type: String }, 
+        
         metadata: {                       
             type: new Schema(
                 {

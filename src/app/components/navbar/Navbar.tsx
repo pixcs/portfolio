@@ -29,6 +29,7 @@ type Props = {
     showInbox: boolean,
     setShowInbox: Dispatch<SetStateAction<boolean>>,
     resumeUrl: string
+    title: string
 }
 
 const Navbar = ({
@@ -42,7 +43,8 @@ const Navbar = ({
     setReRender,
     showInbox,
     setShowInbox,
-    resumeUrl
+    resumeUrl,
+    title
 }: Props) => {
     const inboxRef = useRef<HTMLDivElement | null>(null);
 
@@ -68,7 +70,7 @@ const Navbar = ({
             <nav className="fixed w-full top-0 flex justify-between items-center py-4 px-5 md:px-70 bg-white/60 dark:bg-slate-950/60 transition-theme background-blur z-20">
                 <div className="flex items-center justify-between w-full md:max-w-7xl mx-auto">
                     <h3 className="text-3xl font-bold text-slate-900 dark:text-white">
-                        <Link href="">{"<PIC />"}</Link>
+                        <Link href="">{`<${title} />`}</Link>
                     </h3>
                     <div className="hidden md:flex space-x-5 items-center">
                         <ul className="flex space-x-8">

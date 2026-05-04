@@ -10,10 +10,12 @@ import {
 
 type Props = {
     status: string,
-    setStatus: Dispatch<SetStateAction<string>>
+    setStatus: Dispatch<SetStateAction<string>>,
+    infoEmail: string | undefined,
+    title: string | undefined,
 }
 
-const ContactForm = ({ status, setStatus }: Props) => {
+const ContactForm = ({ status, setStatus, infoEmail, title }: Props) => {
     const [formData, setFormData] = useState<ContactForm>({
         name: "",
         email: "",
@@ -69,6 +71,8 @@ const ContactForm = ({ status, setStatus }: Props) => {
                         email,
                         subject,
                         message,
+                        infoEmail,  // authenticated user info email  
+                        title       // app title
                     }),
                 }
             );

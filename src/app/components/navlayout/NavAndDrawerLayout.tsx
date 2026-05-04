@@ -15,9 +15,10 @@ const NavAndDrawerLayout = ({ session }: Props) => {
     const [showDrawer, setShowDrawer] = useState(false);
 
     const [listOfMessage, setListOfMessage] = useState<GetInTouch[]>([]);
-    const [reRender, setReRender] = useState(false);
-    const [showInbox, setShowInbox] = useState(false);
-    const [resumeUrl, setResumeUrl] = useState("");
+    const [reRender, setReRender] = useState<boolean>(false);
+    const [showInbox, setShowInbox] = useState<boolean>(false);
+    const [resumeUrl, setResumeUrl] = useState<string>("");
+    const [title, setTitle] = useState<string>("");
 
     useEffect(() => {
         const theme = localStorage.getItem("theme");
@@ -35,6 +36,7 @@ const NavAndDrawerLayout = ({ session }: Props) => {
             const data = await res.json();
 
             if (res.ok && data.info) {
+                setTitle(data.info.title);
                 setResumeUrl(data.info.resumeUrl);
             }
         }
@@ -96,6 +98,7 @@ const NavAndDrawerLayout = ({ session }: Props) => {
                 showInbox={showInbox}
                 setShowInbox={setShowInbox}
                 resumeUrl={resumeUrl}
+                title={title}
             />
             <Drawer
                 darkMode={darkMode}
@@ -107,6 +110,7 @@ const NavAndDrawerLayout = ({ session }: Props) => {
                 setListOfMessage={setListOfMessage}
                 setReRender={setReRender}
                 resumeUrl={resumeUrl}
+                title={title}
             />
         </>
     )

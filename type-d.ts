@@ -80,6 +80,7 @@ type GetInTouch = {
 type AdminInfo = {
     _id?: string;
     userId?: string;
+    title?: string;
     name?: string;
     about?: string;
     address?: string;
@@ -90,6 +91,8 @@ type AdminInfo = {
     linkedUrl?: string;     
     profileUrl?: string;
     resumeUrl?: string;
+    email?: string;
+    contactNumber?: string;
     metadata?: {            
         title?: string;
         description?: string;

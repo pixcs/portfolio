@@ -17,6 +17,7 @@ type Props = {
     setListOfMessage: Dispatch<SetStateAction<GetInTouch[]>>,
     setReRender: Dispatch<SetStateAction<boolean>>,
     resumeUrl: string
+    title: string
 }
 
 const Drawer = ({
@@ -28,7 +29,8 @@ const Drawer = ({
     listOfMessage,
     setListOfMessage,
     setReRender,
-    resumeUrl
+    resumeUrl,
+    title
 }: Props) => {
     return (
         < div
@@ -40,7 +42,7 @@ const Drawer = ({
                 onClick={(e) => e.stopPropagation()} // Prevent click events from propagating to the overlay
             >
                 <div className="flex justify-between items-center p-4 border-b-2 border-gray-100 dark:border-slate-800">
-                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{"<PIC />"}</h3>
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{`<${title} />`}</h3>
                     <IoIosClose
                         className="hovered p-1"
                         size={40}

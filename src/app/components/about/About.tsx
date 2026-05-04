@@ -25,23 +25,17 @@ const About = ({ session }: Props) => {
     const fetchAbout = async () => {
       try {
         const userId = session?.userId || "666b094dab43a459a391d327";
-
         const res = await fetch(
           `${process.env.NEXT_PUBLIC_API_URI}/api/about/${userId}`
         );
-
         const data = await res.json();
-
-        if (res.ok) {
-          setAbout(data.about);
-        }
+        if (res.ok) setAbout(data.about);
       } catch (err) {
         console.error("Failed to fetch about:", err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchAbout();
   }, []);
 
@@ -59,17 +53,19 @@ const About = ({ session }: Props) => {
         </Link>
       )}
 
-      <p className="text-sm text-center font-medium px-2 py-1 mt-5 rounded-full bg-gray-200 max-w-[150px] mx-auto dark:bg-slate-700 transition-theme">
+      <p className="about-label text-sm text-center font-medium px-2 py-1 mt-5 rounded-full bg-gray-200 max-w-[150px] mx-auto dark:bg-slate-700 transition-theme">
         About me
       </p>
 
-      <div className="flex flex-col md:flex-row md:justify-between items-start gap-x-20 mt-10 px-5 md:px-20 md:mx-auto md:max-w-[1500px]">
+      {/* Match the same horizontal padding/max-width as the intro section */}
+      <div className="flex flex-col md:flex-row md:items-center gap-x-16 gap-y-16 mt-16 px-5 md:px-20 md:mx-auto md:max-w-[1500px]">
 
-        {/* Pass about so ProfileImage can use the uploaded images */}
-        {!loading && about && <ProfileImage about={about} />}
+        <div className="about-image-col flex-shrink-0 pl-10 md:pl-16 mr-24">
+          {!loading && about && <ProfileImage about={about} />}
+        </div>
 
-        <div className="md:w-1/2">
-          <h2 className="text-xl md:text-3xl font-bold mb-5 mt-20 md:mt-0">
+        <div className="intro-text md:w-1/2">
+          <h2 className="text-xl md:text-3xl font-bold mb-5 mt-10 md:mt-0">
             {about?.heading || "A little bit about me:"}
           </h2>
 
@@ -79,9 +75,7 @@ const About = ({ session }: Props) => {
             <>
               {about?.paragraphs?.length ? (
                 about.paragraphs.map((p, i) => (
-                  <p key={i} className="dark:text-gray-300 mb-4">
-                    {p}
-                  </p>
+                  <p key={i} className="dark:text-gray-300 mb-4">{p}</p>
                 ))
               ) : (
                 <p className="dark:text-gray-300">No bio available yet.</p>

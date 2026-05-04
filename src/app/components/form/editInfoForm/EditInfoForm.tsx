@@ -11,8 +11,10 @@ import { IoMdArrowRoundBack } from 'react-icons/io';
 import { LuUpload, LuX, LuLoader } from 'react-icons/lu';
 import type { ClientSession } from "@/app/models/models";
 import { GrLinkedinOption } from "react-icons/gr";
+import { PiPlaceholder } from 'react-icons/pi';
 
 type FormAdminInfo = {
+    title: string,
     name: string;
     about: string;
     address: string;
@@ -23,6 +25,8 @@ type FormAdminInfo = {
     linkedUrl: string;       
     profileUrl: string;
     resumeUrl: string;
+    email: string;
+    contactNumber: string;
     metadata: {               
         title: string;
         description: string;
@@ -214,6 +218,7 @@ const ProfileUploader = ({
 /* ─── Main form ─── */
 const EditInfoForm = ({ session, info }: Props) => {
     const [formData, setFormData] = useState<FormAdminInfo>({
+        title: "",
         name: "",
         about: "",
         address: "",
@@ -224,15 +229,17 @@ const EditInfoForm = ({ session, info }: Props) => {
         linkedUrl: "",
         profileUrl: "",
         resumeUrl: "",
+        email: "",
+        contactNumber: "",
         metadata: { title: "", description: "", icons: "" },
     });
     const [notifStatus, setNotifStatus] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
     const {
-        name, about, address, colorStatus, status,
+        title, name, about, address, colorStatus, status,
         githubUrl, facebookUrl, linkedUrl,
-        profileUrl, resumeUrl, metadata,
+        profileUrl, resumeUrl, email, contactNumber, metadata,
     } = formData;
 
     // Generic flat field handler
@@ -252,16 +259,19 @@ const EditInfoForm = ({ session, info }: Props) => {
 
     useEffect(() => {
         setFormData({
-            name:        info?.name        || "",
-            about:       info?.about       || "",
-            address:     info?.address     || "",
-            colorStatus: info?.colorStatus || "",
-            status:      info?.status      || "",
-            githubUrl:   info?.githubUrl   || "",
-            facebookUrl: info?.facebookUrl || "",
-            linkedUrl:   info?.linkedUrl   || "",
-            profileUrl:  info?.profileUrl  || "",
-            resumeUrl:   info?.resumeUrl   || "",
+            title:         info?.title        || "",
+            name:          info?.name          || "",
+            about:         info?.about         || "",
+            address:       info?.address       || "",
+            colorStatus:   info?.colorStatus   || "",
+            status:        info?.status        || "",
+            githubUrl:     info?.githubUrl     || "",
+            facebookUrl:   info?.facebookUrl   || "",
+            linkedUrl:     info?.linkedUrl     || "",
+            profileUrl:    info?.profileUrl    || "",
+            resumeUrl:     info?.resumeUrl     || "",
+            email:         info?.email         || "",
+            contactNumber: info?.contactNumber || "",
             metadata: {
                 title:       info?.metadata?.title       || "",
                 description: info?.metadata?.description || "",
@@ -282,6 +292,7 @@ const EditInfoForm = ({ session, info }: Props) => {
                     method: "PUT",
                     headers: { "Content-type": "application/json" },
                     body: JSON.stringify({
+                        title,
                         name,
                         about,
                         address,
@@ -292,6 +303,8 @@ const EditInfoForm = ({ session, info }: Props) => {
                         linkedUrl,
                         profileUrl,
                         resumeUrl,
+                        email,
+                        contactNumber,
                         metadata,
                     }),
                 }
@@ -343,6 +356,10 @@ const EditInfoForm = ({ session, info }: Props) => {
 
                         {/* ── Left: form fields ── */}
                         <div className="flex-1 p-7 flex flex-col gap-5 border-b md:border-b-0 md:border-r border-gray-200/60 dark:border-slate-700/40">
+
+                            <Field label="Title">
+                                <input type="text" name="title" value={title} onChange={handleChange} className={inputCls} placeholder="Portfolio" />
+                            </Field>
 
                             <Field label="Display Name">
                                 <input type="text" name="name" value={name} onChange={handleChange} className={inputCls} placeholder="Your name" />
@@ -396,6 +413,15 @@ const EditInfoForm = ({ session, info }: Props) => {
                                     <textarea name="resumeUrl" value={resumeUrl} onChange={handleChange} className={`${inputCls} min-h-14 resize-none`} placeholder="https://…" />
                                 </Field>
                             </div>
+
+                            <Field label="Email">
+                                <input type="email" name="email" value={email} onChange={handleChange} className={inputCls} placeholder="sample@gmail.com" />
+                            </Field>
+
+
+                            <Field label="Contact Number">
+                                <input type="text" name="contactNumber" value={contactNumber} onChange={handleChange} className={inputCls} placeholder="+63 9152967010" />
+                            </Field>
 
                             {/* ── SEO Metadata ── new section */}
                             <div className="flex flex-col gap-3 pt-1">

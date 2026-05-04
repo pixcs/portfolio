@@ -22,8 +22,15 @@ export type AdminInfoSchema = {
     status: string;
     githubUrl: string;
     facebookUrl: string;
+    linkedInUrl: string;
+    linkedUrl: string;       
     profileUrl: string;
     resumeUrl: string;
+    metadata: {             
+        title: string;
+        description: string;
+        icons: string;
+    };
 };
 
 export type AboutContentSchema = {
@@ -78,8 +85,21 @@ const adminProfileSchema = new Schema<AdminInfoSchema>(
         status:      { type: String },
         githubUrl:   { type: String },
         facebookUrl: { type: String },
+        linkedInUrl: { type: String },
+        linkedUrl:   { type: String },     
         profileUrl:  { type: String },
         resumeUrl:   { type: String },
+        metadata: {                       
+            type: new Schema(
+                {
+                    title:       { type: String },
+                    description: { type: String },
+                    icons:       { type: String },
+                },
+                { _id: false }
+            ),
+            default: {},
+        },
     },
     { timestamps: true }
 );
@@ -173,12 +193,13 @@ projectSchema.index({ userId: 1 });
 
 
 
+// Delete cache so schema changes always take effect in dev hot reload
+delete (mongoose.models as Record<string, unknown>).Admin;
+export const AdminModel = mongoose.model<AdminSchema>("Admin", adminSchema);
 
-export const AdminModel      = mongoose.models.Admin      || mongoose.model("Admin", adminSchema);
-export const AdminInfoModel  = mongoose.models.AdminInfo  || mongoose.model("AdminInfo", adminProfileSchema);
-export const GetInTouchModel = mongoose.models.GetInTouch || mongoose.model("GetInTouch", getInTouch);
+delete (mongoose.models as Record<string, unknown>).AdminInfo;
+export const AdminInfoModel = mongoose.model<AdminInfoSchema>("AdminInfo", adminProfileSchema);
 
-//  Delete cache so schema changes always take effect in dev hot reload
 delete (mongoose.models as Record<string, unknown>).AboutMe;
 export const AboutMeModel = mongoose.model<AboutContentSchema>("AboutMe", aboutContentSchema);
 
@@ -187,3 +208,8 @@ export const WorkExperience = mongoose.model<WorkExpSchema>("WorkExp", workExper
 
 delete (mongoose.models as Record<string, unknown>).Project;
 export const ProjectModel = mongoose.model<ProjectSchema>("Project", projectSchema);
+
+delete (mongoose.models as Record<string, unknown>).GetInTouch;
+export const GetInTouchModel = mongoose.model("GetInTouch", getInTouch);
+
+

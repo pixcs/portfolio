@@ -8,6 +8,24 @@ import { AdminInfoModel } from "@/app/models/models";
 
 type Params = { params: { userId: string } };
 
+// Whitelist of allowed top-level fields for PUT
+const ALLOWED_FIELDS = [
+    "name",
+    "about",
+    "address",
+    "colorStatus",
+    "status",
+    "githubUrl",
+    "facebookUrl",
+    "linkedInUrl",
+    "linkedUrl",       // new
+    "profileUrl",
+    "resumeUrl",
+    "metadata",        // new
+] as const;
+
+type AllowedField = (typeof ALLOWED_FIELDS)[number];
+
 export async function GET(_req: NextRequest, { params }: Params) {
     try {
         await connectToDB();
@@ -37,11 +55,38 @@ export async function PUT(req: NextRequest, { params }: Params) {
 
         const body = await req.json();
 
+        // Strip unknown fields — only persist what the schema expects
+        const sanitized = ALLOWED_FIELDS.reduce<Partial<Record<AllowedField, unknown>>>(
+            (acc, key) => {
+                if (key in body) acc[key] = body[key];
+                return acc;
+            },
+            {}
+        );
+
+        // Validate metadata shape if provided
+        if (sanitized.metadata !== undefined) {
+            const meta = sanitized.metadata as Record<string, unknown>;
+            const isValidMeta =
+                typeof meta === "object" &&
+                meta !== null &&
+                ["title", "description", "icons"].every(
+                    (k) => !(k in meta) || typeof meta[k] === "string"
+                );
+
+            if (!isValidMeta) {
+                return NextResponse.json(
+                    { error: "Invalid metadata shape. Expected { title?, description?, icons? }." },
+                    { status: 400 }
+                );
+            }
+        }
+
         const userId = new mongoose.Types.ObjectId(params.userId);
 
         const info = await AdminInfoModel.findOneAndUpdate(
             { userId },
-            { ...body, userId },
+            { ...sanitized, userId },
             { new: true, upsert: true }
         );
 
@@ -71,13 +116,13 @@ export async function POST(req: NextRequest, { params }: { params: { userId: str
             return NextResponse.json({ error: "Invalid file type." }, { status: 400 });
         }
 
-        // delete old blob
+        // Delete old blob if it exists
         if (oldPathname) {
-        try {
-            await del(oldPathname);
-        } catch (err) {
-            console.log("Delete failed:", err);
-        }
+            try {
+                await del(oldPathname);
+            } catch (err) {
+                console.log("Delete failed:", err);
+            }
         }
 
         const ext = file.name.split(".").pop() ?? "jpg";
@@ -87,7 +132,6 @@ export async function POST(req: NextRequest, { params }: { params: { userId: str
             access: "public",
         });
 
-        // update AdminInfo document
         await AdminInfoModel.findOneAndUpdate(
             { userId: params.userId },
             { profileUrl: blob.url },

@@ -2,13 +2,15 @@
 
 import Link from 'next/link';
 import React, { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
-import { LuGithub } from 'react-icons/lu';
+import { LuGithub, LuLink } from 'react-icons/lu';
 import { RiMapPinLine, RiCheckLine } from 'react-icons/ri';
 import { SlSocialFacebook } from 'react-icons/sl';
+import { TbSeo } from 'react-icons/tb';
 import Image from "next/image";
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { LuUpload, LuX, LuLoader } from 'react-icons/lu';
 import type { ClientSession } from "@/app/models/models";
+import { GrLinkedinOption } from "react-icons/gr";
 
 type FormAdminInfo = {
     name: string;
@@ -18,13 +20,19 @@ type FormAdminInfo = {
     status: string;
     githubUrl: string;
     facebookUrl: string;
+    linkedUrl: string;       
     profileUrl: string;
     resumeUrl: string;
+    metadata: {               
+        title: string;
+        description: string;
+        icons: string;
+    };
 };
 
 type Props = {
     session: ClientSession;
-    info: AdminInfo | null;  
+    info: AdminInfo | null;
 };
 
 const Field = ({ label, children }: { label?: string; children: React.ReactNode }) => (
@@ -80,9 +88,7 @@ const ProfileUploader = ({
         try {
             const body = new FormData();
             body.append("file", file);
-            if (currentUrl) {
-                body.append("oldPathname", currentUrl);
-            }
+            if (currentUrl) body.append("oldPathname", currentUrl);
 
             const res = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URI}/api/admin-info/${userId}`,
@@ -131,7 +137,6 @@ const ProfileUploader = ({
             <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-500 dark:text-slate-500">
                 Profile Image
             </span>
-
             <div
                 role="button"
                 tabIndex={0}
@@ -149,12 +154,7 @@ const ProfileUploader = ({
             >
                 {resolvedSrc ? (
                     <div className="relative w-full h-40">
-                        <Image
-                            src={resolvedSrc}
-                            alt="Profile preview"
-                            fill
-                            className="object-cover"
-                        />
+                        <Image src={resolvedSrc} alt="Profile preview" fill className="object-cover" />
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-200 flex items-center justify-center">
                             <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-1.5 text-white text-xs font-medium">
                                 <LuUpload size={13} />
@@ -181,25 +181,19 @@ const ProfileUploader = ({
                                     <LuUpload size={17} className="text-gray-400 dark:text-slate-500" />
                                 </div>
                                 <div>
-                                    <p className="text-sm font-medium text-gray-700 dark:text-slate-300">
-                                        Click or drag to upload
-                                    </p>
-                                    <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
-                                        JPEG, PNG, WEBP, GIF · max 5 MB
-                                    </p>
+                                    <p className="text-sm font-medium text-gray-700 dark:text-slate-300">Click or drag to upload</p>
+                                    <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">JPEG, PNG, WEBP, GIF · max 5 MB</p>
                                 </div>
                             </>
                         )}
                     </div>
                 )}
-
                 {uploading && resolvedSrc && (
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                         <LuLoader size={22} className="text-white animate-spin" />
                     </div>
                 )}
             </div>
-
             <input
                 ref={inputRef}
                 type="file"
@@ -207,7 +201,6 @@ const ProfileUploader = ({
                 className="hidden"
                 onChange={handleInputChange}
             />
-
             {error && (
                 <p className="text-xs text-red-500 dark:text-red-400 flex items-center gap-1">
                     <LuX size={11} />
@@ -228,16 +221,33 @@ const EditInfoForm = ({ session, info }: Props) => {
         status: "",
         githubUrl: "",
         facebookUrl: "",
+        linkedUrl: "",
         profileUrl: "",
         resumeUrl: "",
+        metadata: { title: "", description: "", icons: "" },
     });
     const [notifStatus, setNotifStatus] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-    const { name, about, address, colorStatus, status, githubUrl, facebookUrl, profileUrl, resumeUrl } = formData;
 
+    const {
+        name, about, address, colorStatus, status,
+        githubUrl, facebookUrl, linkedUrl,
+        profileUrl, resumeUrl, metadata,
+    } = formData;
+
+    // Generic flat field handler
     const handleChange = (e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         const { name, value } = e.currentTarget;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    // Nested metadata handler
+    const handleMetaChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.currentTarget;
+        setFormData(prev => ({
+            ...prev,
+            metadata: { ...prev.metadata, [name]: value },
+        }));
     };
 
     useEffect(() => {
@@ -249,18 +259,22 @@ const EditInfoForm = ({ session, info }: Props) => {
             status:      info?.status      || "",
             githubUrl:   info?.githubUrl   || "",
             facebookUrl: info?.facebookUrl || "",
+            linkedUrl:   info?.linkedUrl   || "",
             profileUrl:  info?.profileUrl  || "",
             resumeUrl:   info?.resumeUrl   || "",
+            metadata: {
+                title:       info?.metadata?.title       || "",
+                description: info?.metadata?.description || "",
+                icons:       info?.metadata?.icons       || "",
+            },
         });
     }, [session, info]);
 
     const handleUpdateInfo = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
         if (!session?.userId) return;
 
         setIsLoading(true);
-
         try {
             const res = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URI}/api/admin-info/${session.userId}`,
@@ -275,16 +289,16 @@ const EditInfoForm = ({ session, info }: Props) => {
                         status,
                         githubUrl,
                         facebookUrl,
+                        linkedUrl,
                         profileUrl,
                         resumeUrl,
+                        metadata,
                     }),
                 }
             );
 
             const result = await res.json();
-
             if (!res.ok) throw new Error(result.error);
-
             setNotifStatus(result.message);
         } catch (err) {
             console.error(err);
@@ -316,9 +330,7 @@ const EditInfoForm = ({ session, info }: Props) => {
                         <IoMdArrowRoundBack size={16} className="transition-transform duration-200 group-hover:-translate-x-1" />
                         Home
                     </Link>
-                    <h1 className="text-lg font-bold tracking-tight text-gray-800 dark:text-slate-100">
-                        Admin Info
-                    </h1>
+                    <h1 className="text-lg font-bold tracking-tight text-gray-800 dark:text-slate-100">Admin Info</h1>
                     <div className="w-20" />
                 </div>
 
@@ -357,19 +369,18 @@ const EditInfoForm = ({ session, info }: Props) => {
 
                             <ProfileUploader
                                 currentUrl={profileUrl}
-                                onUploadSuccess={(url) =>
-                                    setFormData(prev => ({ ...prev, profileUrl: url }))
-                                }
+                                onUploadSuccess={(url) => setFormData(prev => ({ ...prev, profileUrl: url }))}
                                 userId={session.userId!}
                             />
 
-                            {/* Social links */}
+                            {/* ── Social & Links ── */}
                             <div className="flex flex-col gap-3 pt-1">
                                 <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-500 dark:text-slate-500">Links</span>
 
                                 {[
-                                    { icon: <LuGithub size={15} />, name: "githubUrl", value: githubUrl, href: githubUrl, placeholder: "https://github.com/…" },
+                                    { icon: <LuGithub size={15} />,        name: "githubUrl",   value: githubUrl,   href: githubUrl,   placeholder: "https://github.com/…" },
                                     { icon: <SlSocialFacebook size={15} />, name: "facebookUrl", value: facebookUrl, href: facebookUrl, placeholder: "https://facebook.com/…" },
+                                    { icon: <GrLinkedinOption size={15} />,           name: "linkedUrl",   value: linkedUrl,   href: linkedUrl,   placeholder: "https://…" },  // new
                                 ].map(({ icon, name: n, value, href, placeholder }) => (
                                     <div key={n} className="flex items-center gap-2">
                                         <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 flex items-center justify-center text-gray-500 dark:text-slate-400">
@@ -384,6 +395,65 @@ const EditInfoForm = ({ session, info }: Props) => {
                                 <Field label="Resume URL">
                                     <textarea name="resumeUrl" value={resumeUrl} onChange={handleChange} className={`${inputCls} min-h-14 resize-none`} placeholder="https://…" />
                                 </Field>
+                            </div>
+
+                            {/* ── SEO Metadata ── new section */}
+                            <div className="flex flex-col gap-3 pt-1">
+                                <div className="flex items-center gap-2">
+                                    <TbSeo size={13} className="text-gray-400 dark:text-slate-500" />
+                                    <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-500 dark:text-slate-500">
+                                        SEO Metadata
+                                    </span>
+                                </div>
+
+                                <div className="rounded-xl border border-gray-200 dark:border-slate-700/60 bg-gray-50/50 dark:bg-slate-800/30 p-4 flex flex-col gap-4">
+
+                                    <Field label="Page Title">
+                                        <input
+                                            type="text"
+                                            name="title"
+                                            value={metadata.title}
+                                            onChange={handleMetaChange}
+                                            className={inputCls}
+                                            placeholder="John Doe | Software Developer"
+                                        />
+                                    </Field>
+
+                                    <Field label="Description">
+                                        <textarea
+                                            name="description"
+                                            value={metadata.description}
+                                            onChange={handleMetaChange}
+                                            className={`${inputCls} min-h-20 resize-none`}
+                                            placeholder="Portfolio of John Doe, Software Developer"
+                                        />
+                                    </Field>
+
+                                    <Field label="Favicon URL">
+                                        <div className="flex items-center gap-3">
+                                            {metadata.icons && (
+                                                <div className="relative flex-shrink-0 w-8 h-8 rounded-md overflow-hidden border border-gray-200 dark:border-slate-700 bg-gray-100 dark:bg-slate-800">
+                                                    <Image
+                                                        src={metadata.icons}
+                                                        alt="favicon preview"
+                                                        fill
+                                                        className="object-cover"
+                                                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                                                    />
+                                                </div>
+                                            )}
+                                            <input
+                                                type="text"
+                                                name="icons"
+                                                value={metadata.icons}
+                                                onChange={handleMetaChange}
+                                                className={`${inputCls} flex-1`}
+                                                placeholder="https://…/favicon.png"
+                                            />
+                                        </div>
+                                    </Field>
+
+                                </div>
                             </div>
 
                             <button
@@ -412,12 +482,7 @@ const EditInfoForm = ({ session, info }: Props) => {
                             </span>
 
                             <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 shadow-lg shadow-slate-900/20 bg-gray-100 dark:bg-slate-800">
-                                <Image
-                                    src={previewSrc}
-                                    alt="profile"
-                                    fill
-                                    className="object-cover"
-                                />
+                                <Image src={previewSrc} alt="profile" fill className="object-cover" />
                                 <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-slate-400/40 dark:border-slate-500/40 rounded-tr-xl" />
                                 <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-slate-400/40 dark:border-slate-500/40 rounded-bl-xl" />
                             </div>
@@ -435,6 +500,36 @@ const EditInfoForm = ({ session, info }: Props) => {
                                     </div>
                                 )}
                             </div>
+
+                            {/* ── Metadata preview card ── new */}
+                            {(metadata.title || metadata.description || metadata.icons) && (
+                                <div className="w-full rounded-lg bg-gray-50 dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700 p-3.5 flex flex-col gap-2">
+                                    <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-500 dark:text-slate-500">
+                                        SEO Preview
+                                    </span>
+                                    <div className="flex items-center gap-2">
+                                        {metadata.icons && (
+                                            <div className="relative w-4 h-4 flex-shrink-0 rounded-sm overflow-hidden">
+                                                <Image
+                                                    src={metadata.icons}
+                                                    alt="favicon"
+                                                    fill
+                                                    className="object-cover"
+                                                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                                                />
+                                            </div>
+                                        )}
+                                        <p className="text-xs font-medium text-blue-600 dark:text-blue-400 truncate">
+                                            {metadata.title || "—"}
+                                        </p>
+                                    </div>
+                                    {metadata.description && (
+                                        <p className="text-[11px] text-gray-400 dark:text-slate-500 line-clamp-2 leading-relaxed">
+                                            {metadata.description}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
                         </div>
 
                     </form>

@@ -78,16 +78,26 @@ type GetInTouch = {
 }
 
 type AdminInfo = {
-    name: string,
-    about: string,
-    address: string,
-    colorStatus: string,
-    status: string,
-    githubUrl: string,
-    facebookUrl: string,
-    profileUrl: string,
-    resumeUrl: string
-}
+    _id?: string;
+    userId?: string;
+    name?: string;
+    about?: string;
+    address?: string;
+    colorStatus?: string;
+    status?: string;
+    githubUrl?: string;
+    facebookUrl?: string;
+    linkedUrl?: string;     
+    profileUrl?: string;
+    resumeUrl?: string;
+    metadata?: {            
+        title?: string;
+        description?: string;
+        icons?: string;
+    };
+    createdAt?: string;
+    updatedAt?: string;
+};
 
 type UserInfo = {
     _id: string

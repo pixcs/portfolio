@@ -10,17 +10,6 @@ import { logout } from "@/app/lib/action";
 import { FiEdit } from "react-icons/fi";
 import { GrLinkedinOption } from "react-icons/gr";
 
-type AdminInfo = {
-  name?: string;
-  about?: string;
-  address?: string;
-  colorStatus?: string;
-  status?: string;
-  githubUrl?: string;
-  facebookUrl?: string;
-  profileUrl?: string;
-};
-
 type Props = {
   session: IronSession<SessionData> | undefined;
 };
@@ -91,12 +80,11 @@ const Introduction = async ({ session }: Props) => {
             </Link>
           )}
 
-          <Link
-            href="https://www.linkedin.com/in/john-patrick-papa-62a04a314/"
-            target="_blank"
-          >
-            <GrLinkedinOption size={38} className="px-2 py-1 hovered" />
-          </Link>
+          {info?.linkedUrl && (
+            <Link href={info.linkedUrl} target="_blank">
+               <GrLinkedinOption size={38} className="px-2 py-1 hovered" />
+            </Link>
+          )}
 
           {session?.isLoggedIn && session?.isAdmin && (
             <Link href="edit-info">

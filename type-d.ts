@@ -2,15 +2,14 @@ declare module "*.css";
 
 interface SessionData {
     userId?: string;
-    username?: string;
-    img?: string,
+    email?: string;
     isAdmin?: boolean;
     isLoggedIn: boolean;
 }
 
 type Admin = {
     _id: string,
-    username: string,
+    email: string,
     password: string,
     isAdmin: boolean,
     createdAt: string,
@@ -91,7 +90,6 @@ type AdminInfo = {
     linkedUrl?: string;     
     profileUrl?: string;
     resumeUrl?: string;
-    email?: string;
     contactNumber?: string;
     metadata?: {            
         title?: string;

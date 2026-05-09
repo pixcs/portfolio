@@ -62,7 +62,7 @@ const Contact = ({ session }: Props) => {
         }
     };
 
-    const email = info?.email || "johnpatrickpapa20@gmail.com";
+    const email = session?.email || "johnpatrickpapa20@gmail.com";
     const phone = info?.contactNumber || "+63 9152967010";
 
     return (
@@ -78,7 +78,7 @@ const Contact = ({ session }: Props) => {
                 <ContactForm 
                     status={status} 
                     setStatus={setStatus}
-                    infoEmail={info?.email}
+                    infoEmail={session?.email}
                     title={info?.title}
                  />
 

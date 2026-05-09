@@ -19,7 +19,6 @@ const ALLOWED_FIELDS = [
     "linkedUrl",
     "profileUrl",
     "resumeUrl",
-    "email",
     "contactNumber",
     "metadata",
 ] as const;
@@ -36,7 +35,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
         const info = await AdminInfoModel.findOne({
             userId: new mongoose.Types.ObjectId(params.userId),
-        }).lean(); // ✅ FIXED
+        }).lean();
 
         return NextResponse.json({ info }, { status: 200 });
     } catch (err) {

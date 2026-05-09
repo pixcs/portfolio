@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
     const { name, email, subject, message, infoEmail, title } = await request.json();
-    console.log('send-email', infoEmail,  title);
 
     const transporter = nodemailer.createTransport({
         service: 'gmail',

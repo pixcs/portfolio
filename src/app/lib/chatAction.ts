@@ -7,6 +7,8 @@ import {
   WorkExpSchema, 
   ProjectSchema 
 } from "../models/models";
+import { connectToDB } from "@/app/lib/connectToDB";
+import { AdminModel } from "@/app/models/models";
 
 type PortfolioData = {
   info: AdminInfoSchema | null;
@@ -25,6 +27,17 @@ type PortfolioContext = {
   projectImageMap: Record<string, string>;
   workImageMap: Record<string, string>;
 };
+
+async function fetchAdminEmail(userId: string): Promise<string | null> {
+  await connectToDB();
+
+  const admin = await AdminModel
+    .findById(userId)
+    .select("email")
+    .lean();
+
+  return admin?.email || null;
+}
 
 async function fetchPortfolioData(userId: string): Promise<PortfolioData> {
   const base = process.env.NEXT_PUBLIC_API_URI;
@@ -54,6 +67,9 @@ async function fetchPortfolioData(userId: string): Promise<PortfolioData> {
 async function buildPortfolioContext(userId: string): Promise<PortfolioContext> {
   const { info, about, workExp, projects } = await fetchPortfolioData(userId);
 
+  // direct database query
+  const email = await fetchAdminEmail(userId);
+
   if (!info) return { context: "No information available.", projectImageMap: {}, workImageMap: {} };
 
   const sections: string[] = [];
@@ -66,7 +82,7 @@ async function buildPortfolioContext(userId: string): Promise<PortfolioContext> 
   if (info.about)         sections.push(`About: ${info.about}`);
   if (info.address)       sections.push(`Location: ${info.address}`);
   if (info.status)        sections.push(`Current status: ${info.status}`);
-  if (info.email)         sections.push(`Email: ${info.email}`);
+  if (email)              sections.push(`Email: ${email}`);
   if (info.contactNumber) sections.push(`Contact: ${info.contactNumber}`);
   if (info.githubUrl)     sections.push(`GitHub: ${info.githubUrl}`);
   if (info.linkedUrl)     sections.push(`LinkedIn: ${info.linkedUrl}`);
@@ -135,12 +151,12 @@ async function sendChatMessage(
     role: "system",
     content: `You are a helpful portfolio assistant.
 
-Here is information about this developer:
+      Here is information about this developer:
 
-${portfolioContext}
+      ${portfolioContext}
 
-Only answer using the provided information.
-If unsure, say you don't know.`,
+      Only answer using the provided information.
+      If unsure, say you don't know.`,
   };
 
   const response = await axios.request({

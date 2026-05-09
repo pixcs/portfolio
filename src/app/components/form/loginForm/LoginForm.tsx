@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { RiUser3Line, RiLockPasswordLine, RiEyeLine, RiEyeOffLine, RiErrorWarningLine } from "react-icons/ri";
+import { RiLockPasswordLine, RiEyeLine, RiEyeOffLine, RiErrorWarningLine, RiMailLine } from "react-icons/ri";
 
 type ErrorResponse = { error: string };
 
@@ -11,7 +11,7 @@ function isErrorResponse(data: any): data is ErrorResponse {
 }
 
 const LoginForm = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -26,7 +26,7 @@ const LoginForm = () => {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/login`, {
         method: "POST",
         headers: { "Content-type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }),
       });
       const data: Admin | ErrorResponse = await res.json();
 
@@ -49,24 +49,24 @@ const LoginForm = () => {
   return (
     <form onSubmit={handleLogin} className="flex flex-col gap-5">
 
-      {/* Username */}
+      {/* Email */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="username" className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-slate-400">
-          Username
+        <label htmlFor="email" className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-slate-400">
+          Email
         </label>
         <div className="relative group">
-          <RiUser3Line
+          <RiMailLine
             size={16}
             className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 group-focus-within:text-gray-600 dark:group-focus-within:text-slate-300 transition-colors duration-200"
           />
           <input
-            type="text"
-            name="username"
-            id="username"
+            type="email"
+            name="email"
+            id="email"
             required
-            placeholder="Enter your username"
+            placeholder="Enter your email"
             className="w-full pl-9 pr-4 py-3 rounded-lg text-sm bg-gray-50 dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-500 outline-none focus:border-slate-500 dark:focus:border-slate-500 focus:ring-2 focus:ring-slate-500/20 transition duration-200"
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
       </div>
@@ -81,22 +81,25 @@ const LoginForm = () => {
             size={16}
             className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 group-focus-within:text-gray-600 dark:group-focus-within:text-slate-300 transition-colors duration-200"
           />
-          <input
+        <input
             type={showPassword ? "text" : "password"}
             name="password"
             id="password"
             required
             placeholder="Enter your password"
-            className="w-full pl-9 pr-10 py-3 rounded-lg text-sm bg-gray-50 dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-500 outline-none focus:border-slate-500 dark:focus:border-slate-500 focus:ring-2 focus:ring-slate-500/20 transition duration-200"
+            className="w-full pl-9 pr-10 py-3 rounded-lg text-sm bg-gray-50 dark:bg-slate-800/60 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-slate-200 placeholder:text-gray-400 dark:placeholder:text-slate-500 outline-none focus:border-slate-500 dark:focus:border-slate-500 focus:ring-2 focus:ring-slate-500/20 transition duration-200 [&::-ms-reveal]:hidden [&::-ms-clear]:hidden"
             onChange={(e) => setPassword(e.target.value)}
-          />
+        />
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition-colors duration-200"
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
-            {showPassword ? <RiEyeOffLine size={16} /> : <RiEyeLine size={16} />}
+            {showPassword 
+                ? <RiEyeOffLine size={16} className="text-gray-400 dark:text-slate-500" /> 
+                : <RiEyeLine    size={16} className="text-gray-400 dark:text-slate-500" />
+            }
           </button>
         </div>
       </div>

@@ -3,14 +3,15 @@ import mongoose, { Schema, Types } from "mongoose";
 export type ClientSession = {
     isLoggedIn: boolean;
     userId?: string;
+    email?: string;
     username?: string;
     isAdmin: boolean;
 };
 
 type AdminSchema = {
-    username: string;
-    password: string;
-    isAdmin: boolean;
+  email: string;
+  password: string;
+  isAdmin: boolean;
 };
 
 export type AdminInfoSchema = {
@@ -28,7 +29,6 @@ export type AdminInfoSchema = {
     profileUrl: string;
     resumeUrl: string;
 
-    email: string,
     contactNumber: string;
 
     metadata: {             
@@ -68,7 +68,7 @@ export type ProjectSchema = {
 
 const adminSchema = new Schema<AdminSchema>(
     {
-        username: { type: String, required: true, unique: true, min: 3, max: 20 },
+        email:     { type: String, required: true, unique: true },
         password: { type: String, required: true, min: 8, max: 20 },
         isAdmin:  { type: Boolean, default: true },
     },
@@ -96,7 +96,6 @@ const adminProfileSchema = new Schema<AdminInfoSchema>(
         profileUrl:  { type: String },
         resumeUrl:   { type: String },
 
-        email:       { type: String }, 
         contactNumber: { type: String }, 
         
         metadata: {                       

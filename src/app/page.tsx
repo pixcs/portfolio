@@ -28,7 +28,7 @@ export default async function Home() {
       </main>
       <footer>
         <p className=" text-sm md:text-base flex items-center justify-center text-wrap dark:text-gray-400 px-8 py-6">
-          ©  {new Date().getFullYear()} | Designed by Sagar Shah and coded by ❤️ John Patrick Papa
+          ©  {new Date().getFullYear()} | All right reserved ❤️ John Patrick Papa
         </p>
       </footer>
     </Fragment>

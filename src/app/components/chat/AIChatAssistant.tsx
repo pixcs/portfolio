@@ -24,7 +24,6 @@ const SUGGESTED_QUESTIONS = [
   "How can I contact you?",
 ];
 
-// Hook: streams text character by character
 function useTypewriter(text: string, enabled: boolean, speed = 50) {
   const [displayed, setDisplayed] = useState("");
   const [done, setDone] = useState(false);
@@ -38,8 +37,6 @@ function useTypewriter(text: string, enabled: boolean, speed = 50) {
       setDone(true);
       return;
     }
-
-    // Reset when text changes (new message)
     indexRef.current = 0;
     setDisplayed("");
     setDone(false);
@@ -59,7 +56,6 @@ function useTypewriter(text: string, enabled: boolean, speed = 50) {
     };
 
     rafRef.current = requestAnimationFrame(tick);
-
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
@@ -68,7 +64,6 @@ function useTypewriter(text: string, enabled: boolean, speed = 50) {
   return { displayed, done };
 }
 
-// Wrapper: renders a single AI bubble with optional typewriter
 function AIBubble({
   content,
   stream,
@@ -93,7 +88,6 @@ function AIBubble({
               {children}
             </a>
           ),
-
           img: ({ src, alt }) => (
             <img
               src={src || ""}
@@ -105,7 +99,6 @@ function AIBubble({
       >
         {displayed}
       </ReactMarkdown>
-      {/* blinking cursor while typing */}
       {stream && !done && (
         <span
           className="inline-block w-[2px] h-[1em] ml-[1px] align-middle animate-blink"
@@ -131,7 +124,6 @@ export default function AIChatAssistant({ session }: Props) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [hasUnread, setHasUnread] = useState(false);
-  // track which message id is currently streaming
   const [streamingId, setStreamingId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -143,6 +135,17 @@ export default function AIChatAssistant({ session }: Props) {
       setHasUnread(false);
     }
   }, [isOpen, messages]);
+
+  // Lock body scroll on mobile when chat is open
+  useEffect(() => {
+    const isMobile = window.innerWidth < 640;
+    if (isMobile) {
+      document.body.style.overflow = isOpen ? "hidden" : "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
   const sendMessage = async (content: string) => {
     if (!content.trim() || isLoading) return;
@@ -164,7 +167,10 @@ export default function AIChatAssistant({ session }: Props) {
         .filter((m) => m.id !== "welcome")
         .map((m) => ({ role: m.role, content: m.content }));
 
-      const { reply, projectImageMap, workImageMap } = await handleChat(conversationHistory, session?.userId);
+      const { reply, projectImageMap, workImageMap } = await handleChat(
+        conversationHistory,
+        session?.userId
+      );
 
       let enriched = reply;
 
@@ -228,7 +234,6 @@ export default function AIChatAssistant({ session }: Props) {
   return (
     <>
       <style>{`
-        /* blink animation for the cursor */
         @keyframes blink {
           0%, 100% { opacity: 1; }
           50%       { opacity: 0; }
@@ -291,7 +296,6 @@ export default function AIChatAssistant({ session }: Props) {
           color: var(--cw-placeholder);
         }
 
-        /* Markdown styles scoped to AI bubbles only */
         .ai-markdown p             { margin-bottom: 0.25rem; }
         .ai-markdown p:last-child  { margin-bottom: 0; }
         .ai-markdown ul            { list-style: disc; padding-left: 1.25rem; margin: 0.25rem 0; }
@@ -304,14 +308,31 @@ export default function AIChatAssistant({ session }: Props) {
         .ai-markdown h1,
         .ai-markdown h2,
         .ai-markdown h3            { font-weight: 600; margin: 0.4rem 0 0.2rem; }
+
+        /* ── Mobile: full-screen takeover ── */
+        @media (max-width: 639px) {
+          .chat-widget-window {
+            position: fixed !important;
+            inset: 0 !important;
+            width: 100dvw !important;
+            height: 100dvh !important;
+            max-height: 100dvh !important;
+            max-width: 100% !important;
+            border-radius: 0 !important;
+            border: none !important;
+          }
+        }
       `}</style>
 
       {/* ── Toggle button ── */}
       <button
         onClick={() => setIsOpen((p) => !p)}
         aria-label="Toggle AI Chat"
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
+        className="fixed z-50 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95"
         style={{
+          // Respects iOS safe area (home bar / notch)
+          bottom: "calc(1.5rem + env(safe-area-inset-bottom, 0px))",
+          right: "1.5rem",
           background: "linear-gradient(135deg, rgb(15, 23, 42), rgb(11, 37, 103))",
           boxShadow: "0 8px 32px rgba(99,102,241,0.35)",
         }}
@@ -326,24 +347,25 @@ export default function AIChatAssistant({ session }: Props) {
 
       {/* ── Chat window ── */}
       <div
-        className={`chat-widget-window fixed bottom-24 right-6 z-50 w-[22rem] sm:w-96 rounded-2xl overflow-hidden transition-all duration-300 origin-bottom-right ${
-          isOpen
+        className={`chat-widget-window fixed z-50 transition-all duration-300 origin-bottom-right
+          sm:bottom-24 sm:right-6 sm:w-96 sm:rounded-2xl sm:max-h-[520px]
+          ${isOpen
             ? "opacity-100 scale-100 pointer-events-auto"
             : "opacity-0 scale-90 pointer-events-none"
-        }`}
+          }`}
         style={{
           background: "var(--cw-bg)",
           border: "1px solid var(--cw-border)",
           boxShadow: "var(--cw-shadow)",
-          maxHeight: "520px",
           display: "flex",
           flexDirection: "column",
         }}
       >
-        {/* Header */}
+        {/* Header — taller on mobile, respects notch */}
         <div
           className="flex items-center gap-3 px-4 py-3 shrink-0"
           style={{
+            paddingTop: "calc(0.75rem + env(safe-area-inset-top, 0px))",
             background: "var(--cw-header-bg)",
             borderBottom: "1px solid var(--cw-border)",
           }}
@@ -361,18 +383,17 @@ export default function AIChatAssistant({ session }: Props) {
             />
           </div>
 
-          <div>
-            <p
-              className="text-sm font-semibold leading-tight"
-              style={{ color: "var(--cw-header-name)" }}
-            >
-              Portfolio Assistant
-            </p>
-          </div>
+          <p
+            className="text-sm font-semibold leading-tight"
+            style={{ color: "var(--cw-header-name)" }}
+          >
+            Portfolio Assistant
+          </p>
 
+          {/* Larger close button for touch */}
           <button
             onClick={() => setIsOpen(false)}
-            className="ml-auto text-lg leading-none transition-colors"
+            className="ml-auto w-10 h-10 flex items-center justify-center rounded-full transition-colors text-lg"
             style={{ color: "var(--cw-close)" }}
             onMouseEnter={(e) => (e.currentTarget.style.color = "var(--cw-close-hover)")}
             onMouseLeave={(e) => (e.currentTarget.style.color = "var(--cw-close)")}
@@ -390,9 +411,7 @@ export default function AIChatAssistant({ session }: Props) {
           {messages.map((msg) => (
             <div
               key={msg.id}
-              className={`flex gap-2 ${
-                msg.role === "user" ? "flex-row-reverse" : "flex-row"
-              }`}
+              className={`flex gap-2 ${msg.role === "user" ? "flex-row-reverse" : "flex-row"}`}
             >
               {msg.role === "assistant" && (
                 <div
@@ -404,7 +423,7 @@ export default function AIChatAssistant({ session }: Props) {
               )}
 
               <div
-                className={`max-w-[80%] flex flex-col gap-1 ${
+                className={`max-w-[85%] sm:max-w-[80%] flex flex-col gap-1 ${
                   msg.role === "user" ? "items-end" : "items-start"
                 }`}
               >
@@ -440,7 +459,6 @@ export default function AIChatAssistant({ session }: Props) {
                   )}
                 </div>
 
-                {/* hide timestamp while still typing */}
                 {streamingId !== msg.id && (
                   <span className="text-xs px-1" style={{ color: "var(--cw-time)" }}>
                     {formatTime(msg.timestamp)}
@@ -450,7 +468,7 @@ export default function AIChatAssistant({ session }: Props) {
             </div>
           ))}
 
-          {/* Typing indicator — shown only while waiting for the API response */}
+          {/* Typing indicator */}
           {isLoading && (
             <div className="flex gap-2 items-end">
               <div
@@ -472,7 +490,7 @@ export default function AIChatAssistant({ session }: Props) {
                       key={i}
                       className="w-1.5 h-1.5 rounded-full animate-bounce"
                       style={{
-                        backgroundColor: "var(--cw-msg-ai-text)",  // ← adapts to light/dark
+                        backgroundColor: "var(--cw-msg-ai-text)",
                         animationDelay: `${i * 0.15}s`,
                       }}
                     />
@@ -508,10 +526,12 @@ export default function AIChatAssistant({ session }: Props) {
           </div>
         )}
 
-        {/* Input */}
+        {/* Input — safe area padding for iOS home bar */}
         <div
-          className="px-3 py-3 shrink-0"
+          className="px-3 shrink-0"
           style={{
+            paddingTop: "0.75rem",
+            paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom, 0px))",
             borderTop: "1px solid var(--cw-border)",
             background: "var(--cw-bg)",
           }}
@@ -531,31 +551,21 @@ export default function AIChatAssistant({ session }: Props) {
               onKeyDown={handleKeyDown}
               placeholder="Ask me anything..."
               disabled={isLoading}
-              className="flex-1 bg-transparent text-sm outline-none disabled:opacity-50"
+              // text-base (16px) prevents iOS auto-zoom on input focus
+              className="flex-1 bg-transparent text-base sm:text-sm outline-none disabled:opacity-50"
               style={{ color: "var(--cw-input-text)" }}
             />
+            {/* Larger touch target on mobile */}
             <button
               onClick={() => sendMessage(input)}
               disabled={!input.trim() || isLoading}
-              className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 shrink-0"
+              className="w-10 h-10 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100 shrink-0"
               style={{ background: "linear-gradient(135deg, rgb(45, 65, 111), rgb(11, 37, 103))" }}
               aria-label="Send message"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M22 2L11 13"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M22 2L15 22L11 13L2 9L22 2Z"
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+                <path d="M22 2L11 13" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
           </div>

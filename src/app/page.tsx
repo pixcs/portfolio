@@ -9,6 +9,7 @@ import Experience from "./components/experienceComponent/Experience";
 import Project from "@/app/components/projectComponent/Project";
 import Contact from "@/app/components/contact/Contact";
 import { getSession } from "@/app/lib/action";
+import AIChatAssistant from "@/app/components/chat/AIChatAssistant";
 
 export default async function Home() {
   const session = await getSession();
@@ -23,6 +24,7 @@ export default async function Home() {
         <Experience session={session} />
         <Project session={session} />
         <Contact session={session} />
+        <AIChatAssistant session={session} />
       </main>
       <footer>
         <p className=" text-sm md:text-base flex items-center justify-center text-wrap dark:text-gray-400 px-8 py-6">

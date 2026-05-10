@@ -29,7 +29,8 @@ function parseColor(css: string): [number, number, number] {
     const x = c.getContext("2d")!;
     x.fillStyle = css;
     x.fillRect(0, 0, 1, 1);
-    const [r, g, b] = x.getImageData(0, 0, 1, 1).data;
+    const data = x.getImageData(0, 0, 1, 1).data;
+    const r = data[0], g = data[1], b = data[2];
     return [r, g, b];
   } catch {
     return [127, 255, 178]; // fallback: mint green

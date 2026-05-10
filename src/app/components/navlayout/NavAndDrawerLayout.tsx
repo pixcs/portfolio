@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Navbar from "@/app/components/navbar/Navbar";
 import Drawer from "@/app/components/drawer/Drawer";
 import { IronSession } from "iron-session";
-import { info } from "console";
 
 type Props = {
     session: IronSession<SessionData> | undefined

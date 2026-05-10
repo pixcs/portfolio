@@ -9,6 +9,7 @@ import { IronSession } from "iron-session";
 import { logout } from "@/app/lib/action";
 import { FiEdit } from "react-icons/fi";
 import { GrLinkedinOption } from "react-icons/gr";
+import HeroCursorEffect from "./HeroCursorEffect";
 
 type Props = {
   session: IronSession<SessionData> | undefined;
@@ -39,7 +40,8 @@ const Introduction = async ({ session }: Props) => {
 
   return (
     <>
-      <section className="flex flex-col-reverse justify-center items-center md:flex-row md:justify-evenly mt-20 md:mt-24 relative px-5 md:mx-auto md:max-w-[1500px]">
+      <section className="flex flex-col-reverse justify-center items-center md:flex-row md:justify-evenly relative px-5 md:mx-auto md:max-w-[1500px] min-h-[calc(100vh-5rem)] md:min-h-[calc(100vh-6rem)]">
+        <HeroCursorEffect color={info?.colorStatus} />
 
         {/* ── Text column ── */}
         <div className="intro-text max-w-screen-lg md:w-1/2 flex flex-col gap-y-4 mt-16">

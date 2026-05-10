@@ -43,116 +43,120 @@ async function fetchAdminEmail(userId: string): Promise<string | null> {
 async function fetchPortfolioData(userId: string): Promise<PortfolioData> {
   const base = process.env.NEXT_PUBLIC_API_URI;
 
-  const [infoRes, aboutRes, skillsRes, workRes, projectsRes] =
-    await Promise.all([
-      fetch(`${base}/api/admin-info/${userId}`,           { cache: "no-store" }),
-      fetch(`${base}/api/about/${userId}`,                { cache: "no-store" }),
-      fetch(`${base}/api/skills/${userId}`,               { cache: "no-store" }),
-      fetch(`${base}/api/work-experience/user/${userId}`, { cache: "no-store" }),
-      fetch(`${base}/api/project/user/${userId}`,         { cache: "no-store" }),
-    ]);
+  const [infoRes, aboutRes, workRes, projectsRes, skillsRes] = await Promise.all([
+    fetch(`${base}/api/admin-info/${userId}`,           { cache: "no-store" }),
+    fetch(`${base}/api/about/${userId}`,                { cache: "no-store" }),
+    fetch(`${base}/api/work-experience/user/${userId}`, { cache: "no-store" }),
+    fetch(`${base}/api/project/user/${userId}`,         { cache: "no-store" }),
+    fetch(`${base}/api/skills/${userId}`,               { cache: "no-store" }),
+  ]);
 
-  const [infoData, aboutData, skillsData, workData, projectsData] =
-    await Promise.all([
-      infoRes.ok ? infoRes.json() : null,
-      aboutRes.ok ? aboutRes.json() : null,
-      skillsRes.ok ? skillsRes.json() : null,
-      workRes.ok ? workRes.json() : null,
-      projectsRes.ok ? projectsRes.json() : null,
-    ]);
+  const [infoData, aboutData, workData, projectsData, skillsData] = await Promise.all([
+    infoRes.ok     ? infoRes.json()     : null,
+    aboutRes.ok    ? aboutRes.json()    : null,
+    workRes.ok     ? workRes.json()     : null,
+    projectsRes.ok ? projectsRes.json() : null,
+    skillsRes.ok   ? skillsRes.json()   : null,
+  ]);
 
   return {
-    info: infoData?.info ?? null,
-    about: aboutData?.about ?? null,
-    skills: skillsData?.enabledSkills ?? [],
-    workExp: workData?.workExp ?? [],
-    projects: projectsData?.projects ?? [],
+    info:     infoData?.info          ?? null,
+    about:    aboutData?.about        ?? null,
+    workExp:  workData?.workExp       ?? [],
+    projects: projectsData?.projects  ?? [],
+    skills:   skillsData?.enabledSkills ?? [],
   };
 }
 
 async function buildPortfolioContext(userId: string): Promise<PortfolioContext> {
-  const { info, about, workExp, projects, skills } =
-    await fetchPortfolioData(userId);
+  const { info, about, workExp, projects, skills } = await fetchPortfolioData(userId);
 
   const email = await fetchAdminEmail(userId);
 
-  if (!info) {
-    return {
-      context: "No information available.",
-      projectImageMap: {},
-      workImageMap: {},
-    };
-  }
+  if (!info) return { context: "No information available.", projectImageMap: {}, workImageMap: {} };
 
   const sections: string[] = [];
   const projectImageMap: Record<string, string> = {};
   const workImageMap: Record<string, string> = {};
 
-  // Basic info
+  // AdminInfoSchema
   sections.push(`${info.name} is a software developer.`);
+  if (info.profileUrl)    sections.push(`Profile Image: ![Profile](${info.profileUrl})`);
+  if (info.about)         sections.push(`About: ${info.about}`);
+  if (info.address)       sections.push(`Location: ${info.address}`);
+  if (info.status)        sections.push(`Current status: ${info.status}`);
+  if (email)              sections.push(`Email: ${email}`);
+  if (info.contactNumber) sections.push(`Contact: ${info.contactNumber}`);
+  if (info.githubUrl)     sections.push(`GitHub: ${info.githubUrl}`);
+  if (info.linkedUrl)     sections.push(`LinkedIn: ${info.linkedUrl}`);
+  if (info.facebookUrl)   sections.push(`Facebook: ${info.facebookUrl}`);
+  if (info.resumeUrl)     sections.push(`Resume: ${info.resumeUrl}`);
 
-  if (email) sections.push(`Email: ${email}`);
-  if (info.about) sections.push(`About: ${info.about}`);
-  if (info.address) sections.push(`Location: ${info.address}`);
-
-  // Skills 
-  if (skills?.length) {
-    sections.push(
-      `Skills:\n${skills
-        .map((s) => `- ${s.name} (${s.category})`)
-        .join("\n")}`
-    );
-  }
-
-  // About
+  // AboutContentSchema
   if (about?.paragraphs?.length) {
     sections.push(`Background:\n${about.paragraphs.join("\n")}`);
   }
+  if (about?.quickFacts?.length) {
+    sections.push(`Quick facts:\n${about.quickFacts.map((f) => `- ${f}`).join("\n")}`);
+  }
+  if (about?.profileImages?.length) {
+    sections.push(
+      `Profile Photos:\n${about.profileImages.map((url) => `![Photo](${url})`).join("\n")}`
+    );
+  }
 
-  // Work
+  // Skills
+  if (skills.length) {
+    const byCategory = skills.reduce<Record<string, string[]>>((acc, skill) => {
+      (acc[skill.category] ??= []).push(skill.name);
+      return acc;
+    }, {});
+
+    const skillLines = Object.entries(byCategory)
+      .map(([category, names]) => `${category}: ${names.join(", ")}`)
+      .join("\n");
+
+    sections.push(`## Skills\n\n${skillLines}`);
+  }
+
+  // WorkExpSchema
   if (workExp.length) {
     const workLines = workExp.map((w) => {
       if (w.companyLogo) workImageMap[w.companyName] = w.companyLogo;
-
       return [
         `Company: ${w.companyName}`,
         `Position: ${w.position}`,
         `Period: ${w.range}`,
+        w.companyUrl ? `Company Website: ${w.companyUrl}` : "",
         w.tasks?.length
-          ? `Responsibilities:\n${w.tasks.map((t) => `- ${t}`).join("\n")}`
+          ? `Responsibilities:\n${w.tasks.map((t) => `  - ${t}`).join("\n")}`
           : "",
       ]
         .filter(Boolean)
         .join("\n");
     });
-
     sections.push(`## Work Experience\n\n${workLines.join("\n\n---\n\n")}`);
   }
 
-  // Projects
+  // ProjectSchema
   if (projects.length) {
     const projectLines = projects.map((p) => {
       if (p.projectImage) projectImageMap[p.projectName] = p.projectImage;
-
       return [
-        `Project: ${p.projectName}`,
+        `Project Name: ${p.projectName}`,
         `Description: ${p.description}`,
+        p.projectUrl    ? `Live URL: ${p.projectUrl}` : "",
         p.toolsAndTech?.length
-          ? `Tech: ${p.toolsAndTech.join(", ")}`
+          ? `Technologies Used: ${p.toolsAndTech.join(", ")}`
           : "",
       ]
         .filter(Boolean)
         .join("\n");
     });
-
     sections.push(`## Projects\n\n${projectLines.join("\n\n---\n\n")}`);
   }
 
-  return {
-    context: sections.join("\n\n"),
-    projectImageMap,
-    workImageMap,
-  };
+  return { context: sections.join("\n\n"), projectImageMap, workImageMap };
 }
 
 async function sendChatMessage(
@@ -221,10 +225,42 @@ export async function handleChat(
     const showWork =
       /\b(experience|work experience|company|companies|employment|job|jobs|role|roles)\b/i.test(userLower);
 
+    // If user asks about a specific project, only return that project's image
+    let filteredProjectImageMap: Record<string, string> = {};
+    if (showProjects) {
+      const mentionedProject = Object.keys(projectImageMap).find((projectName) =>
+        userLower.includes(projectName.toLowerCase())
+      );
+
+      if (mentionedProject) {
+        // Specific project named — return only that one
+        filteredProjectImageMap = { [mentionedProject]: projectImageMap[mentionedProject] };
+      } else {
+        // Generic query e.g. "show me your projects" — return all
+        filteredProjectImageMap = projectImageMap;
+      }
+    }
+
+    // only return the mentioned company's logo
+    let filteredWorkImageMap: Record<string, string> = {};
+    if (showWork) {
+      const mentionedCompany = Object.keys(workImageMap).find((companyName) =>
+        userLower.includes(companyName.toLowerCase())
+      );
+
+      if (mentionedCompany) {
+        // Specific company named — return only that one
+        filteredWorkImageMap = { [mentionedCompany]: workImageMap[mentionedCompany] };
+      } else {
+        // Generic query e.g. "show me your work experience" — return all
+        filteredWorkImageMap = workImageMap;
+      }
+    }
+
     return {
       reply,
-      projectImageMap: showProjects ? projectImageMap : {},
-      workImageMap:    showWork     ? workImageMap    : {},
+      projectImageMap: filteredProjectImageMap,
+      workImageMap:    filteredWorkImageMap,
     };
   } catch (error) {
     console.error("AI Chat Error:", error);

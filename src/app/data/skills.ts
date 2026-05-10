@@ -26,8 +26,6 @@ export const SKILLS: Skill[] = [
   // ── Languages ────────────────────────────────────────────────
   { iconKey: "IoLogoJavascript",  name: "JavaScript",     color: "text-yellow-400", category: "Language",   enabled: true  },
   { iconKey: "SiTypescript",      name: "TypeScript",     color: "text-sky-600",    category: "Language",   enabled: true  },
-  { iconKey: "FaHtml5",           name: "HTML5",          color: "text-orange-500", category: "Language",   enabled: true  },
-  { iconKey: "IoLogoCss3",        name: "CSS3",           color: "text-sky-700",    category: "Language",   enabled: true  },
   { iconKey: "FaJava",            name: "Java",           color: "text-orange-500", category: "Language",   enabled: true  },
   { iconKey: "FaPhp",             name: "PHP",            color: "text-indigo-500", category: "Language",   enabled: true  },
   { iconKey: "IoLogoPython",      name: "Python",         color: "text-yellow-500", category: "Language",   enabled: false },
@@ -52,6 +50,8 @@ export const SKILLS: Skill[] = [
   { iconKey: "IoLogoSass",        name: "Sass",           color: "text-pink-500",   category: "Language",   enabled: false },
 
   // ── Frontend ─────────────────────────────────────────────────
+  { iconKey: "FaHtml5",           name: "HTML5",          color: "text-orange-500", category: "Frontend",   enabled: true  },
+  { iconKey: "IoLogoCss3",        name: "CSS3",           color: "text-sky-700",    category: "Frontend",   enabled: true  },
   { iconKey: "FaReact",           name: "React",          color: "text-sky-500",    category: "Frontend",   enabled: true  },
   { iconKey: "RiNextjsFill",      name: "Next.js",        color: "text-black dark:text-white", category: "Frontend", enabled: true },
   { iconKey: "RiTailwindCssFill", name: "Tailwind CSS",   color: "text-sky-500",    category: "Frontend",   enabled: true  },

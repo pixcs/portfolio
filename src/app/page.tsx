@@ -20,7 +20,7 @@ export default async function Home() {
       <main>
         <Introduction session={session} />
         <About session={session} />
-        <Skills />
+        <Skills session={session}/>
         <Experience session={session} />
         <Project session={session} />
         <Contact session={session} />

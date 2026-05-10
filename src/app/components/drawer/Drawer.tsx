@@ -60,6 +60,12 @@ const Drawer = ({
                         className="text-slate-500 hover:text-black dark:text-gray-300 dark:hover:text-white font-medium cursor-pointer duration-200"
                         onClick={() => setShowDrawer(!showDrawer)}
                     >
+                        <Link href="#skills">Skills</Link>
+                    </li>
+                    <li
+                        className="text-slate-500 hover:text-black dark:text-gray-300 dark:hover:text-white font-medium cursor-pointer duration-200"
+                        onClick={() => setShowDrawer(!showDrawer)}
+                    >
                         <Link href="#project">Project</Link>
                     </li>
                     <li

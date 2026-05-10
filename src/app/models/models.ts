@@ -47,6 +47,18 @@ export type AboutContentSchema = {
     profileImagePathnames: string[]
 };
 
+export type SkillItem = {
+    iconKey:  string;   
+    name:     string;  
+    color:    string;   
+    category: string;   
+};
+
+export type SkillsContentSchema = {
+    userId:        Types.ObjectId;
+    enabledSkills: SkillItem[];  
+};
+
 export type WorkExpSchema = {
     userId: Types.ObjectId;
     companyName: string;
@@ -149,6 +161,32 @@ const aboutContentSchema = new Schema<AboutContentSchema>(
     { timestamps: true }
 );
 
+const skillItemSchema = new Schema<SkillItem>(
+    {
+        iconKey:  { type: String, required: true },
+        name:     { type: String, required: true },
+        color:    { type: String, required: true },
+        category: { type: String, required: true },
+    },
+    { _id: false }   // sub-documents don't need their own _id
+);
+ 
+const skillsContentSchema = new Schema<SkillsContentSchema>(
+    {
+        userId: {
+            type:     Schema.Types.ObjectId,
+            ref:      "Admin",
+            required: true,
+            unique:   true,   // one skills document per user,
+        },
+        enabledSkills: {
+            type:    [skillItemSchema],
+            default: [],
+        },
+    },
+    { timestamps: true }
+);
+
 const workExperience = new Schema<WorkExpSchema>(
     {
         userId: {
@@ -197,6 +235,7 @@ const getInTouch = new Schema(
 
 // Single index definitions — no duplicates
 aboutContentSchema.index({ userId: 1 });
+skillsContentSchema.index({ userId: 1 });
 workExperience.index({ userId: 1 });
 projectSchema.index({ userId: 1 });
 
@@ -211,6 +250,9 @@ export const AdminInfoModel = mongoose.model<AdminInfoSchema>("AdminInfo", admin
 
 delete (mongoose.models as Record<string, unknown>).AboutMe;
 export const AboutMeModel = mongoose.model<AboutContentSchema>("AboutMe", aboutContentSchema);
+
+delete (mongoose.models as Record<string, unknown>).SkillsContent;
+export const SkillsContentModel = mongoose.model<SkillsContentSchema>("SkillsContent", skillsContentSchema);
 
 delete (mongoose.models as Record<string, unknown>).WorkExp;
 export const WorkExperience = mongoose.model<WorkExpSchema>("WorkExp", workExperience);

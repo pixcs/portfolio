@@ -17,6 +17,41 @@ type Props = {
   session: IronSession<SessionData> | undefined;
 };
 
+const AboutSkeleton = () => (
+  <div className="flex flex-col md:flex-row md:items-center gap-x-16 gap-y-16 mt-16 px-5 md:px-20 md:mx-auto md:max-w-[1500px] animate-pulse">
+    {/* Image skeleton */}
+    <div className="flex-shrink-0 pl-10 md:pl-16 mr-10">
+      <div className="relative mx-auto md:mx-0 w-[220px] sm:w-[260px] md:w-[320px] lg:w-[380px] aspect-[3/4]">
+        <div className="w-full h-full rounded-sm bg-gray-300 dark:bg-slate-700" />
+        {/* Deco blocks */}
+        <div className="absolute bg-gray-300 dark:bg-slate-700" style={{ top: "20%", bottom: -50, left: -50, width: 36 }} />
+        <div className="absolute bg-gray-300 dark:bg-slate-700" style={{ bottom: -50, left: -50, right: "25%", height: 36 }} />
+      </div>
+    </div>
+
+    {/* Text skeleton */}
+    <div className="md:w-1/2 space-y-4">
+      {/* Heading */}
+      <div className="h-8 w-2/3 rounded-md bg-gray-300 dark:bg-slate-700 mb-5" />
+      {/* Paragraphs */}
+      <div className="h-4 w-full rounded bg-gray-300 dark:bg-slate-700" />
+      <div className="h-4 w-5/6 rounded bg-gray-300 dark:bg-slate-700" />
+      <div className="h-4 w-full rounded bg-gray-300 dark:bg-slate-700" />
+      <div className="h-4 w-4/6 rounded bg-gray-300 dark:bg-slate-700" />
+      <div className="h-4 w-full rounded bg-gray-300 dark:bg-slate-700 mt-2" />
+      <div className="h-4 w-3/4 rounded bg-gray-300 dark:bg-slate-700" />
+      {/* Quick facts label */}
+      <div className="h-4 w-1/2 rounded bg-gray-300 dark:bg-slate-700 mt-6" />
+      {/* Quick facts grid */}
+      <div className="grid md:grid-cols-2 gap-3 mt-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="h-4 rounded bg-gray-300 dark:bg-slate-700" />
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 const About = ({ session }: Props) => {
   const [about, setAbout] = useState<AboutMeInfo | null>(null);
   const [loading, setLoading] = useState(true);
@@ -57,46 +92,42 @@ const About = ({ session }: Props) => {
         About me
       </p>
 
-      {/* Match the same horizontal padding/max-width as the intro section */}
-      <div className="flex flex-col md:flex-row md:items-center gap-x-16 gap-y-16 mt-16 px-5 md:px-20 md:mx-auto md:max-w-[1500px]">
+      {loading ? (
+        <AboutSkeleton />
+      ) : (
+        <div className="flex flex-col md:flex-row md:items-center gap-x-16 gap-y-16 mt-16 px-5 md:px-20 md:mx-auto md:max-w-[1500px]">
+          <div className="about-image-col flex-shrink-0 pl-10 md:pl-16 mr-10">
+            <ProfileImage about={about ?? {}} />
+          </div>
 
-        <div className="about-image-col flex-shrink-0 pl-10 md:pl-16 mr-10">
-          {!loading && about && <ProfileImage about={about} />}
+          <div className="intro-text md:w-1/2">
+            <h2 className="text-xl md:text-3xl font-bold mb-5 mt-10 md:mt-0">
+              {about?.heading || "A little bit about me:"}
+            </h2>
+
+            {about?.paragraphs?.length ? (
+              about.paragraphs.map((p, i) => (
+                <p key={i} className="dark:text-gray-300 mb-4">{p}</p>
+              ))
+            ) : (
+              <p className="dark:text-gray-300">No bio available yet.</p>
+            )}
+
+            {about?.quickFacts?.length ? (
+              <>
+                <p className="dark:text-gray-300 mt-6 mb-3">
+                  A few quick facts about me:
+                </p>
+                <ul className="list-disc ml-5 grid md:grid-cols-2 leading-7 md:leading-10 dark:text-gray-300">
+                  {about.quickFacts.map((fact, i) => (
+                    <li key={i}>{fact}</li>
+                  ))}
+                </ul>
+              </>
+            ) : null}
+          </div>
         </div>
-
-        <div className="intro-text md:w-1/2">
-          <h2 className="text-xl md:text-3xl font-bold mb-5 mt-10 md:mt-0">
-            {about?.heading || "A little bit about me:"}
-          </h2>
-
-          {loading ? (
-            <p className="dark:text-gray-300">Loading...</p>
-          ) : (
-            <>
-              {about?.paragraphs?.length ? (
-                about.paragraphs.map((p, i) => (
-                  <p key={i} className="dark:text-gray-300 mb-4">{p}</p>
-                ))
-              ) : (
-                <p className="dark:text-gray-300">No bio available yet.</p>
-              )}
-
-              {about?.quickFacts?.length ? (
-                <>
-                  <p className="dark:text-gray-300 mt-6 mb-3">
-                    A few quick facts about me:
-                  </p>
-                  <ul className="list-disc ml-5 grid md:grid-cols-2 leading-7 md:leading-10 dark:text-gray-300">
-                    {about.quickFacts.map((fact, i) => (
-                      <li key={i}>{fact}</li>
-                    ))}
-                  </ul>
-                </>
-              ) : null}
-            </>
-          )}
-        </div>
-      </div>
+      )}
     </section>
   );
 };

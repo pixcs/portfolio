@@ -235,4 +235,9 @@ body {}
     are already defined — they work here too since ProfileImage
     and the text column reuse those same class names. */
 
+  iframe[title*="reCAPTCHA"],
+  div.grecaptcha-badge,
+  .grecaptcha-badge {
+    display: none !important;
+  }
 }

@@ -1,11 +1,10 @@
-"use server";
-
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { RiShieldKeyholeLine } from "react-icons/ri";
 import Link from "next/link";
 import LoginForm from "@/app/components/form/loginForm/LoginForm";
 import { getSession } from "@/app/lib/action";
 import { redirect } from "next/navigation";
+import LoginRecaptchaProvider from "@/app/components/providers/LoginRecaptchaProvider";
 
 const Login = async () => {
   const session = await getSession();
@@ -84,17 +83,35 @@ const Login = async () => {
             <div className="mx-8 h-px bg-gray-200/70 dark:bg-slate-700/50" />
 
             {/* Form area */}
-            <div className="px-8 py-8">
+          <div className="px-8 py-8">
+            <LoginRecaptchaProvider>
               <LoginForm />
-            </div>
+            </LoginRecaptchaProvider>
+          </div>
 
             {/* Bottom accent line */}
             <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-400/40 dark:via-slate-600/40 to-transparent" />
           </div>
 
           {/* Footer note */}
-          <p className="mt-6 text-center text-xs text-gray-400 dark:text-slate-600">
-            Protected area &mdash; authorized personnel only
+          <p className="text-[10px] text-gray-400 mt-4 text-center leading-relaxed">
+            This site is protected by reCAPTCHA and the Google{" "}
+            <a
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              className="underline hover:text-gray-300"
+            >
+              Privacy Policy
+            </a>{" "}
+            and{" "}
+            <a
+              href="https://policies.google.com/terms"
+              target="_blank"
+              className="underline hover:text-gray-300"
+            >
+              Terms of Service
+            </a>{" "}
+            apply.
           </p>
         </div>
       </main>

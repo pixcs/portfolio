@@ -143,10 +143,26 @@ const Skills = ({ session }: Props) => {
     >
       {session?.isLoggedIn && session?.isAdmin && (
         <Link
-          href="skills/update-new"
-          className="absolute top-5 left-8 flex items-center px-4 py-2 rounded-lg bg-white dark:bg-slate-800 border dark:border-0 border-gray-300 hover:border-gray-700 dark:border-gray-500 font-medium hover:text-black dark:text-white hover:bg-white hovered shadow-xl"
+          href="/skills/update-new"
+          className="
+            absolute top-5 left-8
+            flex items-center gap-2
+            px-4 py-2
+            rounded-full
+            bg-white/80 dark:bg-slate-900/70
+            backdrop-blur-md
+            border border-gray-200/60 dark:border-slate-700/50
+            text-sm font-medium
+            text-gray-700 dark:text-gray-200
+            shadow-sm
+            hover:shadow-md
+            hover:scale-[1.02]
+            transition-all duration-200 ease-out
+          "
         >
-          Update New <RxUpdate className="ml-2" />
+          <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+          Update Skills
+          <RxUpdate className="text-base" />
         </Link>
       )}
 

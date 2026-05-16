@@ -55,13 +55,10 @@ const LoginForm = () => {
     } finally {
       setLoading(false);
     }
-  }, [executeRecaptcha, email, password]);  // ← dependencies
+  }, [executeRecaptcha, email, password]);
 
   return (
     <form onSubmit={handleLogin} className="flex flex-col gap-5">
-      {/* Everything below is UNCHANGED */}
-
-      {/* Email */}
       <div className="flex flex-col gap-1.5">
         <label htmlFor="email" className="text-xs font-semibold uppercase tracking-widest text-gray-500 dark:text-slate-400">
           Email

@@ -73,7 +73,7 @@ const ProjectContainer = ({ projects, session }: Props) => {
                 formReset={formReset}
                 session={session}
             />
-            <section className="flex-1 md:max-h-[700px] md:overflow-y-scroll relative">
+                 <section className='flex-1 overflow-y-auto relative'>
                 <h2 className='text-2xl font-medium p-8'>List of my projects</h2>
                 <ProjectList
                     projects={projects}

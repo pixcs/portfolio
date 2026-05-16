@@ -78,7 +78,7 @@ const ExpContainer = ({ listOfExperience, session }: Props) => {
                 formReset={formReset}
                 session={session}  
             />
-            <section className='flex-1 md:max-h-[700px] md:overflow-y-scroll relative'>
+            <section className='flex-1 overflow-y-auto relative'>
                 <h2 className='text-xl md:text-2xl font-medium p-8'>List of my previous experience</h2>
                 <ExperienceList
                     listOfExperience={listOfExperience}

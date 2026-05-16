@@ -13,7 +13,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <div className="min-h-screen text-gray-600 dark:text-white bg-white dark:bg-slate-900 transition-theme">
+        <div className="h-screen flex flex-col text-gray-600 dark:text-white bg-white dark:bg-slate-900 transition-theme overflow-hidden">
 
             {/* Header */}
             <div className="relative overflow-hidden bg-slate-900 dark:bg-slate-950 border-b border-slate-700/50">
@@ -51,7 +51,11 @@ export default function RootLayout({
                 </div>
             </div>
 
-            {children}
+            <div className="h-screen flex flex-col overflow-hidden text-gray-600 dark:text-white bg-white dark:bg-slate-900 transition-theme">
+                <div className="flex-1 overflow-hidden">
+                    {children}
+                </div>
+            </div>
         </div>
     );
 }

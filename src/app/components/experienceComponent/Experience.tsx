@@ -21,10 +21,26 @@ const Experience = async ({ session }: Props) => {
         <section className="py-16 bg-gray-100 dark:bg-slate-900 transition-theme relative">
             {session?.isLoggedIn && (
                 <Link
-                    href="experience/create-new"
-                    className="absolute top-5 left-8 flex items-center px-4 py-2 rounded-lg bg-white dark:bg-slate-800 border dark:border-0 border-gray-300 hover:border-gray-700  dark:border-gray-500 font-medium hover:text-black dark:text-white hover:bg-white hovered shadow-xl"
+                    href="/experience/create-new"
+                    className="
+                    absolute top-5 left-8
+                    flex items-center gap-2
+                    px-4 py-2
+                    rounded-full
+                    bg-white/80 dark:bg-slate-900/70
+                    backdrop-blur-md
+                    border border-gray-200/60 dark:border-slate-700/50
+                    text-sm font-medium
+                    text-gray-700 dark:text-gray-200
+                    shadow-sm
+                    hover:shadow-md
+                    hover:scale-[1.02]
+                    transition-all duration-200 ease-out
+                    "
                 >
-                    Create New <IoMdAdd className="ml-2" />
+                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                    Create New
+                    <IoMdAdd className="text-base" />
                 </Link>
             )}
             <p className='text-sm text-center font-medium px-2 py-1 mt-5 md:mt-5 rounded-full bg-gray-200 max-w-[150px] mx-auto dark:bg-slate-700 transition-theme'>

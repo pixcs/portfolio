@@ -1,3 +1,5 @@
+"use server";
+
 import EditInfoForm from "@/app/components/form/editInfoForm/EditInfoForm";
 import { getSession } from "@/app/lib/action";
 import { redirect } from "next/navigation";

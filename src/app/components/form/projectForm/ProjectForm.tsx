@@ -148,7 +148,7 @@ const ProjectForm = ({
     const inputStyle = "dark:text-gray-300 dark:bg-slate-900 mx-8 p-4 border-2 border-gray-200 dark:border-slate-700 rounded-lg outline-1 outline-gray-400 dark:outline-gray-800";
 
     return (
-        <section className='w-full md:w-1/3 bg-gray-100/50 dark:bg-slate-800 py-4 md:h-[700px] md:overflow-y-scroll relative'>
+        <section className='w-full md:w-1/3 bg-gray-100/50 dark:bg-slate-800 py-4 overflow-y-auto relative'>
 
             {/* Success Toast */}
             <div className={`fixed top-5 right-5 z-50 flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium shadow-xl border

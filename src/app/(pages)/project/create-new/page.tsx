@@ -17,7 +17,7 @@ const CreateNew = async () => {
   const { projects }: { projects: Project[] } = await res.json();
 
   return (
-    <main className='flex flex-col md:flex-row items-start gap-x-5'>
+    <main className='flex flex-col md:flex-row items-stretch h-full'>
       <ProjectContainer projects={projects} session={session} />
     </main>
   )

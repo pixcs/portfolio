@@ -55,7 +55,7 @@ const Login = async () => {
       </nav>
 
       {/* Main content */}
-      <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-12">
+      <main className="relative z-10 flex-1 flex items-center justify-center px-4">
         <div className="w-full max-w-md">
 
           {/* Card */}
@@ -93,7 +93,7 @@ const Login = async () => {
             <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-400/40 dark:via-slate-600/40 to-transparent" />
           </div>
 
-          {/* Footer note */}
+          {/* Foote */}
           <p className="text-[10px] text-gray-400 mt-4 text-center leading-relaxed">
             This site is protected by reCAPTCHA and the Google{" "}
             <a

@@ -4,12 +4,12 @@ import Link from "next/link";
 
 const NotFound = () => {
   return (
-    <div className='mobile-height md:desktop-height'>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center gap-y-4 w-full">
+    <div className='min-h-screen flex items-center justify-center'>
+      <div className="flex flex-col items-center gap-y-4 w-full">
         <div className="flex items-center justify-center gap-5 md:gap-10">
           <TbError404 size={100} />
           <div className="font-bold">|</div>
-          <h1 className="text-xl md:text-5xl font-medium"> Page not found</h1>
+          <h1 className="text-xl md:text-5xl font-medium">Page not found</h1>
         </div>
         <Link
           href="/"
@@ -20,7 +20,7 @@ const NotFound = () => {
         </Link>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default NotFound;

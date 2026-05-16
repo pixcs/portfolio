@@ -8,7 +8,7 @@ import { IronSession } from 'iron-session';
 
 type Props = {
     listOfExperience: WorkExperience[];
-    session: IronSession<SessionData> | undefined 
+    session: IronSession<SessionData> | undefined
 };
 
 const ExpContainer = ({ listOfExperience, session }: Props) => {
@@ -26,15 +26,12 @@ const ExpContainer = ({ listOfExperience, session }: Props) => {
 
     const editGetWorkExperience = async (id: string) => {
         setIsLoading(true);
-
         try {
             const res = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URI}/api/work-experience/${id}`
             );
-
             const { experience } = await res.json();
             setselectEditWorkExp(experience);
-
         } finally {
             setIsLoading(false);
         }
@@ -48,24 +45,24 @@ const ExpContainer = ({ listOfExperience, session }: Props) => {
             position: "",
             tasks: "",
             range: ""
-        })
-        setTasks([])
+        });
+        setTasks([]);
         setselectEditWorkExp(null);
-    }
+    };
 
     useEffect(() => {
         if (selectEditWorkExp) {
-            setFormData(() => ({
+            setFormData({
                 companyName: selectEditWorkExp.companyName,
                 companyLogo: selectEditWorkExp.companyLogo,
                 companyUrl: selectEditWorkExp.companyUrl,
                 position: selectEditWorkExp.position,
                 tasks: "",
                 range: selectEditWorkExp.range
-            }))
+            });
             setTasks(selectEditWorkExp.tasks);
         }
-    }, [selectEditWorkExp])
+    }, [selectEditWorkExp]);
 
     return (
         <>
@@ -76,9 +73,9 @@ const ExpContainer = ({ listOfExperience, session }: Props) => {
                 setTasks={setTasks}
                 selectEditWorkExp={selectEditWorkExp}
                 formReset={formReset}
-                session={session}  
+                session={session}
             />
-            <section className='flex-1 overflow-y-auto relative'>
+            <section className='relative md:flex-1 md:overflow-y-auto'>
                 <h2 className='text-xl md:text-2xl font-medium p-8'>List of my previous experience</h2>
                 <ExperienceList
                     listOfExperience={listOfExperience}
@@ -94,9 +91,8 @@ const ExpContainer = ({ listOfExperience, session }: Props) => {
                     </div>
                 )}
             </section>
-
         </>
-    )
-}
+    );
+};
 
 export default ExpContainer;

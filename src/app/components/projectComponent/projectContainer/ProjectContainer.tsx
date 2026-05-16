@@ -52,10 +52,10 @@ const ProjectContainer = ({ projects, session }: Props) => {
     useEffect(() => {
         if (selectEditProject) {
             setFormData({
-                projectName:       selectEditProject.projectName,
-                projectImage:      selectEditProject.projectImage,
-                projectUrl:        selectEditProject.projectUrl,
-                description:       selectEditProject.description,
+                projectName: selectEditProject.projectName,
+                projectImage: selectEditProject.projectImage,
+                projectUrl: selectEditProject.projectUrl,
+                description: selectEditProject.description,
                 toolsAndTechInput: "",
             });
             setToolsAndTech(selectEditProject.toolsAndTech);
@@ -73,7 +73,7 @@ const ProjectContainer = ({ projects, session }: Props) => {
                 formReset={formReset}
                 session={session}
             />
-                 <section className='flex-1 overflow-y-auto relative'>
+            <section className='relative md:flex-1 md:overflow-y-auto'>
                 <h2 className='text-2xl font-medium p-8'>List of my projects</h2>
                 <ProjectList
                     projects={projects}
@@ -81,7 +81,7 @@ const ProjectContainer = ({ projects, session }: Props) => {
                     formReset={formReset}
                 />
                 {isLoading && (
-                    <div className='fixed top-0 bottom-0 left-0 right-0 bg-gray-100/70 dark:bg-slate-700/70 backdrop-blur-sm'>
+                    <div className='fixed inset-0 bg-gray-100/70 dark:bg-slate-700/70 backdrop-blur-sm'>
                         <div className='absolute top-1/2 left-1/2 -translate-x-1/2 flex flex-col items-center justify-center gap-y-7'>
                             <SiContentstack size={100} className="rotate-effect" />
                             <h1 className='text-xl md:text-5xl font-bold'>Please wait...</h1>

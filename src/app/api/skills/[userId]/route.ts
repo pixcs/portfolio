@@ -20,11 +20,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
         const doc = await SkillsContentModel.findOne({ userId }).lean();
 
         if (!doc) {
-            // First visit — return the hardcoded defaults so the UI is pre-populated
-            const defaults = SKILLS.filter((s) => s.enabled).map(({ iconKey, name, color, category }) => ({
-                iconKey, name, color, category,
-            }));
-            return NextResponse.json({ enabledSkills: defaults }, { status: 200 });
+            return NextResponse.json({ enabledSkills: [] }, { status: 200 });
         }
 
         return NextResponse.json({ enabledSkills: doc.enabledSkills }, { status: 200 });

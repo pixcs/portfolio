@@ -372,7 +372,10 @@ const EditAboutMeForm = ({ session, info }: Props) => {
 
                 {/* Top nav */}
                 <div className="flex items-center justify-between mb-8">
-                    <Link href="/" className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-slate-400 hovered px-3 py-2 group">
+                    <Link 
+                        href={`/user/${session.userId}`} 
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-slate-400 hovered px-3 py-2 group"
+                    >
                         <IoMdArrowRoundBack size={16} className="transition-transform duration-200 group-hover:-translate-x-1" />
                         Home
                     </Link>

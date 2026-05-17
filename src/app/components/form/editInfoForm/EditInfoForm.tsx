@@ -26,6 +26,7 @@ type FormAdminInfo = {
     linkedUrl: string;
     profileUrl: string;
     resumeUrl: string;
+    email: string;
     contactNumber: string;
     metadata: {
         title: string;
@@ -514,7 +515,7 @@ const EditInfoForm = ({ session, info }: Props) => {
     const [formData, setFormData] = useState<FormAdminInfo>({
         title: "", name: "", about: "", address: "", colorStatus: "", status: "",
         githubUrl: "", facebookUrl: "", linkedUrl: "", profileUrl: "", resumeUrl: "",
-        contactNumber: "",
+        email: "", contactNumber: "",
         metadata: { title: "", description: "", icons: "" },
     });
     const [notifStatus, setNotifStatus] = useState("");
@@ -523,7 +524,7 @@ const EditInfoForm = ({ session, info }: Props) => {
     const {
         title, name, about, address, colorStatus, status,
         githubUrl, facebookUrl, linkedUrl,
-        profileUrl, resumeUrl, contactNumber, metadata,
+        profileUrl, resumeUrl, email, contactNumber, metadata,
     } = formData;
 
     const handleChange = (e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -549,6 +550,7 @@ const EditInfoForm = ({ session, info }: Props) => {
             linkedUrl:     info?.linkedUrl     || "",
             profileUrl:    info?.profileUrl    || "",
             resumeUrl:     info?.resumeUrl     || "",
+            email:         info?.email || "",
             contactNumber: info?.contactNumber || "",
             metadata: {
                 title:       info?.metadata?.title       || "",
@@ -571,7 +573,7 @@ const EditInfoForm = ({ session, info }: Props) => {
                     body: JSON.stringify({
                         title, name, about, address, colorStatus, status,
                         githubUrl, facebookUrl, linkedUrl,
-                        profileUrl, resumeUrl, contactNumber, metadata,
+                        profileUrl, resumeUrl, email, contactNumber, metadata,
                     }),
                 }
             );
@@ -609,7 +611,10 @@ const EditInfoForm = ({ session, info }: Props) => {
 
                 {/* ── Top nav ── */}
                 <div className="flex items-center justify-between mb-8">
-                    <Link href="/" className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-slate-400 hovered px-3 py-2 group">
+                    <Link 
+                        href={`/user/${session.userId}`} 
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-slate-400 hovered px-3 py-2 group"
+                    >
                         <IoMdArrowRoundBack size={16} className="transition-transform duration-200 group-hover:-translate-x-1" />
                         Home
                     </Link>
@@ -697,6 +702,19 @@ const EditInfoForm = ({ session, info }: Props) => {
                                         <textarea name="resumeUrl" value={resumeUrl} onChange={handleChange} className={`${inputCls} min-h-14 resize-none`} placeholder="https://…" />
                                     </Field>
                                 </div>
+
+                                <Field label="Email">
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={email}
+                                        onChange={handleChange}
+                                        className={inputCls}
+                                    />
+                                    <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">
+                                        Use the email address associated with your account.
+                                    </p>
+                                </Field>
 
                                 <Field label="Contact Number">
                                     <input type="text" name="contactNumber" value={contactNumber} onChange={handleChange} className={inputCls} placeholder="+63 9152967010" />

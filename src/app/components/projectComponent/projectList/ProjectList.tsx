@@ -95,7 +95,17 @@ const ProjectList = ({ projects, getEditProject, formReset }: Props) => {
                 </div>
             )}
 
-            {projects.length > 0 ? (
+            {projects.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-24 text-center">
+                    <p className="text-4xl mb-4">🚀</p>
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                        No projects added yet
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-slate-400">
+                        Use the form to add your first project.
+                    </p>
+                </div>
+            ) : (
                 projects.map((project, index) => (
                     <div
                         className={`flex flex-col ${index % 2 !== 0 ? 'md:flex-row-reverse' : 'md:flex-row'} md:max-w-4xl mb-12 mx-4 md:mx-auto shadow-xl dark:bg-slate-800 rounded-xl fade-in-effect`}
@@ -137,10 +147,6 @@ const ProjectList = ({ projects, getEditProject, formReset }: Props) => {
                         </div>
                     </div>
                 ))
-            ) : (
-                <h1 className='mx-8 text-xl md:text-4xl text-center text-gray-400 font-semibold'>
-                    Currently projects not found
-                </h1>
             )}
         </>
     );

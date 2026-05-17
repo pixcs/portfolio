@@ -90,6 +90,7 @@ type AdminInfo = {
     linkedUrl?: string;     
     profileUrl?: string;
     resumeUrl?: string;
+    email?: string;
     contactNumber?: string;
     metadata?: {            
         title?: string;

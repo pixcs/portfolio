@@ -27,6 +27,7 @@ const CATEGORIES = [
 
 type Props = {
   session: IronSession<SessionData> | undefined;
+  profileUserId: string;
 };
 
 type SkillItem = {
@@ -36,93 +37,61 @@ type SkillItem = {
   category: string;
 };
 
-const Skills = ({ session }: Props) => {
+const Skills = ({ session, profileUserId }: Props) => {
   const [query, setQuery] = useState("");
   const [activeTab, setActiveTab] = useState("All");
-
-  const [enabledMap, setEnabledMap] = useState<
-    Record<string, boolean>
-  >({});
-
+  const [enabledMap, setEnabledMap] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [hasSkills, setHasSkills] = useState(false);
+
+  const isOwner = session?.isLoggedIn && session?.userId === profileUserId;
 
   useEffect(() => {
-    const userId = session?.userId || "666b094dab43a459a391d327";
-
     const fetchSkills = async () => {
       try {
         setIsLoading(true);
 
+        const res = await fetch(`/api/skills/${profileUserId}`);
 
-        const res = await fetch(`/api/skills/${userId}`);
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch skills.");
-        }
+        if (!res.ok) throw new Error("Failed to fetch skills.");
 
         const data = await res.json();
 
         const nextMap: Record<string, boolean> = {};
+        SKILLS.forEach((skill) => { nextMap[skill.name] = false; });
+        data.enabledSkills.forEach((skill: SkillItem) => { nextMap[skill.name] = true; });
 
-        // default all to false
-        SKILLS.forEach((skill) => {
-          nextMap[skill.name] = false;
-        });
-
-        // enable returned skills
-        data.enabledSkills.forEach((skill: SkillItem) => {
-          nextMap[skill.name] = true;
-        });
-
+        setHasSkills(data.enabledSkills.length > 0);
         setEnabledMap(nextMap);
       } catch (err) {
         console.error(err);
-
-        // fallback to default hardcoded skills
         const fallback: Record<string, boolean> = {};
-
-        SKILLS.forEach((skill) => {
-          fallback[skill.name] = skill.enabled;
-        });
-
+        SKILLS.forEach((skill) => { fallback[skill.name] = skill.enabled; });
         setEnabledMap(fallback);
+        setHasSkills(false);
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (userId) {
-      fetchSkills();
-    }
-  }, [session?.userId]);
+    if (profileUserId) fetchSkills();
+  }, [profileUserId]);
 
-  // ── Filtered skills ───────────────────────────────────────────
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-
     return SKILLS.filter((s) => {
       const isEnabled = enabledMap[s.name];
-      const matchesSearch =
-        !q || s.name.toLowerCase().includes(q);
-
-      const matchesTab =
-        activeTab === "All" || s.category === activeTab;
-
+      const matchesSearch = !q || s.name.toLowerCase().includes(q);
+      const matchesTab = activeTab === "All" || s.category === activeTab;
       return isEnabled && matchesSearch && matchesTab;
     });
   }, [query, activeTab, enabledMap]);
 
-  // ── Only show tabs that have enabled skills ──────────────────
   const activeCats = useMemo(() => {
     const cats = new Set(
-      SKILLS.filter((s) => enabledMap[s.name]).map(
-        (s) => s.category
-      )
+      SKILLS.filter((s) => enabledMap[s.name]).map((s) => s.category)
     );
-
-    return CATEGORIES.filter(
-      (c) => c === "All" || cats.has(c as any)
-    );
+    return CATEGORIES.filter((c) => c === "All" || cats.has(c as any));
   }, [enabledMap]);
 
   if (isLoading) {
@@ -136,12 +105,53 @@ const Skills = ({ session }: Props) => {
     );
   }
 
+  // ── Empty state ──────────────────────────────────────────────────
+  if (!hasSkills) {
+    return (
+      <section id="skills" className="py-24 fade-in-effect relative">
+        <p className="text-sm text-center font-medium px-3 py-1 rounded-full bg-gray-200 max-w-[140px] mx-auto dark:bg-slate-700 transition-theme">
+          Skills
+        </p>
+
+        <div className="flex flex-col items-center justify-center py-20 text-center px-6">
+          <p className="text-4xl mb-4">🛠️</p>
+          {isOwner ? (
+            <>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                No skills added yet
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-slate-400 max-w-sm mb-6">
+                Add the tools, technologies, and frameworks you work with so visitors know your stack.
+              </p>
+              <Link
+                href="/skills/update-new"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-sm bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-semibold hover:opacity-90 transition-opacity"
+              >
+                <RxUpdate size={14} />
+                Add your skills
+              </Link>
+            </>
+          ) : (
+            <>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                No skills listed yet
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-slate-400 max-w-sm">
+                This developer hasn't added their skills yet.
+              </p>
+            </>
+          )}
+        </div>
+      </section>
+    );
+  }
+
+  // ── Normal render ────────────────────────────────────────────────
   return (
-    <section 
-      id="skills" 
-      className="py-24 fade-in-effect"
-    >
-      {session?.isLoggedIn && session?.isAdmin && (
+    <section id="skills" className="py-24 fade-in-effect relative">
+
+      {/* Update button — only show when there IS data */}
+      {isOwner && hasSkills && (
         <Link
           href="/skills/update-new"
           className="
@@ -177,7 +187,6 @@ const Skills = ({ session }: Props) => {
 
       {/* ── Controls ── */}
       <div className="mt-8 mb-4 flex flex-col items-center gap-4 px-6">
-        {/* Search */}
         <div className="relative w-full max-w-sm">
           <input
             type="text"
@@ -195,7 +204,6 @@ const Skills = ({ session }: Props) => {
               transition-all duration-200
             "
           />
-
           {query && (
             <button
               onClick={() => setQuery("")}
@@ -206,7 +214,6 @@ const Skills = ({ session }: Props) => {
           )}
         </div>
 
-        {/* Category tabs */}
         <div className="flex flex-wrap justify-center gap-2">
           {activeCats.map((cat) => (
             <button
@@ -214,8 +221,7 @@ const Skills = ({ session }: Props) => {
               onClick={() => setActiveTab(cat)}
               className={`
                 px-3 py-1 rounded-full text-xs font-medium transition-all duration-200
-                ${
-                activeTab === cat
+                ${activeTab === cat
                   ? "bg-black dark:bg-white text-white dark:text-black shadow-sm"
                   : "bg-gray-100 dark:bg-slate-800 text-gray-500 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-slate-700"
                 }
@@ -229,8 +235,7 @@ const Skills = ({ session }: Props) => {
 
       {/* ── Count ── */}
       <p className="text-center text-xs text-gray-400 dark:text-slate-500 mb-8">
-        Showing {filtered.length} skill
-        {filtered.length !== 1 ? "s" : ""}
+        Showing {filtered.length} skill{filtered.length !== 1 ? "s" : ""}
         {query ? ` matching "${query}"` : ""}
       </p>
 
@@ -241,10 +246,7 @@ const Skills = ({ session }: Props) => {
             const Icon = iconRegistry[skill.iconKey];
 
             if (!Icon) {
-              console.warn(
-                `[Skills] Missing icon in registry: "${skill.iconKey}"`
-              );
-
+              console.warn(`[Skills] Missing icon in registry: "${skill.iconKey}"`);
               return null;
             }
 
@@ -263,12 +265,10 @@ const Skills = ({ session }: Props) => {
                 "
               >
                 <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition duration-500 bg-gradient-to-br from-sky-500/10 to-purple-500/10" />
-
                 <Icon
                   size={42}
                   className={`${skill.color} relative z-10 transition-transform duration-300 group-hover:scale-110`}
                 />
-
                 <p className="mt-3 text-sm font-medium dark:text-gray-200 relative z-10 text-center">
                   {skill.name}
                 </p>
@@ -279,16 +279,11 @@ const Skills = ({ session }: Props) => {
       ) : (
         <div className="flex flex-col items-center gap-2 mt-8 text-gray-400 dark:text-slate-500">
           <p className="text-sm">
-            No skills found
-            {query ? ` for "${query}"` : ""}.
+            No skills found{query ? ` for "${query}"` : ""}.
           </p>
-
           {query && (
             <button
-              onClick={() => {
-                setQuery("");
-                setActiveTab("All");
-              }}
+              onClick={() => { setQuery(""); setActiveTab("All"); }}
               className="text-xs text-sky-500 hover:underline"
             >
               Clear filters

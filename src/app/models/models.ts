@@ -9,9 +9,10 @@ export type ClientSession = {
 };
 
 type AdminSchema = {
-  email: string;
-  password: string;
-  isAdmin: boolean;
+    email: string;
+    password: string;
+    username: string;        
+    isAdmin: boolean;
 };
 
 export type AdminInfoSchema = {
@@ -29,6 +30,7 @@ export type AdminInfoSchema = {
     profileUrl: string;
     resumeUrl: string;
 
+    email: string;
     contactNumber: string;
 
     metadata: {             
@@ -60,6 +62,7 @@ export type SkillsContentSchema = {
 };
 
 export type WorkExpSchema = {
+    _id: Types.ObjectId;
     userId: Types.ObjectId;
     companyName: string;
     companyLogo: string;
@@ -80,8 +83,9 @@ export type ProjectSchema = {
 
 const adminSchema = new Schema<AdminSchema>(
     {
-        email:     { type: String, required: true, unique: true },
+        email:    { type: String, required: true, unique: true },
         password: { type: String, required: true, min: 8, max: 20 },
+        username: { type: String, required: true, unique: true }, 
         isAdmin:  { type: Boolean, default: true },
     },
     { timestamps: true }
@@ -108,6 +112,7 @@ const adminProfileSchema = new Schema<AdminInfoSchema>(
         profileUrl:  { type: String },
         resumeUrl:   { type: String },
 
+        email:         { type: String }, 
         contactNumber: { type: String }, 
         
         metadata: {                       

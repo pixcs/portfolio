@@ -12,9 +12,10 @@ import { IronSession } from "iron-session";
 
 type Props = {
     session: IronSession<SessionData> | undefined
+    profileUserId: string
 }
 
-const Contact = ({ session }: Props) => {
+const  Contact = ({ session, profileUserId }: Props) => {
     const [emailCopied, setEmailCopied] = useState(false);
     const [phoneNumberCopied, setPhoneNumberCopied] = useState(false);
     const [status, setStatus] = useState<string>("");
@@ -25,10 +26,8 @@ const Contact = ({ session }: Props) => {
     useEffect(() => {
         const fetchInfo = async () => {
             try {
-                const userId = session?.userId || "666b094dab43a459a391d327";
-
                 const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URI}/api/admin-info/${userId}`,
+                    `${process.env.NEXT_PUBLIC_API_URI}/api/admin-info/${profileUserId}`,
                     { cache: "no-store" }
                 );
 
@@ -62,8 +61,8 @@ const Contact = ({ session }: Props) => {
         }
     };
 
-    const email = session?.email || "johnpatrickpapa20@gmail.com";
-    const phone = info?.contactNumber || "+63 9152967010";
+    const email = session?.email || info?.email || "";
+    const phone = info?.contactNumber || ''; // i just leave it empty so it will not show an error but you can expect that it will also have a data
 
     return (
         <section
@@ -88,54 +87,60 @@ const Contact = ({ session }: Props) => {
                     </p>
 
                     {/* EMAIL */}
-                    <div className="intro-text flex items-center justify-center space-x-2 md:space-x-5 my-2">
-                        <MdOutlineEmail size={35} className="h-5 md:h-9" />
-                        <h2 className="text-sm md:text-2xl dark:text-white font-bold">
-                            {loading ? "Loading..." : email}
-                        </h2>
+                    {email && (
+                        <div className="intro-text flex items-center justify-center space-x-2 md:space-x-5 my-2">
+                            <MdOutlineEmail size={35} className="h-5 md:h-9" />
+                            <h2 className="text-sm md:text-2xl dark:text-white font-bold">
+                                {loading ? "Loading..." : email}
+                            </h2>
 
-                        <div className="relative">
-                            <IoCopyOutline
-                                size={40}
-                                className="hovered p-2 h-8 md:h-10 cursor-pointer"
-                                onClick={() => handleCopy(email)}
-                            />
-                            <p
-                                className={`${
-                                    emailCopied ? "opacity-100" : "opacity-0"
-                                } absolute text-sm -top-8 -left-3 md:-top-7 px-2 py-1 bg-gray-200 dark:bg-slate-700 rounded-md transition-all`}
-                            >
-                                Copied!
-                            </p>
+                            <div className="relative">
+                                <IoCopyOutline
+                                    size={40}
+                                    className="hovered p-2 h-8 md:h-10 cursor-pointer"
+                                    onClick={() => handleCopy(email)}
+                                />
+                                <p
+                                    className={`${
+                                        emailCopied ? "opacity-100" : "opacity-0"
+                                    } absolute text-sm -top-8 -left-3 md:-top-7 px-2 py-1 bg-gray-200 dark:bg-slate-700 rounded-md transition-all`}
+                                >
+                                    Copied!
+                                </p>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* PHONE */}
-                    <div className="intro-text flex items-center justify-center space-x-2 md:space-x-5 my-2">
-                        <IoCallOutline size={30} className="h-5 md:h-9" />
-                        <h2 className="text-sm md:text-2xl dark:text-white font-bold">
-                            {loading ? "Loading..." : phone}
-                        </h2>
+                    {phone && (
+                        <div className="intro-text flex items-center justify-center space-x-2 md:space-x-5 my-2">
+                            <IoCallOutline size={30} className="h-5 md:h-9" />
+                            <h2 className="text-sm md:text-2xl dark:text-white font-bold">
+                                {loading ? "Loading..." : phone}
+                            </h2>
 
-                        <div className="relative">
-                            <IoCopyOutline
-                                size={40}
-                                className="hovered p-2 h-8 md:h-10 cursor-pointer"
-                                onClick={() => handleCopy(phone)}
-                            />
-                            <p
-                                className={`${
-                                    phoneNumberCopied ? "opacity-100" : "opacity-0"
-                                } absolute text-sm -top-8 md:-top-7 -left-3 px-2 py-1 bg-gray-200 dark:bg-slate-700 rounded-md transition-all`}
-                            >
-                                Copied!
-                            </p>
+                            <div className="relative">
+                                <IoCopyOutline
+                                    size={40}
+                                    className="hovered p-2 h-8 md:h-10 cursor-pointer"
+                                    onClick={() => handleCopy(phone)}
+                                />
+                                <p
+                                    className={`${
+                                        phoneNumberCopied ? "opacity-100" : "opacity-0"
+                                    } absolute text-sm -top-8 md:-top-7 -left-3 px-2 py-1 bg-gray-200 dark:bg-slate-700 rounded-md transition-all`}
+                                >
+                                    Copied!
+                                </p>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
-                    <p className="dark:text-gray-400 text-center mt-5 md:mt-10">
-                        You may also find me on these platforms!
-                    </p>
+                    {(info?.githubUrl || info?.facebookUrl || info?.linkedUrl) && (
+                        <p className="dark:text-gray-400 text-center mt-5 md:mt-10">
+                            You may also find me on these platforms!
+                        </p>
+                    )}
 
                     {/* SOCIALS */}
                     <div className="intro-text flex items-center justify-center gap-x-2 my-4">

@@ -19,6 +19,7 @@ const ALLOWED_FIELDS = [
     "linkedUrl",
     "profileUrl",
     "resumeUrl",
+    "email",
     "contactNumber",
     "metadata",
 ] as const;

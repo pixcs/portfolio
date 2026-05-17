@@ -180,7 +180,7 @@ export default function SkillsForm({
             {/* ── Top nav ── */}
             <div className="flex items-center justify-between mb-8">
                 <Link
-                    href="/"
+                    href={`/user/${userId}`} 
                     className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-slate-400 hover:text-gray-800 dark:hover:text-slate-200 px-3 py-2 group transition-colors"
                 >
                     <IoMdArrowRoundBack
@@ -191,7 +191,7 @@ export default function SkillsForm({
                 </Link>
 
                 <h1 className="text-lg font-bold tracking-tight text-gray-800 dark:text-slate-100">
-                    Skills
+                    My Skills
                 </h1>
 
                 <div className="w-20" />

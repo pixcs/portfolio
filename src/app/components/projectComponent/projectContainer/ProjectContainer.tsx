@@ -74,7 +74,11 @@ const ProjectContainer = ({ projects, session }: Props) => {
                 session={session}
             />
             <section className='relative md:flex-1 md:overflow-y-auto'>
-                <h2 className='text-2xl font-medium p-8'>List of my projects</h2>
+                {projects.length > 0 && (
+                    <h2 className='text-xl md:text-2xl font-medium p-8'>
+                        List of my projects
+                    </h2>
+                )}
                 <ProjectList
                     projects={projects}
                     getEditProject={getEditProject}

@@ -76,7 +76,11 @@ const ExpContainer = ({ listOfExperience, session }: Props) => {
                 session={session}
             />
             <section className='relative md:flex-1 md:overflow-y-auto'>
-                <h2 className='text-xl md:text-2xl font-medium p-8'>List of my previous experience</h2>
+                {listOfExperience.length > 0 && (
+                    <h2 className='text-xl md:text-2xl font-medium p-8'>
+                        List of my previous experience
+                    </h2>
+                )}
                 <ExperienceList
                     listOfExperience={listOfExperience}
                     editGetWorkExperience={editGetWorkExperience}

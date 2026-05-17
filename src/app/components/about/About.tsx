@@ -138,7 +138,7 @@ const About = ({ session, profileUserId }: Props) => {
                 Nothing here yet
               </h3>
               <p className="text-sm text-gray-500 dark:text-slate-400 max-w-sm">
-                This developer hasn't added their about section yet.
+                <span>This developer hasn&apos;t added their about section yet.</span>
               </p>
             </>
           )}

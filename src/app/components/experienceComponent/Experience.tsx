@@ -66,7 +66,7 @@ const Experience = async ({ session, profileUserId }: Props) => {
                                 No experience added yet
                             </h3>
                             <p className="text-sm text-gray-500 dark:text-slate-400 max-w-sm mb-6">
-                                Add your work history so visitors can see where you've worked and what you've done.
+                                Add your work history so visitors can see where you&apos;ve worked and what you&apos;ve done.
                             </p>
                             <Link
                                 href="/experience/create-new"
@@ -82,7 +82,7 @@ const Experience = async ({ session, profileUserId }: Props) => {
                                 No experience listed yet
                             </h3>
                             <p className="text-sm text-gray-500 dark:text-slate-400 max-w-sm">
-                                This developer hasn't added their work experience yet.
+                                This developer hasn&apos;t added their work experience yet.
                             </p>
                         </>
                     )}

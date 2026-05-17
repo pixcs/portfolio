@@ -84,7 +84,7 @@ const Introduction = async ({ session, profileUserId }: Props) => {
           Profile not set up yet
         </h1>
         <p className="text-sm text-gray-500 dark:text-slate-400 max-w-xs">
-          This developer hasn't filled in their portfolio information yet.
+          This developer hasn&apos;t filled in their portfolio information yet.
         </p>
         <Link
           href="/"

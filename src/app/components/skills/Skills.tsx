@@ -137,7 +137,7 @@ const Skills = ({ session, profileUserId }: Props) => {
                 No skills listed yet
               </h3>
               <p className="text-sm text-gray-500 dark:text-slate-400 max-w-sm">
-                This developer hasn't added their skills yet.
+                This developer hasn&apos;t added their skills yet.
               </p>
             </>
           )}

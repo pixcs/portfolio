@@ -66,7 +66,7 @@ const Project = async ({ session, profileUserId }: Props) => {
                                 No projects added yet
                             </h3>
                             <p className="text-sm text-gray-500 dark:text-slate-400 max-w-sm mb-6">
-                                Showcase the projects you've built so visitors can see your work in action.
+                                Showcase the projects you&apos;ve built so visitors can see your work in action.
                             </p>
                             <Link
                                 href="/project/create-new"
@@ -82,7 +82,7 @@ const Project = async ({ session, profileUserId }: Props) => {
                                 No projects yet
                             </h3>
                             <p className="text-sm text-gray-500 dark:text-slate-400 max-w-sm">
-                                This developer hasn't added any projects yet.
+                                This developer hasn&apos;t added any projects yet.
                             </p>
                         </>
                     )}

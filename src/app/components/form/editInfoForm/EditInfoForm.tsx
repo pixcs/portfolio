@@ -37,6 +37,7 @@ type FormAdminInfo = {
 
 type FormSecurity = {
     newEmail: string;
+    username: string;
     currentPasswordForEmail: string;
     currentPassword: string;
     newPassword: string;
@@ -244,18 +245,32 @@ const SecurityPanel = ({ session, setNotifStatus }: { session: ClientSession, se
     const router = useRouter();
     const [form, setForm] = useState<FormSecurity>({
         newEmail: "",
+        username: session?.username ?? "",
+
         currentPasswordForEmail: "",
         currentPassword: "",
+        
         newPassword: "",
         confirmPassword: "",
     });
+
+    useEffect(() => {
+        setForm(prev => ({
+            ...prev,
+            username: session?.username ?? "",
+        }));
+        console.log('SESSION', session);
+    }, [session]);
+
+    const [usernameNotif, setUsernameNotif] = useState<{ ok: boolean; msg: string } | null>(null);
+    const [usernameLoading, setUsernameLoading] = useState(false);
 
     const [emailNotif,    setEmailNotif]    = useState<{ ok: boolean; msg: string } | null>(null);
     const [passNotif,     setPassNotif]     = useState<{ ok: boolean; msg: string } | null>(null);
     const [emailLoading,  setEmailLoading]  = useState(false);
     const [passLoading,   setPassLoading]   = useState(false);
 
-    const { newEmail, currentPasswordForEmail, currentPassword, newPassword, confirmPassword } = form;
+    const { newEmail, username, currentPasswordForEmail, currentPassword, newPassword, confirmPassword } = form;
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.currentTarget;
@@ -267,7 +282,8 @@ const SecurityPanel = ({ session, setNotifStatus }: { session: ClientSession, se
     const passwordTooShort = newPassword.length > 0  && newPassword.length < 8;
     const passwordTooLong  = newPassword.length > 20;
 
-    const canChangeEmail = newEmail.trim().length > 0 && currentPasswordForEmail.length > 0;
+    const canChangeUsername = username.trim().length >= 3;
+    const canChangeEmail    = (newEmail.trim().length > 0 || canChangeUsername) && currentPasswordForEmail.length > 0;
     const canChangePass  = currentPassword.length > 0
         && newPassword.length >= 8
         && newPassword.length <= 20
@@ -284,7 +300,11 @@ const SecurityPanel = ({ session, setNotifStatus }: { session: ClientSession, se
                 {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ newEmail, currentPassword: currentPasswordForEmail }),
+                    body: JSON.stringify({
+                        newEmail:    newEmail    || undefined,
+                        newUsername: username    || undefined,
+                        currentPassword: currentPasswordForEmail,
+                    }),
                 }
             );
             const result = await res.json();
@@ -293,7 +313,7 @@ const SecurityPanel = ({ session, setNotifStatus }: { session: ClientSession, se
             setEmailNotif({ ok: true, msg: result.message ?? "Email updated successfully." });
             setNotifStatus(result.message);
 
-            setForm(prev => ({ ...prev, newEmail: "", currentPasswordForEmail: "" }));
+            setForm(prev => ({ ...prev, newEmail: "", username: "", currentPasswordForEmail: "" }));
 
             // refresh so the session iss also reflect after saving the new email
             setTimeout(() =>  router.refresh(), 2500);
@@ -383,6 +403,22 @@ const SecurityPanel = ({ session, setNotifStatus }: { session: ClientSession, se
                         </div>
                     </Field>
 
+                    <Field label="Username">
+                        <div className="relative">
+                            <LuUser size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500" />
+                            <input
+                                type="text"
+                                name="username"
+                                value={username}
+                                onChange={handleChange}
+                                className={`${inputCls} pl-9`}
+                            />
+                        </div>
+                        {username.length > 0 && username.trim().length < 3 && (
+                            <Feedback ok={false} msg="Username must be at least 3 characters" />
+                        )}
+                    </Field>
+
                     <Field label="Confirm with current password">
                         <PasswordInput
                             name="currentPasswordForEmail"
@@ -408,7 +444,7 @@ const SecurityPanel = ({ session, setNotifStatus }: { session: ClientSession, se
                                 <span className="w-3.5 h-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
                                 Updating…
                             </span>
-                        ) : "Update Email"}
+                        ) : "Update"}
                     </button>
                 </form>
             </div>
@@ -508,7 +544,150 @@ const SecurityPanel = ({ session, setNotifStatus }: { session: ClientSession, se
                         </div>
                     ))}
                 </div>
+
+                <div className="h-px w-full bg-gray-100 dark:bg-slate-800" />
+
+                {/* ══ Section: Delete Account ══ */}
+                <DeleteAccountSection session={session} />
             </div>
+        </div>
+    );
+};
+
+const DeleteAccountSection = ({ session }: { session: ClientSession }) => {
+    const router = useRouter();
+    const [step, setStep]           = useState<"idle" | "confirm" | "loading" | "done">("idle");
+    const [password, setPassword]   = useState("");
+    const [error, setError]         = useState<string | null>(null);
+
+    const handleDelete = async () => {
+        if (!session?.userId || !password) return;
+        setStep("loading");
+        setError(null);
+        try {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URI}/api/admin/${session.userId}/delete`,
+                {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ currentPassword: password }),
+                }
+            );
+            const result = await res.json();
+            if (!res.ok) {
+                setError(result.error ?? "Failed to delete account.");
+                setStep("confirm");
+                return;
+            }
+            setStep("done");
+            setTimeout(() => router.push("/"), 1500);
+        } catch {
+            setError("Something went wrong. Please try again.");
+            setStep("confirm");
+        }
+    };
+
+    return (
+        <div className="flex flex-col gap-5">
+            <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 flex items-center justify-center flex-shrink-0">
+                    <LuX size={14} className="text-red-500 dark:text-red-400" />
+                </div>
+                <div>
+                    <p className="text-sm font-semibold text-gray-800 dark:text-slate-100">Delete Account</p>
+                    <p className="text-xs text-gray-400 dark:text-slate-500 mt-0.5">
+                        Permanently remove your account and all data
+                    </p>
+                </div>
+            </div>
+
+            {/* ── Idle state: just the trigger button ── */}
+            {step === "idle" && (
+                <button
+                    type="button"
+                    onClick={() => setStep("confirm")}
+                    className="max-w-sm w-full py-2.5 rounded-lg text-sm font-semibold tracking-wide
+                        bg-white dark:bg-slate-900 text-red-500 dark:text-red-400
+                        border border-red-200 dark:border-red-900/60
+                        hover:bg-red-50 dark:hover:bg-red-950/30
+                        shadow-sm transition duration-200"
+                >
+                    Delete Account
+                </button>
+            )}
+
+            {/* ── Confirm state: password prompt ── */}
+            {step === "confirm" && (
+                <div className="max-w-sm flex flex-col gap-4 rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-950/20 p-4">
+                    <div className="flex flex-col gap-1">
+                        <p className="text-sm font-semibold text-red-600 dark:text-red-400">
+                            Are you sure?
+                        </p>
+                        <p className="text-xs text-red-500/80 dark:text-red-400/70 leading-relaxed">
+                            This action is <span className="font-semibold">irreversible</span>. Enter your password to confirm.
+                        </p>
+                    </div>
+
+                    <Field label="Confirm Password">
+                        <PasswordInput
+                            name="deletePassword"
+                            value={password}
+                            onChange={(e) => {
+                                setPassword(e.target.value);
+                                setError(null);
+                            }}
+                            placeholder="Enter your current password"
+                        />
+                    </Field>
+
+                    {error && <Feedback ok={false} msg={error} />}
+
+                    <div className="flex gap-2">
+                        <button
+                            type="button"
+                            onClick={handleDelete}
+                            disabled={!password}
+                            className="flex-1 py-2.5 rounded-lg text-sm font-semibold
+                                bg-red-500 hover:bg-red-600 text-white
+                                disabled:opacity-50 disabled:cursor-not-allowed
+                                shadow-sm shadow-red-500/20 transition duration-200"
+                        >
+                            Yes, Delete My Account
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => { setStep("idle"); setPassword(""); setError(null); }}
+                            className="px-4 py-2.5 rounded-lg text-sm font-semibold
+                                bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300
+                                border border-gray-200 dark:border-slate-700
+                                hover:bg-gray-50 dark:hover:bg-slate-700
+                                transition duration-200"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Loading state ── */}
+            {step === "loading" && (
+                <div className="max-w-sm flex items-center gap-3 px-4 py-3 rounded-xl
+                    border border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-950/20">
+                    <span className="w-4 h-4 rounded-full border-2 border-red-300 border-t-red-500 animate-spin flex-shrink-0" />
+                    <p className="text-sm text-red-500 dark:text-red-400 font-medium">Deleting your account…</p>
+                </div>
+            )}
+
+            {/* ── Done state ── */}
+            {step === "done" && (
+                <div className="max-w-sm flex items-center gap-3 px-4 py-3 rounded-xl
+                    border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/50 dark:bg-emerald-950/20">
+                    <RiCheckLine size={15} className="text-emerald-500 flex-shrink-0" />
+                    <p className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
+                        Account deleted. Redirecting…
+                    </p>
+                </div>
+            )}
         </div>
     );
 };

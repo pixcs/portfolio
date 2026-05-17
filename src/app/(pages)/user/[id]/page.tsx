@@ -72,11 +72,15 @@ export default async function UserPortfolio({ params }: Props) {
     if (!res.ok) notFound();
 
     const { user } = await res.json();
-    console.log('User id:', user);
+    console.log('User id:', user, 'SESSION',  session);
 
     return (
         <Fragment>
-            <NavAndDrawerLayout session={session} />
+            <NavAndDrawerLayout 
+                session={session}  
+                profileUserId={user._id}
+                title={user.title}
+            />
             <main>
                 <Introduction
                     session={session}
@@ -109,7 +113,7 @@ export default async function UserPortfolio({ params }: Props) {
             </main>
             <footer>
                 <p className="text-sm md:text-base flex items-center justify-center dark:text-gray-400 px-8 py-6">
-                    © {new Date().getFullYear()} | All rights reserved ❤️ {user.name}
+                    © {new Date().getFullYear()} | All rights reserved ❤️ {user.title}
                 </p>
             </footer>
         </Fragment>

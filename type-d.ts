@@ -3,6 +3,7 @@ declare module "*.css";
 interface SessionData {
     userId?: string;
     email?: string;
+    username?: string;
     isAdmin?: boolean;
     isLoggedIn: boolean;
 }
@@ -10,6 +11,7 @@ interface SessionData {
 type Admin = {
     _id: string,
     email: string,
+    username: string,
     password: string,
     isAdmin: boolean,
     createdAt: string,

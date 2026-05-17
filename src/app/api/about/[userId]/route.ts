@@ -138,10 +138,10 @@ export async function PUT(req: NextRequest, { params }: Params) {
             { status: 200 }
         );
 
-    } catch (err) {
+    }  catch (err) {
         console.error("[PUT /api/about]", err);
         return NextResponse.json(
-            { error: "Internal server error." },
+            { error: err instanceof Error ? err.message : "Internal server error." },
             { status: 500 }
         );
     }

@@ -79,6 +79,7 @@ export const POST = async (request: Request) => {
     if (session) {
       session.userId = user._id.toString();
       session.email = user.email;
+      session.username = user.username;
       session.isAdmin = user.isAdmin;
       session.isLoggedIn = true;
 

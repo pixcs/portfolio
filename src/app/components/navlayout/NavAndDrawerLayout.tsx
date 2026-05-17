@@ -6,10 +6,12 @@ import Drawer from "@/app/components/drawer/Drawer";
 import { IronSession } from "iron-session";
 
 type Props = {
-    session: IronSession<SessionData> | undefined
+    session: IronSession<SessionData> | undefined,
+    profileUserId: string
+    title: string
 }
 
-const NavAndDrawerLayout = ({ session }: Props) => {
+const NavAndDrawerLayout = ({ session, profileUserId, title }: Props) => {
     const [darkMode, setDarkMode] = useState(false);
     const [showDrawer, setShowDrawer] = useState(false);
 
@@ -17,7 +19,6 @@ const NavAndDrawerLayout = ({ session }: Props) => {
     const [reRender, setReRender] = useState<boolean>(false);
     const [showInbox, setShowInbox] = useState<boolean>(false);
     const [resumeUrl, setResumeUrl] = useState<string>("");
-    const [title, setTitle] = useState<string>("");
 
     useEffect(() => {
         const theme = localStorage.getItem("theme");
@@ -27,15 +28,12 @@ const NavAndDrawerLayout = ({ session }: Props) => {
         }
 
         const getResumeUrl = async () => {
-            const alternative = session?.userId ?? "666b094dab43a459a391d327";
-
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/admin-info/${alternative}`,
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URI}/api/admin-info/${profileUserId}`,
                 { cache: "no-store" }
             );
             const data = await res.json();
 
             if (res.ok && data.info) {
-                setTitle(data.info.title);
                 setResumeUrl(data.info.resumeUrl);
             }
         }

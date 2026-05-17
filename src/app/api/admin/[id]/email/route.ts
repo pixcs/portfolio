@@ -19,11 +19,11 @@ export const PATCH = async (
         );
     }
 
-    const { newEmail, currentPassword } = await request.json();
+    const { newEmail, newUsername, currentPassword } = await request.json();
 
-    if (!newEmail || !currentPassword) {
+    if (!currentPassword || (!newEmail && !newUsername)) {
         return NextResponse.json(
-            { error: "New email and current password are required." },
+            { error: "Current password and at least one of new email or username are required." },
             { status: 400 }
         );
     }
@@ -39,10 +39,7 @@ export const PATCH = async (
         );
     }
 
-    const isMatch = await bcrypt.compare(
-        currentPassword,
-        admin.password
-    );
+    const isMatch = await bcrypt.compare(currentPassword, admin.password);
 
     if (!isMatch) {
         return NextResponse.json(
@@ -51,32 +48,47 @@ export const PATCH = async (
         );
     }
 
-    const emailTaken = await AdminModel.findOne({
-        email: newEmail
-    });
-
-    if (emailTaken) {
-        return NextResponse.json(
-            { error: "That email is already in use." },
-            { status: 409 }
-        );
+    if (newEmail) {
+        const emailTaken = await AdminModel.findOne({ email: newEmail });
+        if (emailTaken) {
+            return NextResponse.json(
+                { error: "That email is already in use." },
+                { status: 409 }
+            );
+        }
+        admin.email = newEmail;
     }
 
-    /* update database */
-    admin.email = newEmail;
+    if (newUsername) {
+        const usernameTaken = await AdminModel.findOne({ 
+            username: newUsername,
+            _id: { $ne: id }  //  exclude the current user
+        });
+        if (usernameTaken) {
+            return NextResponse.json(
+                { error: "That username is already taken." },
+                { status: 409 }
+            );
+        }
+        admin.username = newUsername;
+    }
+
     await admin.save();
 
-    /* update iron-session */
     const session = await getIronSession<SessionData>(
         await cookies(),
         sessionOptions
     );
 
-    session.email = newEmail;
+    if (newEmail)    session.email    = newEmail;
+    if (newUsername) session.username = newUsername;
 
     await session.save();
 
-    return NextResponse.json({
-        message: "Email updated successfully."
-    });
+    const message =
+        newEmail && newUsername ? "Email and username updated successfully." :
+        newEmail                ? "Email updated successfully."              :
+                                  "Username updated successfully.";
+
+    return NextResponse.json({ message });
 };

@@ -79,7 +79,7 @@ const About = ({ session, profileUserId }: Props) => {
   return (
     <section
       id="about"
-      className="min-h-screen mt-14 md:mt-40 py-16 bg-gray-100 dark:bg-slate-900 transition-theme relative"
+      className="min-h-screen mt-14 md:mt-40 pt-16 pb-32 bg-gray-100 dark:bg-slate-900 transition-theme relative"
     >
       {isOwner && !isEmpty && (
         <Link

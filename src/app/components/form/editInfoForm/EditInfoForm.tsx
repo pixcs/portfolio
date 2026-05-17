@@ -67,6 +67,12 @@ const inputCls =
 
 const FALLBACK = "https://i.pinimg.com/564x/dd/af/0f/ddaf0f3a57413545d2c2b23568328b17.jpg";
 
+const getAvatarFromEmail = (email?: string) => {
+    if (!email) return "";
+    const name = email.split("@")[0];
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&bold=true`;
+};
+
 /* ─── Password input with show/hide ─── */
 const PasswordInput = ({
     name, value, onChange, placeholder, disabled,
@@ -589,8 +595,6 @@ const EditInfoForm = ({ session, info }: Props) => {
         }
     };
 
-    const previewSrc = profileUrl || FALLBACK;
-
     const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
         { id: "profile",  label: "Profile Info",        icon: <LuUser size={13} /> },
         { id: "security", label: "Password & Security", icon: <LuShieldCheck size={13} /> },
@@ -765,7 +769,15 @@ const EditInfoForm = ({ session, info }: Props) => {
                             <div className="md:w-64 p-7 flex flex-col items-center gap-5">
                                 <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-500 dark:text-slate-500 self-start">Preview</span>
                                 <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 shadow-lg shadow-slate-900/20 bg-gray-100 dark:bg-slate-800">
-                                    <Image src={previewSrc} alt="profile" fill className="object-cover" />
+                                    {profileUrl ? (
+                                        <Image src={profileUrl} alt="profile" fill className="object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-900 text-white">
+                                            <span className="text-3xl font-bold uppercase tracking-wider">
+                                                {name?.slice(0, 1) || session.email?.slice(0, 1) || "U"}
+                                            </span>
+                                        </div>
+                                    )}
                                     <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-slate-400/40 dark:border-slate-500/40 rounded-tr-xl" />
                                     <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-slate-400/40 dark:border-slate-500/40 rounded-bl-xl" />
                                 </div>

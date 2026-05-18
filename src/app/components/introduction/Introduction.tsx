@@ -8,10 +8,10 @@ import { RiMapPinLine } from "react-icons/ri";
 import { LuGithub } from "react-icons/lu";
 import { SlSocialFacebook } from "react-icons/sl";
 import { IronSession } from "iron-session";
-import { logout } from "@/app/lib/action";
 import { FiEdit } from "react-icons/fi";
 import { GrLinkedinOption } from "react-icons/gr";
 import HeroCursorEffect from "./HeroCursorEffect";
+import LogoutButton from "@/app/components/partials/LogoutButton";
 
 type Props = {
   session: IronSession<SessionData> | undefined;
@@ -63,12 +63,7 @@ const Introduction = async ({ session, profileUserId }: Props) => {
           <FiEdit size={15} />
           Set up your profile
         </Link>
-        {/* Logout */}
-        <form action={logout}>
-          <button className="text-xs text-gray-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
-            Logout
-          </button>
-        </form>
+        <LogoutButton />
       </section>
     );
   }
@@ -156,11 +151,7 @@ const Introduction = async ({ session, profileUserId }: Props) => {
               </Link>
             )}
             {isOwner && (
-              <form action={logout}>
-                <button className="px-2 py-1 hovered active:scale-95">
-                  Logout
-                </button>
-              </form>
+              <LogoutButton />
             )}
           </div>
         </div>

@@ -3,13 +3,7 @@ import { redirect } from 'next/navigation';
 import { Fragment } from 'react';
 import Link from 'next/link';
 import { IoMdArrowRoundBack } from 'react-icons/io';
-import { Metadata } from "next";
 import ProjectContainer from '@/app/components/projectComponent/projectContainer/ProjectContainer';
-
-export const metadata: Metadata = {
-    title: "Add new project",
-    description: "Add new project"
-}
 
 const CreateNew = async () => {
     const session = await getSession();

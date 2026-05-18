@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import axios from "axios";
 import { connectToDB } from "@/app/lib/connectToDB";
@@ -119,6 +120,9 @@ export async function POST(req: NextRequest) {
       password: hashedPassword,
       isAdmin:  true,
     });
+
+    /* ── 7. Revalidate home page so new user appears immediately ── */
+    revalidatePath("/");
 
     return NextResponse.json(
       {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import { connectToDB } from "@/app/lib/connectToDB";
@@ -117,6 +118,9 @@ export const DELETE = async (
         GetInTouchModel.deleteMany({}), // no userId — safe for single-admin app
         AdminModel.findByIdAndDelete(id),
     ]);
+
+    // Revalidate home page so deleted user disappears
+    revalidatePath("/");
 
     /* ── 4. Destroy session ── */
     const session = await getIronSession<SessionData>(

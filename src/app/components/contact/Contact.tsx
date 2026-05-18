@@ -61,7 +61,7 @@ const  Contact = ({ session, profileUserId }: Props) => {
         }
     };
 
-    const email = session?.email || info?.email || "";
+    const email = info?.email || "";
     const phone = info?.contactNumber || ''; // i just leave it empty so it will not show an error but you can expect that it will also have a data
 
     return (

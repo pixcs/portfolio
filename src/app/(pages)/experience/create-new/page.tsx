@@ -3,13 +3,7 @@ import { redirect } from 'next/navigation';
 import { Fragment } from 'react';
 import Link from 'next/link';
 import { IoMdArrowRoundBack } from 'react-icons/io';
-import { Metadata } from "next";
 import ExpContainer from '@/app/components/experienceComponent/expContainer/ExpContainer';
-
-export const metadata: Metadata = {
-    title: "Add new work experience",
-    description: "Add new information about my work experience"
-}
 
 const CreateNew = async () => {
     const session = await getSession();

@@ -801,7 +801,7 @@ const EditInfoForm = ({ session, info }: Props) => {
                         <IoMdArrowRoundBack size={16} className="transition-transform duration-200 group-hover:-translate-x-1" />
                         Home
                     </Link>
-                    <h1 className="text-lg font-bold tracking-tight text-gray-800 dark:text-slate-100">Admin Info</h1>
+                    <h1 className="text-lg font-bold tracking-tight text-gray-800 dark:text-slate-100">Admin Settings</h1>
                     <div className="w-20" />
                 </div>
 

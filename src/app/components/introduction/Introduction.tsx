@@ -16,32 +16,21 @@ import LogoutButton from "@/app/components/partials/LogoutButton";
 type Props = {
   session: IronSession<SessionData> | undefined;
   profileUserId: string;
+  info: AdminInfo | null; 
 };
 
-const Introduction = async ({ session, profileUserId }: Props) => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URI}/api/admin-info/${profileUserId}`,
-    { cache: "no-store" }
-  );
+function resolveImageSrc(profileUrl?: string | null): string {
+  if (!profileUrl) return "/assets/images/profile/default.png";
+  if (profileUrl.startsWith("http")) return profileUrl;
+  return `/assets/images/profile/${profileUrl}`;
+}
 
-  const data = await res.json();
-  const info: AdminInfo | null = data.info;
-
-  if (!res.ok) {
-    console.error("Failed to fetch admin info");
-  }
-
+const Introduction = ({ session, profileUserId, info }: Props) => {
   const isOwner = session?.isLoggedIn && session?.userId === profileUserId;
   const isEmpty = !info;
+  const imageSrc = resolveImageSrc(info?.profileUrl);
 
-  const imageSrc =
-    info?.profileUrl?.startsWith("http")
-      ? info.profileUrl
-      : info?.profileUrl
-      ? `/assets/images/profile/${info.profileUrl}`
-      : "/assets/images/profile/default.png";
-
-  // ── Full empty state for owner ────────────────────────────────────
+  // Empty state: owner 
   if (isEmpty && isOwner) {
     return (
       <section className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-6 mt-20">
@@ -53,7 +42,8 @@ const Introduction = async ({ session, profileUserId }: Props) => {
             Your portfolio is empty
           </h1>
           <p className="text-sm text-gray-500 dark:text-slate-400 max-w-sm mx-auto">
-            Start by filling in your profile information so visitors can learn about you.
+            Start by filling in your profile information so visitors can learn
+            about you.
           </p>
         </div>
         <Link
@@ -68,7 +58,7 @@ const Introduction = async ({ session, profileUserId }: Props) => {
     );
   }
 
-  // ── Empty state for visitors (not the owner) ──────────────────────
+  // Empty state: visitor
   if (isEmpty && !isOwner) {
     return (
       <section className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-4 mt-20">
@@ -92,110 +82,100 @@ const Introduction = async ({ session, profileUserId }: Props) => {
     );
   }
 
-  // ── Normal render ─────────────────────────────────────────────────
   return (
-    <>
-      <section className="flex flex-col-reverse justify-center items-center md:flex-row md:justify-evenly mt-20 md:mt-24 relative px-5 md:mx-auto md:max-w-[1500px]">
-        <HeroCursorEffect color={info?.colorStatus} />
+    <section className="flex flex-col-reverse justify-center items-center md:flex-row md:justify-evenly mt-20 md:mt-24 relative px-5 md:mx-auto md:max-w-[1500px]">
+      <HeroCursorEffect color={info?.colorStatus} />
 
-        {/* ── Text column ── */}
-        <div className="intro-text max-w-screen-lg md:w-1/2 flex flex-col gap-y-4 mt-16">
+      {/* ── Text column ── */}
+      <div className="intro-text max-w-screen-lg md:w-1/2 flex flex-col gap-y-4 mt-16">
+        <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-white transition-theme">
+          {info?.name} <span className="shake-effect">💡</span>
+        </h1>
 
-          <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-white transition-theme">
-            {info?.name}{" "}
-            <span className="shake-effect">💡</span>
-          </h1>
+        {info?.about && (
+          <p className="dark:text-gray-300 transition-theme">{info.about}</p>
+        )}
 
-          {info?.about && (
-            <p className="dark:text-gray-300 transition-theme">
-              {info.about}
-            </p>
+        {info?.address && (
+          <div className="flex items-center space-x-3">
+            <RiMapPinLine size={24} />
+            <p className="dark:text-gray-300">{info.address}</p>
+          </div>
+        )}
+
+        {info?.status && (
+          <div className="flex items-center space-x-3">
+            <div
+              className="w-3 h-3 rounded-full animate-pulse"
+              style={{ backgroundColor: info.colorStatus || "#94a3b8" }}
+            />
+            <p className="dark:text-gray-300">{info.status}</p>
+          </div>
+        )}
+
+        <div className="flex space-x-1 items-center my-6">
+          {info?.githubUrl && (
+            <Link href={info.githubUrl} target="_blank" rel="noopener noreferrer">
+              <LuGithub size={38} className="px-2 p-1 hovered" />
+            </Link>
           )}
-
-          {info?.address && (
-            <div className="flex items-center space-x-3">
-              <RiMapPinLine size={24} />
-              <p className="dark:text-gray-300">{info.address}</p>
-            </div>
+          {info?.facebookUrl && (
+            <Link href={info.facebookUrl} target="_blank" rel="noopener noreferrer">
+              <SlSocialFacebook size={38} className="px-2 py-1 hovered" />
+            </Link>
           )}
-
-          {info?.status && (
-            <div className="flex items-center space-x-3">
-              <div
-                className="w-3 h-3 rounded-full animate-pulse"
-                style={{ backgroundColor: info.colorStatus || "#94a3b8" }}
-              />
-              <p className="dark:text-gray-300">{info.status}</p>
-            </div>
+          {info?.linkedUrl && (
+            <Link href={info.linkedUrl} target="_blank" rel="noopener noreferrer">
+              <GrLinkedinOption size={38} className="px-2 py-1 hovered" />
+            </Link>
           )}
+          {isOwner && (
+            <Link href="/edit-info">
+              <FiEdit size={38} className="px-2 py-1 hovered" />
+            </Link>
+          )}
+          {isOwner && <LogoutButton />}
+        </div>
+      </div>
 
-          <div className="flex space-x-1 items-center my-6">
-            {info?.githubUrl && (
-              <Link href={info.githubUrl} target="_blank">
-                <LuGithub size={38} className="px-2 p-1 hovered" />
-              </Link>
-            )}
-            {info?.facebookUrl && (
-              <Link href={info.facebookUrl} target="_blank">
-                <SlSocialFacebook size={38} className="px-2 py-1 hovered" />
-              </Link>
-            )}
-            {info?.linkedUrl && (
-              <Link href={info.linkedUrl} target="_blank">
-                <GrLinkedinOption size={38} className="px-2 py-1 hovered" />
-              </Link>
-            )}
-            {isOwner && (
-              <Link href="/edit-info">
-                <FiEdit size={38} className="px-2 py-1 hovered" />
-              </Link>
-            )}
-            {isOwner && (
-              <LogoutButton />
+      {/* Image column  */}
+      <div className="intro-image-wrap container relative h-[250px] w-[200px] md:h-[300px] md:w-[250px] md:max-w-xs px-3">
+        <Link
+          href={session?.isLoggedIn ? "/" : "/login"}
+          className="group relative block w-full h-full"
+        >
+          <Image
+            src={imageSrc}
+            alt={`${info?.name ?? "Profile"} photo`}
+            fill
+            className="rounded-sm object-cover transition-all duration-300 group-hover:brightness-50"
+            priority
+          />
+          {/* Overlay */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-sm">
+            {session?.isLoggedIn ? (
+              <>
+                <IoMdArrowRoundBack size={28} className="text-white" />
+                <span className="text-white text-xs font-medium tracking-wide">
+                  Back to Home
+                </span>
+              </>
+            ) : (
+              <>
+                <MdLockOutline size={28} className="text-white" />
+                <span className="text-white text-xs font-medium tracking-wide">
+                  Login as Admin
+                </span>
+              </>
             )}
           </div>
-        </div>
+        </Link>
 
-        {/* ── Image column ── */}
-        <div className="intro-image-wrap container relative h-[250px] w-[200px] md:h-[300px] md:w-[250px] md:max-w-xs px-3">
-          <Link
-            href={session?.isLoggedIn ? "/" : "/login"}
-            className="group relative block w-full h-full"
-          >
-            <Image
-              src={imageSrc}
-              alt="profile-image"
-              fill
-              className="rounded-sm object-cover transition-all duration-300 group-hover:brightness-50"
-              priority
-            />
-            {/* Overlay */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-sm">
-              {session?.isLoggedIn ? (
-                <>
-                  <IoMdArrowRoundBack size={28} className="text-white" />
-                  <span className="text-white text-xs font-medium tracking-wide">
-                    Back to Home
-                  </span>
-                </>
-              ) : (
-                <>
-                  <MdLockOutline size={28} className="text-white" />
-                  <span className="text-white text-xs font-medium tracking-wide">
-                    Login as Admin
-                  </span>
-                </>
-              )}
-            </div>
-          </Link>
-
-          {/* Deco blocks */}
-          <div className="intro-deco-v absolute top-6 md:top-12 -right-6 md:-right-11 w-4 md:w-9 min-h-full bg-gray-200 dark:bg-slate-700 transition-theme" />
-          <div className="intro-deco-h absolute -bottom-6 md:-bottom-12 -right-4 md:-right-8 h-4 md:h-9 left-12 bg-gray-200 dark:bg-slate-700 transition-theme" />
-        </div>
-
-      </section>
-    </>
+        {/* Deco blocks */}
+        <div className="intro-deco-v absolute top-6 md:top-12 -right-6 md:-right-11 w-4 md:w-9 min-h-full bg-gray-200 dark:bg-slate-700 transition-theme" />
+        <div className="intro-deco-h absolute -bottom-6 md:-bottom-12 -right-4 md:-right-8 h-4 md:h-9 left-12 bg-gray-200 dark:bg-slate-700 transition-theme" />
+      </div>
+    </section>
   );
 };
 

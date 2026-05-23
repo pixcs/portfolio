@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { iconRegistry } from "@/app/lib/iconRegistry";
 import { SKILLS } from "@/app/data/skills";
 import { IronSession } from "iron-session";
@@ -25,11 +25,6 @@ const CATEGORIES = [
   "Blockchain",
 ] as const;
 
-type Props = {
-  session: IronSession<SessionData> | undefined;
-  profileUserId: string;
-};
-
 type SkillItem = {
   iconKey: string;
   name: string;
@@ -37,45 +32,26 @@ type SkillItem = {
   category: string;
 };
 
-const Skills = ({ session, profileUserId }: Props) => {
+type Props = {
+  session: IronSession<SessionData> | undefined;
+  profileUserId: string;
+  enabledSkills: SkillItem[]; 
+};
+
+const Skills = ({ session, profileUserId, enabledSkills }: Props) => {
   const [query, setQuery] = useState("");
   const [activeTab, setActiveTab] = useState("All");
-  const [enabledMap, setEnabledMap] = useState<Record<string, boolean>>({});
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasSkills, setHasSkills] = useState(false);
 
   const isOwner = session?.isLoggedIn && session?.userId === profileUserId;
+  const hasSkills = enabledSkills.length > 0;
 
-  useEffect(() => {
-    const fetchSkills = async () => {
-      try {
-        setIsLoading(true);
-
-        const res = await fetch(`/api/skills/${profileUserId}`);
-
-        if (!res.ok) throw new Error("Failed to fetch skills.");
-
-        const data = await res.json();
-
-        const nextMap: Record<string, boolean> = {};
-        SKILLS.forEach((skill) => { nextMap[skill.name] = false; });
-        data.enabledSkills.forEach((skill: SkillItem) => { nextMap[skill.name] = true; });
-
-        setHasSkills(data.enabledSkills.length > 0);
-        setEnabledMap(nextMap);
-      } catch (err) {
-        console.error(err);
-        const fallback: Record<string, boolean> = {};
-        SKILLS.forEach((skill) => { fallback[skill.name] = skill.enabled; });
-        setEnabledMap(fallback);
-        setHasSkills(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (profileUserId) fetchSkills();
-  }, [profileUserId]);
+  // Build enabledMap once from props
+  const enabledMap = useMemo(() => {
+    const map: Record<string, boolean> = {};
+    SKILLS.forEach((s) => { map[s.name] = false; });
+    enabledSkills.forEach((s) => { map[s.name] = true; });
+    return map;
+  }, [enabledSkills]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -88,31 +64,20 @@ const Skills = ({ session, profileUserId }: Props) => {
   }, [query, activeTab, enabledMap]);
 
   const activeCats = useMemo(() => {
-    const cats = new Set(
+    const cats = new Set<string>(
       SKILLS.filter((s) => enabledMap[s.name]).map((s) => s.category)
     );
-    return CATEGORIES.filter((c) => c === "All" || cats.has(c as any));
+
+    return CATEGORIES.filter((c) => c === "All" || cats.has(c));
   }, [enabledMap]);
 
-  if (isLoading) {
-    return (
-      <section className="py-24 flex items-center justify-center">
-        <div className="flex items-center gap-3 text-sm text-gray-400 dark:text-slate-500">
-          <span className="w-4 h-4 rounded-full border-2 border-slate-400/30 border-t-slate-600 animate-spin" />
-          Loading skills...
-        </div>
-      </section>
-    );
-  }
-
-  // ── Empty state ──────────────────────────────────────────────────
+  // ── Empty state ────────────────────────────────────────────────────
   if (!hasSkills) {
     return (
       <section id="skills" className="py-24 fade-in-effect relative">
         <p className="text-sm text-center font-medium px-3 py-1 rounded-full bg-gray-200 max-w-[140px] mx-auto dark:bg-slate-700 transition-theme">
           Skills
         </p>
-
         <div className="flex flex-col items-center justify-center py-20 text-center px-6">
           <p className="text-4xl mb-4">🛠️</p>
           {isOwner ? (
@@ -121,7 +86,8 @@ const Skills = ({ session, profileUserId }: Props) => {
                 No skills added yet
               </h3>
               <p className="text-sm text-gray-500 dark:text-slate-400 max-w-sm mb-6">
-                Add the tools, technologies, and frameworks you work with so visitors know your stack.
+                Add the tools, technologies, and frameworks you work with so
+                visitors know your stack.
               </p>
               <Link
                 href="/skills/update-new"
@@ -146,12 +112,12 @@ const Skills = ({ session, profileUserId }: Props) => {
     );
   }
 
-  // ── Normal render ────────────────────────────────────────────────
+  // ── Normal render ──────────────────────────────────────────────────
   return (
     <section id="skills" className="py-24 fade-in-effect relative">
 
-      {/* Update button — only show when there IS data */}
-      {isOwner && hasSkills && (
+      {/* Update button */}
+      {isOwner && (
         <Link
           href="/skills/update-new"
           className="
@@ -164,9 +130,7 @@ const Skills = ({ session, profileUserId }: Props) => {
             border border-gray-200/60 dark:border-slate-700/50
             text-sm font-medium
             text-gray-700 dark:text-gray-200
-            shadow-sm
-            hover:shadow-md
-            hover:scale-[1.02]
+            shadow-sm hover:shadow-md hover:scale-[1.02]
             transition-all duration-200 ease-out
           "
         >
@@ -176,16 +140,15 @@ const Skills = ({ session, profileUserId }: Props) => {
         </Link>
       )}
 
-      {/* ── Header ── */}
+      {/* Header */}
       <p className="text-sm text-center font-medium px-3 py-1 rounded-full bg-gray-200 max-w-[140px] mx-auto dark:bg-slate-700 transition-theme">
         Skills
       </p>
-
       <p className="text-lg md:text-xl text-center pt-5 px-8 dark:text-gray-300">
         Tools, technologies &amp; frameworks I work with
       </p>
 
-      {/* ── Controls ── */}
+      {/* Controls */}
       <div className="mt-8 mb-4 flex flex-col items-center gap-4 px-6">
         <div className="relative w-full max-w-sm">
           <input
@@ -208,6 +171,7 @@ const Skills = ({ session, profileUserId }: Props) => {
             <button
               onClick={() => setQuery("")}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-300 text-xs"
+              aria-label="Clear search"
             >
               ✕
             </button>
@@ -233,13 +197,13 @@ const Skills = ({ session, profileUserId }: Props) => {
         </div>
       </div>
 
-      {/* ── Count ── */}
+      {/* Count */}
       <p className="text-center text-xs text-gray-400 dark:text-slate-500 mb-8">
         Showing {filtered.length} skill{filtered.length !== 1 ? "s" : ""}
         {query ? ` matching "${query}"` : ""}
       </p>
 
-      {/* ── Grid ── */}
+      {/* Grid */}
       {filtered.length > 0 ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-6 mx-auto max-w-6xl px-6">
           {filtered.map((skill, i) => {

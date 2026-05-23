@@ -136,7 +136,7 @@ const Navbar = ({
                                 ) : (
                                     <div className="p-5 flex flex-col gap-y-4">
                                         <h1 className="font-medium">Apologies, the inboxes are only visible to the administrator.</h1>
-                                        <Link href="login" className=" underline font-medium">
+                                        <Link href="/login" className=" underline font-medium">
                                             <MdOutlineAdminPanelSettings size={30} className=" inline-block mr-4" />
                                             Login as administrator?
                                         </Link>

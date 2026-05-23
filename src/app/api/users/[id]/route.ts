@@ -18,7 +18,7 @@ export const GET = async (
 
         await connectToDB();
 
-        const user = await AdminModel.findById(id, "_id").lean();
+        const user = await AdminModel.findById(id, "_id username").lean();
 
         if (!user) {
             return NextResponse.json(
@@ -36,7 +36,8 @@ export const GET = async (
             user: {
                 _id:          user._id.toString(),
                 name:         info?.name || "Developer",
-                title:        info?.title || "Developer",
+                username:     user.username,
+                title:        info?.title || null,
                 profileImage: info?.profileUrl || null,
             }
         });

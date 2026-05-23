@@ -20,7 +20,6 @@ const CreateNew = async () => {
     const data = await res.json();
     // API returns { workExp }, map it to list_of_experience
     const list_of_experience: WorkExperience[]  = data.workExp ?? [];
-    console.log('list of experience', list_of_experience);
 
     return (
         <Fragment>

@@ -191,6 +191,7 @@ export default async function UserPortfolio({ params }: Props) {
                 <AIChatAssistant
                     session={session}
                     profileUserId={user._id}
+                    username={user.username}
                 />
             </main>
 

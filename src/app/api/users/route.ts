@@ -6,7 +6,7 @@ export const GET = async () => {
     try {
         await connectToDB();
 
-        const users = await AdminModel.find({}, "_id").lean();
+        const users = await AdminModel.find({}, "_id username").lean();
 
         const usersWithInfo = await Promise.all(
             users.map(async (user) => {
@@ -17,9 +17,9 @@ export const GET = async () => {
 
                 return {
                     _id:          user._id.toString(),
-                    name:         info?.name || "Developer",
-                    title:        info?.title || "Developer",
-                    profileImage: info?.profileUrl || null,
+                    username:     user.username || 'Developer',
+                    title:        info?.title || null,
+                    profileImage: info?.profileUrl || null
                 };
             })
         );

@@ -8,6 +8,7 @@ import { IronSession } from "iron-session";
 type Props = {
   session: IronSession<SessionData> | undefined;
   profileUserId: string;
+  username: string;
 };
 
 interface Message {
@@ -121,13 +122,13 @@ function CooldownBar({ seconds }: { seconds: number }) {
   );
 }
 
-export default function AIChatAssistant({ session, profileUserId }: Props) {
+export default function AIChatAssistant({ session, profileUserId, username }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
       role: "assistant",
-      content: "Hi there! 👋 I'm Patrick's AI assistant. Ask me anything about his skills, experience, or projects!",
+      content: `Hi there! 👋 I'm ${username} AI assistant. Ask me anything about his skills, experience, or projects!`,
       timestamp: new Date(),
       isStreaming: false,
     },

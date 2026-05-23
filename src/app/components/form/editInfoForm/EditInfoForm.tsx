@@ -259,11 +259,7 @@ const SecurityPanel = ({ session, setNotifStatus }: { session: ClientSession, se
             ...prev,
             username: session?.username ?? "",
         }));
-        console.log('SESSION', session);
     }, [session]);
-
-    const [usernameNotif, setUsernameNotif] = useState<{ ok: boolean; msg: string } | null>(null);
-    const [usernameLoading, setUsernameLoading] = useState(false);
 
     const [emailNotif,    setEmailNotif]    = useState<{ ok: boolean; msg: string } | null>(null);
     const [passNotif,     setPassNotif]     = useState<{ ok: boolean; msg: string } | null>(null);

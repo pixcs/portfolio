@@ -1,6 +1,5 @@
 "use server";
 
-import axios from "axios";
 import { connectToDB } from "@/app/lib/connectToDB";
 import {
   AdminInfoModel,
@@ -26,19 +25,17 @@ type PortfolioSections = {
   workImageMap:    Record<string, string>;
 };
 
-// ── Config ──────────────────────────────────────────────
-const CACHE_TTL          = 5 * 60 * 1000;
+// Config
+const CACHE_TTL          = 10 * 60 * 1000;
 const MIN_REQUEST_GAP_MS = 10_000;
-const AI_TIMEOUT_MS      = 25_000;  // DeepSeek via RapidAPI is slow — give it 25 s
-const MAX_RETRIES        = 1;       // retry once on timeout/5xx
-const MAX_HISTORY        = 4;
+const AI_TIMEOUT_MS      = 8_000;  // safely under Vercel's 10s limit
+const MAX_HISTORY        = 3;
+const MAX_TOKENS         = 250;
 
 const portfolioCache  = new Map<string, { data: PortfolioSections; ts: number }>();
 const lastRequestTime = new Map<string, number>();
 
-// ─────────────────────────────────────────────────────────
 // INTENT DETECTION
-// ─────────────────────────────────────────────────────────
 type SectionKey = "background" | "skills" | "work" | "projects";
 
 const INTENT_PATTERNS: Record<SectionKey, RegExp> = {
@@ -49,17 +46,29 @@ const INTENT_PATTERNS: Record<SectionKey, RegExp> = {
 };
 
 function detectSections(userMessage: string): SectionKey[] {
+  const msg = userMessage.trim().toLowerCase();
+
+  // STRICT GREETING / INTRO CHECK
+  const isGreetingOrIntro =
+    /^(hi|hello|hey|yo|good\s*morning|good\s*evening)\b/.test(msg) ||
+    /^i'?m\s+\w+/.test(msg) ||              // "I'm Patrick"
+    /^im\s+\w+/.test(msg);                  // "Im Patrick"
+
+  if (isGreetingOrIntro) {
+    return ["background"];
+  }
+
+  // NORMAL INTENT MATCHING
   const matched = (Object.keys(INTENT_PATTERNS) as SectionKey[]).filter(
-    (key) => INTENT_PATTERNS[key].test(userMessage)
+    (key) => INTENT_PATTERNS[key].test(msg)
   );
+
   return matched.length ? matched : ["background"];
 }
 
-// ─────────────────────────────────────────────────────────
-// FETCH + BUILD SECTIONS
-// ─────────────────────────────────────────────────────────
 async function fetchPortfolioData(userId: string) {
   await connectToDB();
+
   const [info, about, workExp, projects, skills] = await Promise.all([
     AdminInfoModel.findOne({ userId }).lean(),
     AboutMeModel.findOne({ userId }).lean(),
@@ -85,7 +94,6 @@ async function getPortfolioSections(userId: string): Promise<PortfolioSections> 
   const projectImageMap: Record<string, string> = {};
   const workImageMap:    Record<string, string> = {};
 
-  // ── identity ─────────────────────────────────────────
   const identityParts: string[] = [];
   if (info) {
     identityParts.push(`Name: ${info.name}`);
@@ -99,14 +107,12 @@ async function getPortfolioSections(userId: string): Promise<PortfolioSections> 
     if (info.resumeUrl)     identityParts.push(`Resume: ${info.resumeUrl}`);
   }
 
-  // ── background ───────────────────────────────────────
   const backgroundParts: string[] = [];
   if (about?.paragraphs?.length)
     backgroundParts.push(`Background:\n${about.paragraphs.join("\n")}`);
   if (about?.quickFacts?.length)
     backgroundParts.push(`Quick Facts:\n${about.quickFacts.map((f: string) => `- ${f}`).join("\n")}`);
 
-  // ── skills ───────────────────────────────────────────
   let skillsSection = "";
   if (skills.length) {
     const byCategory = skills.reduce<Record<string, string[]>>((acc, s) => {
@@ -118,7 +124,6 @@ async function getPortfolioSections(userId: string): Promise<PortfolioSections> 
       .join("\n")}`;
   }
 
-  // ── work ─────────────────────────────────────────────
   let workSection = "";
   if (workExp.length) {
     const lines = workExp.map((w) => {
@@ -131,7 +136,6 @@ async function getPortfolioSections(userId: string): Promise<PortfolioSections> 
     workSection = `Work Experience:\n${lines.join("\n\n")}`;
   }
 
-  // ── projects ─────────────────────────────────────────
   let projectsSection = "";
   if (projects.length) {
     const lines = projects.map((p) => {
@@ -159,9 +163,6 @@ async function getPortfolioSections(userId: string): Promise<PortfolioSections> 
   return result;
 }
 
-// ─────────────────────────────────────────────────────────
-// ASSEMBLE CONTEXT — only what the query needs
-// ─────────────────────────────────────────────────────────
 function assembleContext(sections: PortfolioSections, needed: SectionKey[]): string {
   const parts = [sections.identity];
   for (const key of needed) {
@@ -171,49 +172,43 @@ function assembleContext(sections: PortfolioSections, needed: SectionKey[]): str
   return parts.filter(Boolean).join("\n\n");
 }
 
-// ─────────────────────────────────────────────────────────
-// AI CALL — DeepSeek via RapidAPI, with retry
-// ─────────────────────────────────────────────────────────
-async function callDeepSeek(payload: object, attempt = 0): Promise<string> {
+async function callGroq(messages: object[]): Promise<string> {
   const controller = new AbortController();
   const timer      = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
 
   try {
-    const response: any = await axios({
-      method:  "POST",
-      url:     process.env.DEEPSEEK_AI_URI,
-      signal:  controller.signal,
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      signal: controller.signal,
       headers: {
-        "x-rapidapi-key":  process.env.DEEPSEEK_AI_RAPID_API_KEY,
-        "x-rapidapi-host": process.env.DEEPSEEK_AI_RAPID_API_HOST,
-        "Content-Type":    "application/json",
+        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+        "Content-Type":  "application/json",
       },
-      data: payload,
+      body: JSON.stringify({
+        model:       "llama-3.3-70b-versatile",
+        messages,
+        max_tokens:  MAX_TOKENS,
+        temperature: 0.7,
+        top_p:       0.9,
+        stream:      false,
+      }),
     });
 
-    return (
-      response.data?.result ||
-      response.data?.choices?.[0]?.message?.content ||
-      response.data?.message ||
-      "I couldn't generate a response."
-    );
-  } catch (error: any) {
-    const isTimeout = error.name === "AbortError" || error.code === "ERR_CANCELED";
-    const status    = error?.response?.status;
-
-    // Retry once on timeout or 5xx
-    if ((isTimeout || (status >= 500)) && attempt < MAX_RETRIES) {
-      console.warn(`DeepSeek attempt ${attempt + 1} failed (${isTimeout ? "timeout" : status}), retrying...`);
-      await new Promise((r) => setTimeout(r, 2000)); // 2 s back-off
-      return callDeepSeek(payload, attempt + 1);
+    if (!res.ok) {
+      const status = res.status;
+      if (status === 429) throw new Error("RATE_LIMIT");
+      if (status === 401 || status === 403) throw new Error("INVALID_API_KEY");
+      if (status >= 500) throw new Error("AI_SERVER_ERROR");
+      throw new Error("CHAT_ERROR");
     }
 
-    if (isTimeout)                        throw new Error("AI_TIMEOUT");
-    if (status === 429)                   throw new Error("RATE_LIMIT");
-    if (status === 401 || status === 403) throw new Error("INVALID_API_KEY");
-    if (status >= 500)                    throw new Error("AI_SERVER_ERROR");
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content ?? "I couldn't generate a response.";
 
-    throw new Error("CHAT_ERROR");
+  } catch (error: any) {
+    const isTimeout = error.name === "AbortError" || error.code === "ERR_CANCELED";
+    if (isTimeout) throw new Error("AI_TIMEOUT");
+    throw error;
   } finally {
     clearTimeout(timer);
   }
@@ -236,45 +231,58 @@ async function sendChatMessage(
   lastRequestTime.set(userId, now);
 
   const systemMessage = {
-    role:    "system",
-    content: `You are ${ownerName}'s personal portfolio assistant — friendly, warm, and genuinely excited to talk about their work.
+  role: "system",
+  content: `You are ${ownerName}'s AI portfolio assistant.
 
-Your personality:
-- Conversational and approachable, not robotic
-- Enthusiastic when talking about projects and skills (but not over the top)
-- Use natural language like "Oh, great question!" or "I'd love to tell you about..."
-- Keep answers concise but human — like a friend talking about someone they admire
-- If you don't know something, say "Hmm, I'm not sure about that one!" instead of a stiff "I don't know"
+    Your job is to help visitors learn about ${ownerName}'s:
+    - background
+    - skills
+    - work experience
+    - projects
+    - tech stack
+    - achievements
 
-Only use the information below. Never make things up.
+    Behavior rules:
+    - Be friendly, professional, concise, and enthusiastic.
+    - Only use the portfolio data provided below.
+    - Never invent information, projects, skills, companies, experience, or images.
+    - If information is unavailable, politely say you do not have that information.
+    - Do not guess or assume missing details.
 
---- Portfolio Data ---
-${portfolioContext}
----------------------
+    Important interpretation rules:
+    - Casual messages like "Hi", "Hello", "I'm Patrick", "How are you", or introductions are NOT project names, company names, or image requests.
+    - Never interpret normal conversation text as portfolio entities.
+    - Only mention projects, companies, or skills that explicitly exist in the portfolio data.
+    - Only reference project images if the project explicitly has an image.
+    - Only reference company/work images if they explicitly exist.
+    - If no image exists, simply say:
+      "I don't have an image available for that."
 
-Remember: you're representing ${ownerName}, so be proud and personable about their work! 🚀`,
-  };
+    Formatting rules:
+    - Always format URLs as markdown links: [label](url)
+    - For GitHub links use: [GitHub Profile](url)
+    - For LinkedIn links use: [LinkedIn](url)
+    - For resumes use: [View Resume](url)
+    - For project links use: [Project Name](url)
 
-  const payload = {
-    messages:    [systemMessage, ...messages.slice(-MAX_HISTORY)],
-    temperature: 0.7,
-    top_p:       0.9,
-    max_tokens:  400,
-    web_access:  false,
+    Response style:
+    - Use **bold** for names, roles, technologies, and important highlights.
+    - Use bullet points for lists of skills, tools, tasks, or achievements.
+    - Keep answers clean and readable.
+    - Avoid overly long responses unless the user asks for details.
+
+    Portfolio data:
+    ${portfolioContext}`,
   };
 
   try {
-    return await callDeepSeek(payload);
+      return await callGroq([systemMessage, ...messages.slice(-MAX_HISTORY)]);
   } catch (err) {
-    // Clear cooldown so user can retry immediately after a real error
-    lastRequestTime.delete(userId);
+      lastRequestTime.delete(userId);
     throw err;
   }
 }
 
-// ─────────────────────────────────────────────────────────
-// MAIN EXPORT
-// ─────────────────────────────────────────────────────────
 export async function handleChat(
   messages: ChatMessage[],
   userId:   string,
@@ -291,16 +299,13 @@ export async function handleChat(
 
     const reply = await sendChatMessage(messages, context, userId, sections.ownerName);
 
-    const showProjects = neededSections.includes("projects");
-    const showWork     = neededSections.includes("work");
-
     return {
       reply,
-      projectImageMap: showProjects ? sections.projectImageMap : {},
-      workImageMap:    showWork     ? sections.workImageMap    : {},
+      projectImageMap: neededSections.includes("projects") ? sections.projectImageMap : {},
+      workImageMap:    neededSections.includes("work")     ? sections.workImageMap    : {},
     };
   } catch (error: any) {
-    console.error("AI Chat Error:", error.message);
+      console.error("AI Chat Error:", error.message);
 
     if (
       error.message?.startsWith("COOLDOWN:") ||

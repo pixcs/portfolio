@@ -3,6 +3,7 @@ import { put, del } from "@vercel/blob";
 import mongoose from "mongoose";
 import { connectToDB } from "@/app/lib/connectToDB";
 import { AdminInfoModel } from "@/app/models/models";
+import { revalidatePath } from "next/cache";
 
 type Params = { params: { userId: string } };
 
@@ -94,6 +95,9 @@ export async function PUT(req: NextRequest, { params }: Params) {
             { new: true, upsert: true }
         ).lean();
 
+        // Bust the cache for that user's portfolio page
+        revalidatePath(`/user/${params.userId}`);
+
         return NextResponse.json(
             { message: "Info updated", info },
             { status: 200 }
@@ -148,6 +152,9 @@ export async function POST(
             { profileUrl: blob.url },
             { upsert: true }
         );
+
+        // Bust the cache for that user's portfolio page
+        revalidatePath(`/user/${params.userId}`);
 
         return NextResponse.json({
             url: blob.url,

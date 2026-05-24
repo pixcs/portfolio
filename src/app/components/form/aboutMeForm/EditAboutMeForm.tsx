@@ -6,6 +6,7 @@ import { RiCheckLine } from 'react-icons/ri';
 import { IoMdArrowRoundBack } from 'react-icons/io';
 import { LuPlus, LuX, LuGripVertical, LuUpload, LuImage, LuTrash2 } from 'react-icons/lu';
 import type { ClientSession } from "@/app/models/models";
+import { useRouter } from "next/navigation";
 
 type QuickFact = {
     id: string;
@@ -160,6 +161,7 @@ const ImageSlot = ({
 
 /* ─── Main form ─── */
 const EditAboutMeForm = ({ session, info }: Props) => {
+    const router = useRouter();
     const [formData, setFormData] = useState<FormAboutMe>({
         heading: "",
         paragraphs: [""],
@@ -337,7 +339,12 @@ const EditAboutMeForm = ({ session, info }: Props) => {
 
             const result: { message: string } | { error: string } = await res.json();
             if (!res.ok) console.error("Failed to update about me.");
-            if ("message" in result) setNotifStatus(result.message);
+            if ("message" in result) {
+                setNotifStatus(result.message);
+                router.refresh();
+                //router.push(`/user/${session.userId}`);
+            }
+
             if ("error"   in result) setNotifStatus(result.error);
 
         } catch (err) {

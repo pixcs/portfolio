@@ -1,10 +1,8 @@
-// app/api/skills/[userId]/route.ts
-
 import { NextRequest, NextResponse } from "next/server";
-import mongoose                      from "mongoose";
-import { connectToDB }                 from "@/app/lib/connectToDB";       
-import { SkillsContentModel }        from "@/app/models/models";   
-import { SKILLS }                    from "@/app/data/skills";   
+import mongoose from "mongoose";
+import { connectToDB } from "@/app/lib/connectToDB";       
+import { SkillsContentModel } from "@/app/models/models";   
+import { revalidatePath } from "next/cache";
 
 type Params = { params: { userId: string } };
 
@@ -62,6 +60,10 @@ export async function PUT(req: NextRequest, { params }: Params) {
             { $set: { enabledSkills } },
             { upsert: true, new: true }
         );
+
+
+        // Bust the cache for that user's portfolio page
+        revalidatePath(`/user/${userId}`);
 
         return NextResponse.json(
             { message: "Skills updated successfully.", enabledSkills: doc.enabledSkills },

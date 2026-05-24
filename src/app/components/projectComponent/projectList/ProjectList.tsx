@@ -56,7 +56,7 @@ const ProjectList = ({ projects, getEditProject, formReset }: Props) => {
     return (
         <>
             {/* Toast */}
-            <div className={`fixed top-5 right-5 z-50 flex items-center gap-2 px-4 py-3 rounded-xl text-sm
+            <div className={`fixed top-5 right-5 z-[999] flex items-center gap-2 px-4 py-3 rounded-xl text-sm
                 font-medium shadow-xl border bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-700
                 text-gray-800 dark:text-slate-100 transition-all duration-300
                 ${toast ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2 pointer-events-none"}`}

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectToDB } from "@/app/lib/connectToDB";
 import { ProjectModel } from "@/app/models/models";
+import { revalidatePath } from "next/cache";
 
 type Params = { params: { id: string } };
 
@@ -12,6 +13,9 @@ export const GET = async (_req: Request, { params }: Params) => {
   await connectToDB();
 
   const projects = await ProjectModel.find({ userId: params.id });
+
+  // Bust the cache for that user's portfolio page
+  revalidatePath(`/user/${ params.id}`);
 
   return NextResponse.json({ projects });
 };

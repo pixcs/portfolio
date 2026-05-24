@@ -148,6 +148,7 @@ const Introduction = ({ session, profileUserId, info }: Props) => {
             src={imageSrc}
             alt={`${info?.name ?? "Profile"} photo`}
             fill
+            sizes="(max-width: 768px) 200px, 250px"
             className="rounded-sm object-cover transition-all duration-300 group-hover:brightness-50"
             priority
           />

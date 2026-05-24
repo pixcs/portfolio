@@ -691,6 +691,7 @@ const DeleteAccountSection = ({ session }: { session: ClientSession }) => {
 
 // Main Component
 const EditInfoForm = ({ session, info }: Props) => {
+    const router = useRouter();
     const [activeTab, setActiveTab] = useState<Tab>("profile");
 
     const [formData, setFormData] = useState<FormAdminInfo>({
@@ -761,6 +762,7 @@ const EditInfoForm = ({ session, info }: Props) => {
             const result = await res.json();
             if (!res.ok) throw new Error(result.error ?? "Failed to update.");
             setNotifStatus(result.message);
+            router.refresh();
         } catch (err) {
             console.error(err);
             setNotifStatus("Failed to update.");
@@ -916,7 +918,14 @@ const EditInfoForm = ({ session, info }: Props) => {
                                             <div className="flex items-center gap-3">
                                                 {metadata.icons && (
                                                     <div className="relative flex-shrink-0 w-8 h-8 rounded-md overflow-hidden border border-gray-200 dark:border-slate-700 bg-gray-100 dark:bg-slate-800">
-                                                        <Image src={metadata.icons} alt="favicon preview" fill className="object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                                                        <Image 
+                                                            src={metadata.icons} 
+                                                            alt="favicon preview" 
+                                                            fill 
+                                                            sizes="16px"
+                                                            className="object-cover" 
+                                                            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} 
+                                                        />
                                                     </div>
                                                 )}
                                                 <input type="text" name="icons" value={metadata.icons} onChange={handleMetaChange} className={`${inputCls} flex-1`} placeholder="https://…/favicon.png" />
@@ -945,7 +954,14 @@ const EditInfoForm = ({ session, info }: Props) => {
                                 <span className="text-[10px] font-semibold uppercase tracking-widest text-gray-500 dark:text-slate-500 self-start">Preview</span>
                                 <div className="relative w-40 h-40 md:w-48 md:h-48 rounded-xl overflow-hidden border border-gray-200 dark:border-slate-700 shadow-lg shadow-slate-900/20 bg-gray-100 dark:bg-slate-800">
                                     {profileUrl ? (
-                                        <Image src={profileUrl} alt="profile" fill className="object-cover" />
+                                        <Image 
+                                            src={profileUrl} 
+                                            alt="profile" 
+                                            fill 
+                                            unoptimized
+                                            sizes="(max-width: 768px) 160px, 192px"
+                                            className="object-cover" 
+                                        />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-900 text-white">
                                             <span className="text-3xl font-bold uppercase tracking-wider">
@@ -975,7 +991,14 @@ const EditInfoForm = ({ session, info }: Props) => {
                                         <div className="flex items-center gap-2">
                                             {metadata.icons && (
                                                 <div className="relative w-4 h-4 flex-shrink-0 rounded-sm overflow-hidden">
-                                                    <Image src={metadata.icons} alt="favicon" fill className="object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                                                    <Image 
+                                                        src={metadata.icons} 
+                                                        alt="favicon" 
+                                                        fill 
+                                                        sizes="16px"
+                                                        className="object-cover" 
+                                                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} 
+                                                    />
                                                 </div>
                                             )}
                                             <p className="text-xs font-medium text-blue-600 dark:text-blue-400 truncate">{metadata.title || "—"}</p>

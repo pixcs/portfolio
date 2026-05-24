@@ -96,14 +96,14 @@ export default async function Home() {
                     ) : (
                     <>
                         <Link
-                        href="/register"
-                        className="px-6 py-3 text-sm font-semibold rounded-full bg-white text-slate-900 hover:opacity-90 transition-opacity"
+                            href="/register"
+                            className="px-6 py-3 text-sm font-semibold rounded-full bg-white text-slate-900 hover:opacity-90 transition-opacity"
                         >
                             Create Portfolio
                         </Link>
                         <Link
-                        href="/login"
-                        className="px-6 py-3 text-sm font-medium rounded-full border border-slate-600 text-slate-300 hover:text-white hover:border-slate-400 transition-theme"
+                            href="/login"
+                            className="px-6 py-3 text-sm font-medium rounded-full border border-slate-600 text-slate-300 hover:text-white hover:border-slate-400 transition-theme"
                         >
                             Sign in
                         </Link>

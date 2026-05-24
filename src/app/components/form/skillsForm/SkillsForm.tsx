@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { RiCheckLine } from "react-icons/ri";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { LuSearch, LuX } from "react-icons/lu";
 import { iconRegistry } from "@/app/lib/iconRegistry";
 import { SKILLS, Category } from "@/app/data/skills";
 import type { SkillItem } from "@/app/models/models";
+import { useRouter } from "next/navigation";
 
 const ALL_CATEGORIES: Category[] = [
     "Language",
@@ -35,6 +36,7 @@ export default function SkillsForm({
     userId,
     initialSkills,
 }: SkillsManagerProps) {
+    const router = useRouter();
 
     const [query, setQuery] = useState("");
     const [activeTab, setActiveTab] = useState<"All" | Category>("All");
@@ -114,46 +116,49 @@ export default function SkillsForm({
     // ── Save to API ─────────────────────────────────────────────────
     const handleSave = async () => {
         try {
-        setIsLoading(true);
+            setIsLoading(true);
 
-        const payload = {
-            enabledSkills: enabledSkills.map(
-            ({ iconKey, name, color, category }) => ({
-                iconKey,
-                name,
-                color,
-                category,
-            })
-            ),
-        };
+            const payload = {
+                enabledSkills: enabledSkills.map(
+                ({ iconKey, name, color, category }) => ({
+                    iconKey,
+                    name,
+                    color,
+                    category,
+                })
+                ),
+            };
 
-        const res = await fetch(`/api/skills/${userId}`, {
-            method: "PUT",
-            headers: {
-            "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-        });
+            const res = await fetch(`/api/skills/${userId}`, {
+                method: "PUT",
+                headers: {
+                "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
 
-        const data = await res.json();
+            const data = await res.json();
 
-        if (!res.ok) {
-            throw new Error(
-            data.error || "Failed to save skills."
-            );
-        }
+            if (!res.ok) {
+                throw new Error(
+                data.error || "Failed to save skills."
+                );
+            }
+            setNotifStatus("Skills updated successfully.");
 
-        setNotifStatus("Skills updated successfully.");
+            router.refresh(); // clears Next.js client cache
+            //router.push(`/user/${userId}`); // navigate back with fresh data
+
         } catch (err) {
-        console.error(err);
+            console.error(err);
 
-        setNotifStatus("Failed to update skills.");
+            setNotifStatus("Failed to update skills.");
         } finally {
-        setIsLoading(false);
+            setIsLoading(false);
 
-        setTimeout(() => {
-            setNotifStatus("");
-        }, 2500);
+            setTimeout(() => {
+                setNotifStatus("");
+            }, 2500);
         }
     };
 

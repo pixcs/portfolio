@@ -3,6 +3,7 @@ import { put, del } from "@vercel/blob";
 import mongoose from "mongoose";
 import { connectToDB } from "@/app/lib/connectToDB";
 import { AboutMeModel } from "@/app/models/models";
+import { revalidatePath } from "next/cache";
 
 type Params = { params: { userId: string } };
 
@@ -132,6 +133,9 @@ export async function PUT(req: NextRequest, { params }: Params) {
                 profileImagePathnames: cleanPathnames
             });
         }
+
+        // Bust the cache for that user's portfolio page
+        revalidatePath(`/user/${params.userId}`);
 
         return NextResponse.json(
             { message: "About Me updated.", about },

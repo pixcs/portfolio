@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { put } from "@vercel/blob";
+import { put, del } from "@vercel/blob"; 
 import { connectToDB } from "@/app/lib/connectToDB";
 import { WorkExperience } from "@/app/models/models";
+import { revalidatePath } from "next/cache";
 
 export const POST = async (request: Request) => {
     await connectToDB();
@@ -44,6 +45,7 @@ export const POST = async (request: Request) => {
     });
 
     await newWorkExperience.save();
+    revalidatePath(`/user/${userId}`);
     return NextResponse.json({ success: "Created successfully" });
 };
 
@@ -66,10 +68,27 @@ export const DELETE = async (request: Request) => {
     await connectToDB();
 
     if (!id) {
-        return NextResponse.json({ error: "id not found!" }, { status: 401 })
+        return NextResponse.json({ error: "id not found!" }, { status: 401 });
     }
 
-    await WorkExperience.findByIdAndDelete({ _id: id });
+    const experience = await WorkExperience.findById(id);
 
-    return NextResponse.json({ success: "successfully deleted" });
-}
+    if (!experience) {
+        return NextResponse.json({ error: "Experience not found" }, { status: 404 });
+    }
+
+    if (experience.companyLogo) {
+        try {
+            await del(experience.companyLogo, {
+                token: process.env.BLOB_EXPERIENCE_READ_WRITE_TOKEN,
+            });
+        } catch (err) {
+            console.warn("Failed to delete company logo blob:", err);
+        }
+    }
+
+    await WorkExperience.findByIdAndDelete(id);
+
+    revalidatePath(`/user/${experience.userId}`);
+    return NextResponse.json({ success: "Successfully deleted" });
+};

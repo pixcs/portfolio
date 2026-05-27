@@ -15,20 +15,21 @@ type ChatMessage = {
 };
 
 type PortfolioSections = {
-  ownerName:       string;
-  identity:        string;
-  background:      string;
-  skills:          string;
-  work:            string;
-  projects:        string;
-  projectImageMap: Record<string, string>;
-  workImageMap:    Record<string, string>;
+  ownerName:        string;
+  identity:         string;
+  background:       string;
+  skills:           string;
+  work:             string;
+  projects:         string;
+  projectImageMap:  Record<string, string>;
+  workImageMap:     Record<string, string>;
+  profileImageMap:  Record<string, string>;
 };
 
 // Config
 const CACHE_TTL          = 10 * 60 * 1000;
 const MIN_REQUEST_GAP_MS = 10_000;
-const AI_TIMEOUT_MS      = 8_000;  // safely under Vercel's 10s limit
+const AI_TIMEOUT_MS      = 8_000;
 const MAX_HISTORY        = 3;
 const MAX_TOKENS         = 250;
 
@@ -48,17 +49,13 @@ const INTENT_PATTERNS: Record<SectionKey, RegExp> = {
 function detectSections(userMessage: string): SectionKey[] {
   const msg = userMessage.trim().toLowerCase();
 
-  // STRICT GREETING / INTRO CHECK
   const isGreetingOrIntro =
     /^(hi|hello|hey|yo|good\s*morning|good\s*evening)\b/.test(msg) ||
-    /^i'?m\s+\w+/.test(msg) ||              // "I'm Patrick"
-    /^im\s+\w+/.test(msg);                  // "Im Patrick"
+    /^i'?m\s+\w+/.test(msg) ||
+    /^im\s+\w+/.test(msg);
 
-  if (isGreetingOrIntro) {
-    return ["background"];
-  }
+  if (isGreetingOrIntro) return ["background"];
 
-  // NORMAL INTENT MATCHING
   const matched = (Object.keys(INTENT_PATTERNS) as SectionKey[]).filter(
     (key) => INTENT_PATTERNS[key].test(msg)
   );
@@ -91,8 +88,9 @@ async function getPortfolioSections(userId: string): Promise<PortfolioSections> 
 
   const { info, about, workExp, projects, skills } = await fetchPortfolioData(userId);
 
-  const projectImageMap: Record<string, string> = {};
+  const projectImageMap:  Record<string, string> = {};
   const workImageMap:    Record<string, string> = {};
+  const profileImageMap: Record<string, string> = {};
 
   const identityParts: string[] = [];
   if (info) {
@@ -105,6 +103,11 @@ async function getPortfolioSections(userId: string): Promise<PortfolioSections> 
     if (info.githubUrl)     identityParts.push(`GitHub: ${info.githubUrl}`);
     if (info.linkedUrl)     identityParts.push(`LinkedIn: ${info.linkedUrl}`);
     if (info.resumeUrl)     identityParts.push(`Resume: ${info.resumeUrl}`);
+    // Let the AI know a profile photo is available
+    if (info.profileUrl) {
+      profileImageMap[info.name ?? "profile"] = info.profileUrl;
+      identityParts.push(`Profile photo [has image]: available`);
+    }
   }
 
   const backgroundParts: string[] = [];
@@ -112,6 +115,14 @@ async function getPortfolioSections(userId: string): Promise<PortfolioSections> 
     backgroundParts.push(`Background:\n${about.paragraphs.join("\n")}`);
   if (about?.quickFacts?.length)
     backgroundParts.push(`Quick Facts:\n${about.quickFacts.map((f: string) => `- ${f}`).join("\n")}`);
+  // about.profileImages are additional gallery/about-page photos
+  if (about?.profileImages?.length) {
+    about.profileImages.forEach((url: string, i: number) => {
+      const key = `about photo ${i + 1}`;
+      profileImageMap[key] = url;
+    });
+    backgroundParts.push(`About profile photos [has image]: ${about.profileImages.length} photo(s) available`);
+  }
 
   let skillsSection = "";
   if (skills.length) {
@@ -128,7 +139,11 @@ async function getPortfolioSections(userId: string): Promise<PortfolioSections> 
   if (workExp.length) {
     const lines = workExp.map((w) => {
       if (w.companyLogo) workImageMap[w.companyName] = w.companyLogo;
-      const parts = [`${w.companyName} — ${w.position} (${w.range})`];
+      // "[has image]" tells the AI a logo is available so it won't say "I don't have an image"
+      const header = w.companyLogo
+        ? `${w.companyName} — ${w.position} (${w.range}) [has image]`
+        : `${w.companyName} — ${w.position} (${w.range})`;
+      const parts = [header];
       if (w.tasks?.length)
         parts.push(w.tasks.slice(0, 3).map((t: string) => `  • ${t}`).join("\n"));
       return parts.join("\n");
@@ -140,7 +155,12 @@ async function getPortfolioSections(userId: string): Promise<PortfolioSections> 
   if (projects.length) {
     const lines = projects.map((p) => {
       if (p.projectImage) projectImageMap[p.projectName] = p.projectImage;
-      const parts = [`${p.projectName}: ${p.description}`];
+      const parts = [
+        // "[has image]" tells the AI a screenshot is available
+        p.projectImage
+          ? `${p.projectName} [has image]: ${p.description}`
+          : `${p.projectName}: ${p.description}`,
+      ];
       if (p.toolsAndTech?.length) parts.push(`Tech: ${p.toolsAndTech.join(", ")}`);
       if (p.projectUrl)           parts.push(`URL: ${p.projectUrl}`);
       return parts.join(" | ");
@@ -157,6 +177,7 @@ async function getPortfolioSections(userId: string): Promise<PortfolioSections> 
     projects:        projectsSection,
     projectImageMap,
     workImageMap,
+    profileImageMap,
   };
 
   portfolioCache.set(userId, { data: result, ts: Date.now() });
@@ -170,6 +191,23 @@ function assembleContext(sections: PortfolioSections, needed: SectionKey[]): str
     if (content) parts.push(content);
   }
   return parts.filter(Boolean).join("\n\n");
+}
+
+/**
+ * Filters an image map to only include entries whose name appears in the
+ * AI reply. This prevents dumping every project/company image when the
+ * user only asked about one specific item.
+ */
+function filterImageMapByReply(
+  imageMap: Record<string, string>,
+  reply: string
+): Record<string, string> {
+  const replyLower = reply.toLowerCase();
+  return Object.fromEntries(
+    Object.entries(imageMap).filter(([name]) =>
+      replyLower.includes(name.toLowerCase())
+    )
+  );
 }
 
 async function callGroq(messages: object[]): Promise<string> {
@@ -231,8 +269,8 @@ async function sendChatMessage(
   lastRequestTime.set(userId, now);
 
   const systemMessage = {
-  role: "system",
-  content: `You are ${ownerName}'s AI portfolio assistant.
+    role: "system",
+    content: `You are ${ownerName}'s AI portfolio assistant.
 
     Your job is to help visitors learn about ${ownerName}'s:
     - background
@@ -253,10 +291,11 @@ async function sendChatMessage(
     - Casual messages like "Hi", "Hello", "I'm Patrick", "How are you", or introductions are NOT project names, company names, or image requests.
     - Never interpret normal conversation text as portfolio entities.
     - Only mention projects, companies, or skills that explicitly exist in the portfolio data.
-    - Only reference project images if the project explicitly has an image.
-    - Only reference company/work images if they explicitly exist.
-    - If no image exists, simply say:
-      "I don't have an image available for that."
+    - In the portfolio data, projects, companies, and profile photos marked with [has image] have a visual available.
+      When asked for an image/photo of one of these, confirm it is available (e.g. "Yes, here's a photo of ...").
+    - If something is NOT marked with [has image], say you don't have an image for it.
+    - Never say "I don't have an image" for anything that is marked [has image] in the data.
+    - Profile photo and about profile photos are marked as [has image] in the identity/background data.
 
     Formatting rules:
     - Always format URLs as markdown links: [label](url)
@@ -276,9 +315,9 @@ async function sendChatMessage(
   };
 
   try {
-      return await callGroq([systemMessage, ...messages.slice(-MAX_HISTORY)]);
+    return await callGroq([systemMessage, ...messages.slice(-MAX_HISTORY)]);
   } catch (err) {
-      lastRequestTime.delete(userId);
+    lastRequestTime.delete(userId);
     throw err;
   }
 }
@@ -287,9 +326,10 @@ export async function handleChat(
   messages: ChatMessage[],
   userId:   string,
 ): Promise<{
-  reply:           string;
-  projectImageMap: Record<string, string>;
-  workImageMap:    Record<string, string>;
+  reply:            string;
+  projectImageMap:  Record<string, string>;
+  workImageMap:     Record<string, string>;
+  profileImageMap:  Record<string, string>;
 }> {
   try {
     const sections        = await getPortfolioSections(userId);
@@ -299,13 +339,29 @@ export async function handleChat(
 
     const reply = await sendChatMessage(messages, context, userId, sections.ownerName);
 
-    return {
-      reply,
-      projectImageMap: neededSections.includes("projects") ? sections.projectImageMap : {},
-      workImageMap:    neededSections.includes("work")     ? sections.workImageMap    : {},
-    };
+    // Only return images for projects/companies the AI actually mentioned in its reply.
+    // This prevents flooding the chat with all images when the user asks a general question.
+    const projectImageMap = neededSections.includes("projects")
+      ? filterImageMapByReply(sections.projectImageMap, reply)
+      : {};
+
+    const workImageMap = neededSections.includes("work")
+      ? filterImageMapByReply(sections.workImageMap, reply)
+      : {};
+
+    // Profile images: don't filter by name — the keys ("Patrick", "about photo 1") never
+    // appear verbatim in the AI reply. Instead, return all profile images whenever the
+    // reply signals that photos are available (i.e. the AI acknowledged [has image] entries).
+    const replyLower = reply.toLowerCase();
+    const profilePhotoReferenced =
+      /photo|image|picture|profile|about photo/.test(replyLower) &&
+      Object.keys(sections.profileImageMap).length > 0;
+    const profileImageMap = profilePhotoReferenced ? sections.profileImageMap : {};
+
+    return { reply, projectImageMap, workImageMap, profileImageMap };
+
   } catch (error: any) {
-      console.error("AI Chat Error:", error.message);
+    console.error("AI Chat Error:", error.message);
 
     if (
       error.message?.startsWith("COOLDOWN:") ||

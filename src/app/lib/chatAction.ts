@@ -349,12 +349,14 @@ export async function handleChat(
       ? filterImageMapByReply(sections.workImageMap, reply)
       : {};
 
-    // Profile images: don't filter by name — the keys ("Patrick", "about photo 1") never
-    // appear verbatim in the AI reply. Instead, return all profile images whenever the
-    // reply signals that photos are available (i.e. the AI acknowledged [has image] entries).
-    const replyLower = reply.toLowerCase();
+    // Profile images: only return when the user explicitly asked about the owner's
+    // profile/photo — NOT when the reply just happens to mention "image" in a project context.
+    const lastMsgLower = lastUserMessage.toLowerCase();
     const profilePhotoReferenced =
-      /photo|image|picture|profile|about photo/.test(replyLower) &&
+      /\b(profile|photo|picture|your (face|look|appearance)|show.*you|who are you)\b/.test(lastMsgLower) &&
+      // Make sure this isn't a project/work image request
+      !neededSections.includes("projects") &&
+      !neededSections.includes("work") &&
       Object.keys(sections.profileImageMap).length > 0;
     const profileImageMap = profilePhotoReferenced ? sections.profileImageMap : {};
 

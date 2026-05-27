@@ -568,7 +568,7 @@ export default function AIChatAssistant({ profileUserId, username }: Props) {
                 className="w-1.5 h-1.5 rounded-full animate-pulse shrink-0"
                 style={{ backgroundColor: "#34d399" }}
               />
-              Powered by AI · Not a real person
+              Powered by Groq
             </span>
           </div>
 

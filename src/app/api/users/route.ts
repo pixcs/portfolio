@@ -15,6 +15,8 @@ export const GET = async () => {
                     "name profileUrl title"
                 ).lean();
 
+                console.log("AdminInfo for", user.username, "→", info); // add this
+
                 return {
                     _id:          user._id.toString(),
                     username:     user.username || 'Developer',

@@ -3,10 +3,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import { handleChat } from "@/app/lib/chatAction";
-import { IronSession } from "iron-session";
 
 type Props = {
-  session: IronSession<SessionData> | undefined;
   profileUserId: string;
   username: string;
 };
@@ -122,7 +120,7 @@ function CooldownBar({ seconds }: { seconds: number }) {
   );
 }
 
-export default function AIChatAssistant({ session, profileUserId, username }: Props) {
+export default function AIChatAssistant({ profileUserId, username }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -203,7 +201,7 @@ export default function AIChatAssistant({ session, profileUserId, username }: Pr
         .filter((m) => m.id !== "welcome")
         .map((m) => ({ role: m.role, content: m.content }));
 
-      const userId = session?.userId || profileUserId;
+      const userId =  profileUserId;
 
       const { reply, projectImageMap, workImageMap } = await handleChat(conversationHistory, userId);
 

@@ -68,7 +68,7 @@ const Contact = ({ session, info }: Props) => {
             {email && (
                 <div className="intro-text flex items-center justify-center space-x-2 md:space-x-5 my-2">
                 <MdOutlineEmail size={35} className="h-5 md:h-9" />
-                <h2 className="text-sm md:text-2xl dark:text-white font-bold">
+                <h2 className="text-xs md:text-2xl dark:text-white font-bold">
                     {email}
                 </h2>
                 <div className="relative">

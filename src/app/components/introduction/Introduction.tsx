@@ -16,7 +16,7 @@ import LogoutButton from "@/app/components/partials/LogoutButton";
 type Props = {
   session: IronSession<SessionData> | undefined;
   profileUserId: string;
-  info: AdminInfo | null; 
+  info: AdminInfo | null;
 };
 
 function resolveImageSrc(profileUrl?: string | null): string {
@@ -30,7 +30,7 @@ const Introduction = ({ session, profileUserId, info }: Props) => {
   const isEmpty = !info;
   const imageSrc = resolveImageSrc(info?.profileUrl);
 
-  // Empty state: owner 
+  // Empty state: owner
   if (isEmpty && isOwner) {
     return (
       <section className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center gap-6 mt-20">
@@ -86,9 +86,8 @@ const Introduction = ({ session, profileUserId, info }: Props) => {
     <section className="flex flex-col-reverse justify-center items-center md:flex-row md:justify-evenly mt-20 md:mt-24 relative px-5 md:mx-auto md:max-w-[1500px]">
       <HeroCursorEffect color={info?.colorStatus} />
 
-      {/* ── Text column ── */}
-      <div className="intro-text max-w-screen-lg md:w-1/2 flex flex-col gap-y-4 mt-16">
-        <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-white transition-theme">
+      <div className="intro-text max-w-screen-lg md:w-1/2 flex flex-col gap-y-4 mt-16 relative z-10">
+        <h1 className="text-2xl md:text-6xl font-bold text-slate-900 dark:text-white transition-theme">
           {info?.name} <span className="shake-effect">💡</span>
         </h1>
 
@@ -138,8 +137,7 @@ const Introduction = ({ session, profileUserId, info }: Props) => {
         </div>
       </div>
 
-      {/* Image column  */}
-      <div className="intro-image-wrap container relative h-[250px] w-[200px] md:h-[300px] md:w-[250px] md:max-w-xs px-3">
+      <div className="intro-image-wrap container relative h-[250px] w-[200px] md:h-[300px] md:w-[250px] md:max-w-xs px-3 z-10">
         <Link
           href={session?.isLoggedIn ? "/" : "/login"}
           className="group relative block w-full h-full"

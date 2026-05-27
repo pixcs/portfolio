@@ -18,15 +18,16 @@ interface Message {
 }
 
 const SUGGESTED_QUESTIONS = [
-  "What are your skills?",
-  "Tell me about your projects",
-  "What's your experience?",
-  "How can I contact you?",
+  "What's your tech stack?",
+  "Show me your best project",
+  "Can you tell me about your experience?",
+  "Are you open to work?",
+  "How do I reach you?",
 ];
 
 const CLIENT_COOLDOWN_MS = 10_000;
 
-function useTypewriter(text: string, enabled: boolean, speed = 1) {
+function useTypewriter(text: string, enabled: boolean, speed = 8, charsPerTick = 3) {
   const [displayed, setDisplayed] = useState("");
   const [done, setDone] = useState(false);
   const indexRef = useRef(0);
@@ -47,7 +48,7 @@ function useTypewriter(text: string, enabled: boolean, speed = 1) {
       const elapsed = now - lastTimeRef.current;
       if (elapsed >= speed) {
         lastTimeRef.current = now;
-        indexRef.current += 1;
+        indexRef.current = Math.min(indexRef.current + charsPerTick, text.length);
         setDisplayed(text.slice(0, indexRef.current));
         if (indexRef.current >= text.length) {
           setDone(true);
@@ -501,7 +502,7 @@ export default function AIChatAssistant({ profileUserId, username }: Props) {
       <button
         onClick={() => setIsOpen((p) => !p)}
         aria-label="Toggle AI Chat"
-        className="fixed z-50 w-14 h-14 rounded-sm flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95"
+        className="fixed z-50 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95"
         style={{
           bottom: "calc(1.5rem + env(safe-area-inset-bottom, 0px))",
           right: "1.5rem",
@@ -568,7 +569,7 @@ export default function AIChatAssistant({ profileUserId, username }: Props) {
                 className="w-1.5 h-1.5 rounded-full animate-pulse shrink-0"
                 style={{ backgroundColor: "#34d399" }}
               />
-              Powered by Groq
+              Powered by AI · Not a real person
             </span>
           </div>
 

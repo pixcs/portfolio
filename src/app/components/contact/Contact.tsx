@@ -16,7 +16,7 @@ type Props = {
     info: AdminInfo | null; 
 };
 
-const Contact = ({ session, info }: Props) => {
+const Contact = ({ session, info, profileUserId }: Props) => {
     const [emailCopied, setEmailCopied] = useState(false);
     const [phoneNumberCopied, setPhoneNumberCopied] = useState(false);
     const [status, setStatus] = useState("");
@@ -52,8 +52,9 @@ const Contact = ({ session, info }: Props) => {
             <ContactForm
                 status={status}
                 setStatus={setStatus}
-                infoEmail={session?.email}
+                infoEmail={info?.email}
                 title={info?.title}
+                profileUserId={profileUserId}
             />
 
             <div className="flex-1 flex flex-col items-center justify-start">

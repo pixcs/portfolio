@@ -13,9 +13,16 @@ type Props = {
     setStatus: Dispatch<SetStateAction<string>>,
     infoEmail: string | undefined,
     title: string | undefined,
+    profileUserId: string;
 }
 
-const ContactForm = ({ status, setStatus, infoEmail, title }: Props) => {
+const ContactForm = ({ 
+    status, 
+    setStatus, 
+    infoEmail, 
+    title, 
+    profileUserId 
+}: Props) => {
     const [formData, setFormData] = useState<ContactForm>({
         name: "",
         email: "",
@@ -28,69 +35,46 @@ const ContactForm = ({ status, setStatus, infoEmail, title }: Props) => {
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         e.preventDefault();
         const { name, value } = e.currentTarget;
-
         setFormData((prevFormData) => ({
             ...prevFormData,
             [name]: value
-        }))
-    }
+        }));
+    };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
 
         try {
-            // First request: save message
             const contactRes = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URI}/api/get-in-touch`,
                 {
                     method: "POST",
-                    headers: {
-                        "Content-type": "application/json",
-                    },
-                    body: JSON.stringify({ name, email, subject, message }),
+                    headers: { "Content-type": "application/json" },
+                    body: JSON.stringify({ userId: profileUserId, name, email, subject, message })
                 }
             );
 
             const contactData = await contactRes.json();
+            if (!contactRes.ok) throw new Error(contactData.error || "Failed to save message");
 
-            if (!contactRes.ok) {
-                throw new Error(contactData.error || "Failed to save message");
-            }
-
-            // Second request: send email
             const emailRes = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URI}/api/send-email`,
                 {
                     method: "POST",
-                    headers: {
-                        "Content-type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        name,
-                        email,
-                        subject,
-                        message,
-                        infoEmail,  // authenticated user info email  
-                        title       // app title
-                    }),
+                    headers: { "Content-type": "application/json" },
+                    body: JSON.stringify({ name, email, subject, message, infoEmail, title }),
                 }
             );
 
             const emailData = await emailRes.json();
-
-            if (!emailRes.ok) {
-                throw new Error(emailData.error || "Failed to send email");
-            }
+            if (!emailRes.ok) throw new Error(emailData.error || "Failed to send email");
 
             setStatus("Message sent successfully!");
+            setFormData({ name: "", email: "", subject: "", message: "" });
 
-            setFormData({
-                name: "",
-                email: "",
-                subject: "",
-                message: "",
-            });
+            // 🔔 Notify navbar immediately that a new message was sent
+            window.dispatchEvent(new CustomEvent("newMessageSent"));
 
         } catch (err) {
             if (err instanceof Error) {
@@ -157,14 +141,14 @@ const ContactForm = ({ status, setStatus, infoEmail, title }: Props) => {
                 {isLoading ? (
                     <span className="flex items-center justify-center gap-2">
                         <span className="w-3.5 h-3.5 rounded-full border-2 border-white/30 dark:border-black/30 border-t-white dark:border-t-black animate-spin" />
-                        Processing...
+                        Sending...
                     </span>
                 ) : (
                     "Send message"
                 )}
             </button>
         </form>
-    )
-}
+    );
+};
 
 export default ContactForm;

@@ -14,8 +14,8 @@ export async function POST(request: NextRequest) {
 
     try {
         await transporter.sendMail({
-            from: `"(${title}) Portfolio Website" <${infoEmail}>`,
-            to: process.env.EMAIL_USER,
+            from: `"(${title}) DevFolio" <${process.env.EMAIL_USER}>`,
+            to: infoEmail, // sends to profile owner's email
             subject: `${subject} (from ${name})`,
             html: `
             <div style="
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
 
         // Auto-reply to USER (receipt)
         await transporter.sendMail({
-            from: `"(${title}) Portfolio Website" <${infoEmail}>`,
+            from: `"(${title}) DevFolio" <${process.env.EMAIL_USER}>`,
             to: email,
             subject: "We received your message",
             html: `
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
                         <p>Hi <strong>${name}</strong>,</p>
 
                         <p style="line-height:1.6;">
-                            Thanks for contacting me! I’ve received your message and will get back to you as soon as possible.
+                            Thanks for contacting me! I've received your message and will get back to you as soon as possible.
                         </p>
 
                         <div style="margin:20px 0; padding:15px; background:#f9fafb; border-radius:8px;">

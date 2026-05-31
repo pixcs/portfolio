@@ -227,6 +227,11 @@ const projectSchema = new Schema<ProjectSchema>(
 
 const getInTouch = new Schema(
     {
+        userId:  { 
+            type: Schema.Types.ObjectId, 
+            ref: "Admin", 
+            required: true 
+        },
         name:    { type: String },
         email:   { type: String },
         subject: { type: String },
@@ -243,6 +248,8 @@ aboutContentSchema.index({ userId: 1 });
 skillsContentSchema.index({ userId: 1 });
 workExperience.index({ userId: 1 });
 projectSchema.index({ userId: 1 });
+getInTouch.index({ userId: 1 });
+
 
 
 

@@ -95,12 +95,12 @@ export default async function UserPortfolio({ params }: Props) {
     // ── Parse all responses in parallel ──────────────────────────────
     const [{ user }, infoData, aboutData, skillsData, workExpData, projectsData] =
         await Promise.all([
-        userRes.json(),
-        infoRes.ok     ? infoRes.json()     : Promise.resolve({ info: null }),
-        aboutRes.ok    ? aboutRes.json()    : Promise.resolve({ about: null }),
-        skillsRes.ok   ? skillsRes.json()   : Promise.resolve({ enabledSkills: [] }),
-        workExpRes.ok  ? workExpRes.json()  : Promise.resolve({ workExp: [] }),
-        projectsRes.ok ? projectsRes.json() : Promise.resolve({ projects: [] }),
+            userRes.json(),
+            infoRes.ok     ? infoRes.json()     : Promise.resolve({ info: null }),
+            aboutRes.ok    ? aboutRes.json()    : Promise.resolve({ about: null }),
+            skillsRes.ok   ? skillsRes.json()   : Promise.resolve({ enabledSkills: [] }),
+            workExpRes.ok  ? workExpRes.json()  : Promise.resolve({ workExp: [] }),
+            projectsRes.ok ? projectsRes.json() : Promise.resolve({ projects: [] }),
         ]);
 
     const info: AdminInfo | null     = infoData.info            ?? null;

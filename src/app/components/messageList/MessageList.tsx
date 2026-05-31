@@ -62,7 +62,9 @@ const MessageList = ({
             </div>
             <div className="flex items-center justify-between">
                 <h3 className="text-sm dark:text-gray-300 font-medium">{message.subject}</h3>
-                <p className="text-sm dark:text-gray-300">{message.createdAt.slice(0, 10)}</p>
+                <p className="text-sm dark:text-gray-300">
+                    {message.createdAt?.slice(0, 10)}
+                </p>
             </div>
             <p className="dark:text-gray-300 text-sm">
                 {message.message}

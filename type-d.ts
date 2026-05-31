@@ -70,13 +70,14 @@ type ContactForm = {
 }
 
 type GetInTouch = {
-    _id: string,
-    name: string,
-    email: string,
-    subject: string,
-    message: string,
-    createdAt: string
-}
+    _id: string;
+    userId: string; 
+    name: string;
+    email: string;
+    subject: string;
+    message: string;
+    createdAt?: string;
+};
 
 type AdminInfo = {
     _id?: string;

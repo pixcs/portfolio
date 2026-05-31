@@ -8,10 +8,10 @@ import {
 import {
     MdOutlineLightMode,
     MdOutlineDarkMode,
-    MdOutlineAdminPanelSettings
 } from "react-icons/md";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { BsFillBellFill } from "react-icons/bs";
+import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { IronSession } from "iron-session";
 import MessageList from "@/app/components/messageList/MessageList";
@@ -21,15 +21,17 @@ type Props = {
     darkMode: boolean,
     setDarkMode: Dispatch<SetStateAction<boolean>>,
     showDrawer: boolean,
-    setShowDrawer: Dispatch<SetStateAction<boolean>>
+    setShowDrawer: Dispatch<SetStateAction<boolean>>,
     session: IronSession<SessionData> | undefined,
+    profileUserId: string,
     listOfMessage: GetInTouch[],
     setListOfMessage: Dispatch<SetStateAction<GetInTouch[]>>,
     setReRender: Dispatch<SetStateAction<boolean>>,
     showInbox: boolean,
     setShowInbox: Dispatch<SetStateAction<boolean>>,
-    resumeUrl: string
-    title: string
+    resumeUrl: string,
+    title: string,
+    unreadCount: number,
 }
 
 const Navbar = ({
@@ -38,18 +40,20 @@ const Navbar = ({
     showDrawer,
     setShowDrawer,
     session,
+    profileUserId,
     listOfMessage,
     setListOfMessage,
     setReRender,
     showInbox,
     setShowInbox,
     resumeUrl,
-    title
+    title,
+    unreadCount,
 }: Props) => {
     const inboxRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+        const handleClickOutside = (event: MouseEvent) => {
             if (
                 inboxRef.current &&
                 !inboxRef.current.contains(event.target as Node)
@@ -59,10 +63,7 @@ const Navbar = ({
         };
 
         document.addEventListener("mousedown", handleClickOutside);
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
+        return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
     return (
@@ -88,66 +89,75 @@ const Navbar = ({
                             </li>
                         </ul>
                         <span>|</span>
-                        {darkMode ?
+                        {darkMode ? (
                             <MdOutlineDarkMode
                                 className="cursor-pointer rounded-md p-2 hover:bg-slate-700/90 transition duration-300"
                                 size={35}
                                 onClick={() => setDarkMode(!darkMode)}
                             />
-                            : <MdOutlineLightMode
+                        ) : (
+                            <MdOutlineLightMode
                                 className="cursor-pointer rounded-md p-2 hover:bg-gray-200 transition duration-300"
                                 size={35}
                                 onClick={() => setDarkMode(!darkMode)}
                             />
-                        }
-                        <div className="relative" ref={inboxRef}>
-                            {showInbox ? (
-                                <BsFillBellFill
-                                    className="cursor-pointer rounded-md p-2 hover:bg-gray-200 dark:hover:bg-slate-700/90 transition duration-300"
-                                    size={35}
-                                    onClick={() => setShowInbox(!showInbox)}
-                                />
-                            ) : (
-                                <IoNotificationsOutline
-                                    className="cursor-pointer rounded-md p-2 hover:bg-gray-200 dark:hover:bg-slate-700/90 transition duration-300"
-                                    size={35}                     
-                                    onClick={() => setShowInbox(!showInbox)}
-                                />
-                            )}
-                            <div className={`absolute  ${session?.isLoggedIn && session?.isAdmin ? " -bottom-auto" : "-bottom-48"} right-1/4 max-h-96 overflow-y-auto min-w-96 bg-white/80 p-3 background-blur dark:bg-slate-900/80  border border-gray-300 dark:border-slate-700 rounded-lg transition-all duration-100 backdrop-blur
-                                ${showInbox ? "visible opacity-100" : "invisible opacity-0"}`}
-                            >
-                                <h1 className="font-medium text-gray-400 dark:text-white">Inbox</h1>
-                                {session?.isLoggedIn && session?.isAdmin ? (
-                                    <>
-                                        {listOfMessage.length > 0 ? (
-                                            listOfMessage.map((message) => (
-                                                <MessageList
-                                                    key={message._id}
-                                                    message={message}
-                                                    setListOfMessage={setListOfMessage}
-                                                    setReRender={setReRender}
-                                                />
-                                            ))
-                                        ) : (
-                                            <p className="font-medium p-5">You have not yet received any messages.</p>
-                                        )}
-                                    </>
-                                ) : (
-                                    <div className="p-5 flex flex-col gap-y-4">
-                                        <h1 className="font-medium">Apologies, the inboxes are only visible to the administrator.</h1>
-                                        <Link href="/login" className=" underline font-medium">
-                                            <MdOutlineAdminPanelSettings size={30} className=" inline-block mr-4" />
-                                            Login as administrator?
-                                        </Link>
-                                    </div>
+                        )}
+
+                        {!(session?.isLoggedIn && session?.userId !== profileUserId) && (
+                            <div className="relative" ref={inboxRef}>
+                                {/* Unread count badge */}
+                                {unreadCount > 0 && (
+                                    <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full z-10 flex items-center justify-center animate-pulse">
+                                        {unreadCount > 99 ? "99+" : unreadCount}
+                                    </span>
                                 )}
+                                {showInbox ? (
+                                    <BsFillBellFill
+                                        className="cursor-pointer rounded-md p-2 hover:bg-gray-200 dark:hover:bg-slate-700/90 transition duration-300"
+                                        size={35}
+                                        onClick={() => setShowInbox(!showInbox)}
+                                    />
+                                ) : (
+                                    <IoNotificationsOutline
+                                        className="cursor-pointer rounded-md p-2 hover:bg-gray-200 dark:hover:bg-slate-700/90 transition duration-300"
+                                        size={35}
+                                        onClick={() => setShowInbox(!showInbox)}
+                                    />
+                                )}
+                                <div className={`absolute top-full mt-2 right-0 max-h-96 overflow-y-auto min-w-96 bg-white/80 p-3 background-blur dark:bg-slate-900/80 border border-gray-300 dark:border-slate-700 rounded-lg transition-all duration-100 backdrop-blur
+                                    ${showInbox ? "visible opacity-100" : "invisible opacity-0"}`}
+                                >
+                                    <h1 className="font-medium text-gray-400 dark:text-white">Inbox</h1>
+                                    {session?.isLoggedIn && session?.isAdmin && session?.userId === profileUserId ? (
+                                        <>
+                                            {listOfMessage.length > 0 ? (
+                                                listOfMessage.map((message) => (
+                                                    <MessageList
+                                                        key={message._id}
+                                                        message={message}
+                                                        setListOfMessage={setListOfMessage}
+                                                        setReRender={setReRender}
+                                                    />
+                                                ))
+                                            ) : (
+                                                <p className="font-medium p-5">You have not yet received any messages.</p>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <div className="p-5 flex flex-col gap-y-4">
+                                            <h1 className="font-medium">Apologies, the inbox is only visible to the administrator.</h1>
+                                            <Link href="/login" className="underline font-medium">
+                                                <MdOutlineAdminPanelSettings size={30} className="inline-block mr-4" />
+                                                Login as administrator?
+                                            </Link>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        )}
+
                         <button className="px-4 py-2 font-medium text-white bg-slate-900 rounded-xl hover:bg-gray-700 dark:hover:bg-slate-200 active:bg-slate-700 active:scale-95 dark:bg-white dark:text-slate-900 dark:active:bg-slate-200 transition-theme">
-                            <Link
-                                href={resumeUrl}
-                                target="_blank">
+                            <Link href={resumeUrl} target="_blank">
                                 Download CV
                             </Link>
                         </button>
@@ -159,8 +169,8 @@ const Navbar = ({
                     onClick={() => setShowDrawer(!showDrawer)}
                 />
             </nav>
-        </header >
-    )
-}
+        </header>
+    );
+};
 
 export default Navbar;

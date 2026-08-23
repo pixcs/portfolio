@@ -223,7 +223,7 @@ async function callGroq(messages: object[]): Promise<string> {
         "Content-Type":  "application/json",
       },
       body: JSON.stringify({
-        model:       "llama-3.3-70b-versatile",
+        model:       "openai/gpt-oss-120b",
         messages,
         max_tokens:  MAX_TOKENS,
         temperature: 0.7,
@@ -234,6 +234,9 @@ async function callGroq(messages: object[]): Promise<string> {
 
     if (!res.ok) {
       const status = res.status;
+      const body = await res.text().catch(() => "");
+      console.error(`Groq API error ${status}:`, body); 
+
       if (status === 429) throw new Error("RATE_LIMIT");
       if (status === 401 || status === 403) throw new Error("INVALID_API_KEY");
       if (status >= 500) throw new Error("AI_SERVER_ERROR");
@@ -244,6 +247,7 @@ async function callGroq(messages: object[]): Promise<string> {
     return data.choices?.[0]?.message?.content ?? "I couldn't generate a response.";
 
   } catch (error: any) {
+    console.error("AI Chat Error:", error.message, error.stack);
     const isTimeout = error.name === "AbortError" || error.code === "ERR_CANCELED";
     if (isTimeout) throw new Error("AI_TIMEOUT");
     throw error;

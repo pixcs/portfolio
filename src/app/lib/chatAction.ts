@@ -223,7 +223,7 @@ async function callGroq(messages: object[]): Promise<string> {
         "Content-Type":  "application/json",
       },
       body: JSON.stringify({
-        model:       "openai/gpt-oss-120b",
+        model:       "qwen/qwen3.8-27b",
         messages,
         max_tokens:  MAX_TOKENS,
         temperature: 0.7,

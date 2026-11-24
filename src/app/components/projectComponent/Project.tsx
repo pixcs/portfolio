@@ -12,6 +12,59 @@ type Props = {
   projects: Project[];
 };
 
+/* ---------- Auto-scrolling (marquee) row for tools & tech ---------- */
+const SECONDS_PER_TAG = 3; // lower = faster, higher = slower
+
+const TechScroller = ({ items }: { items: string[] }) => {
+  // Each group holds the list twice so the track is always wider than the card,
+  // then the track slides exactly -50% and restarts: a seamless loop.
+  const doubled = [...items, ...items];
+  const duration = Math.max(items.length * SECONDS_PER_TAG, 10);
+  const fade =
+    "linear-gradient(to right, transparent, black 8%, black 92%, transparent)";
+
+  return (
+    <div
+      className="tech-marquee overflow-hidden"
+      style={{ maskImage: fade, WebkitMaskImage: fade }}
+    >
+      <style>{`
+        @keyframes tech-marquee-slide {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-50%); }
+        }
+        .tech-marquee-track {
+          animation: tech-marquee-slide var(--marquee-duration) linear infinite;
+        }
+        .tech-marquee:hover .tech-marquee-track {
+          animation-play-state: paused;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .tech-marquee-track { animation: none; }
+        }
+      `}</style>
+
+      <div
+        className="tech-marquee-track flex w-max flex-nowrap"
+        style={{ ["--marquee-duration" as string]: `${duration}s` }}
+      >
+        {[0, 1].map((group) => (
+          <div key={group} className="flex flex-nowrap" aria-hidden={group === 1}>
+            {doubled.map((tool, i) => (
+              <span
+                key={`${group}-${i}`}
+                className="shrink-0 whitespace-nowrap mr-2 text-sm dark:text-gray-300 px-4 py-1 bg-gray-200 dark:bg-slate-700/80 rounded-full"
+              >
+                {tool}
+              </span>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const Project = ({ session, profileUserId, projects }: Props) => {
   const isOwner = session?.isLoggedIn && session?.userId === profileUserId;
   const isEmpty = projects.length === 0;
@@ -109,20 +162,13 @@ const Project = ({ session, profileUserId, projects }: Props) => {
                 </Link>
               </div>
 
-              {/* Text panel */}
-              <div className="flex-1 flex flex-col p-8 md:p-12 gap-4">
+              {/* Text panel — min-w-0 lets it shrink so the marquee can't stretch the card */}
+              <div className="flex-1 min-w-0 flex flex-col p-8 md:p-12 gap-4">
                 <h3 className="text-xl font-semibold">{project.projectName}</h3>
                 <p className="dark:text-gray-300">{project.description}</p>
-                <p className="flex flex-wrap gap-2">
-                  {project.toolsAndTech.map((tool) => (
-                    <span
-                      key={tool}
-                      className="text-sm dark:text-gray-300 px-4 py-1 bg-gray-200 dark:bg-slate-700/80 rounded-full"
-                    >
-                      {tool}
-                    </span>
-                  ))}
-                </p>
+
+                <TechScroller items={project.toolsAndTech} />
+
                 <Link
                   href={project.projectUrl}
                   target="_blank"

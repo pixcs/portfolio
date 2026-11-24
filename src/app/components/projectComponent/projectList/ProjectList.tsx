@@ -14,6 +14,58 @@ type Props = {
     formReset: () => void
 }
 
+/* ---------- Auto-scrolling (marquee) row for tools & tech ---------- */
+const SECONDS_PER_TAG = 3; // lower = faster, higher = slower
+
+const TechScroller = ({ items }: { items: string[] }) => {
+    // Each group holds the list twice so the track is always wider than the card,
+    // then the track slides exactly -50% and restarts: a seamless loop.
+    const doubled = [...items, ...items];
+    const duration = Math.max(items.length * SECONDS_PER_TAG, 10);
+    const fade = 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)';
+
+    return (
+        <div
+            className="tech-marquee mb-8 md:mb-0 overflow-hidden"
+            style={{ maskImage: fade, WebkitMaskImage: fade }}
+        >
+            <style>{`
+                @keyframes tech-marquee-slide {
+                    from { transform: translateX(0); }
+                    to   { transform: translateX(-50%); }
+                }
+                .tech-marquee-track {
+                    animation: tech-marquee-slide var(--marquee-duration) linear infinite;
+                }
+                .tech-marquee:hover .tech-marquee-track {
+                    animation-play-state: paused;
+                }
+                @media (prefers-reduced-motion: reduce) {
+                    .tech-marquee-track { animation: none; }
+                }
+            `}</style>
+
+            <div
+                className="tech-marquee-track flex w-max flex-nowrap"
+                style={{ ['--marquee-duration' as string]: `${duration}s` }}
+            >
+                {[0, 1].map((group) => (
+                    <div key={group} className="flex flex-nowrap" aria-hidden={group === 1}>
+                        {doubled.map((tool, i) => (
+                            <span
+                                key={`${group}-${i}`}
+                                className="shrink-0 whitespace-nowrap mr-2 text-sm dark:text-gray-300 px-4 py-1 bg-gray-200 dark:bg-slate-700/80 rounded-full"
+                            >
+                                {tool}
+                            </span>
+                        ))}
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
 const ProjectList = ({ projects, getEditProject, formReset }: Props) => {
     const router = useRouter();
     const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -121,19 +173,13 @@ const ProjectList = ({ projects, getEditProject, formReset }: Props) => {
                                 />
                             </Link>
                         </div>
-                        <div className="flex-1 flex flex-col p-8 md:p-12 gap-4 relative">
+                        {/* min-w-0 lets the flex child shrink so the tag row can scroll instead of stretching the card */}
+                        <div className="flex-1 min-w-0 flex flex-col p-8 md:p-12 gap-4 relative">
                             <h3 className="text-xl font-semibold">{project.projectName}</h3>
                             <p className="dark:text-gray-300">{project.description}</p>
-                            <p className="flex flex-wrap gap-2 mb-8 md:mb-0">
-                                {project.toolsAndTech.map((tools) => (
-                                    <span
-                                        key={tools}
-                                        className="text-sm dark:text-gray-300 px-4 py-1 bg-gray-200 dark:bg-slate-700/80 rounded-full"
-                                    >
-                                        {tools}
-                                    </span>
-                                ))}
-                            </p>
+
+                            <TechScroller items={project.toolsAndTech} />
+
                             <EditProject
                                 projectId={project._id}
                                 getEditProject={getEditProject}

@@ -56,7 +56,7 @@ export const SKILLS: Skill[] = [
   { iconKey: "RiNextjsFill",      name: "Next.js",        color: "text-black dark:text-white", category: "Frontend", enabled: true },
   { iconKey: "RiTailwindCssFill", name: "Tailwind CSS",   color: "text-sky-500",    category: "Frontend",   enabled: true  },
   { iconKey: "FaVuejs",           name: "Vue",            color: "text-green-500",  category: "Frontend",   enabled: false },
-  { iconKey: "SiNuxtdotjs",       name: "Nuxt.js",        color: "text-green-500",  category: "Frontend",   enabled: false },
+  { iconKey: "SiNuxt",       name: "Nuxt.js",        color: "text-green-500",  category: "Frontend",   enabled: false },
   { iconKey: "SiAngular",         name: "Angular",        color: "text-red-600",    category: "Frontend",   enabled: false },
   { iconKey: "SiSvelte",          name: "Svelte",         color: "text-orange-600", category: "Frontend",   enabled: false },
   { iconKey: "SiAstro",           name: "Astro",          color: "text-orange-500", category: "Frontend",   enabled: false },
@@ -65,20 +65,17 @@ export const SKILLS: Skill[] = [
   { iconKey: "SiSolid",           name: "SolidJS",        color: "text-blue-500",   category: "Frontend",   enabled: false },
   { iconKey: "SiJquery",          name: "jQuery",         color: "text-blue-500",   category: "Frontend",   enabled: true  },
   { iconKey: "SiRedux",           name: "Redux",          color: "text-purple-500", category: "Frontend",   enabled: false },
-  { iconKey: "SiZustand",         name: "Zustand",        color: "text-amber-600",  category: "Frontend",   enabled: false },
   { iconKey: "SiReactquery",      name: "React Query",    color: "text-red-500",    category: "Frontend",   enabled: false },
-  { iconKey: "SiJotai",           name: "Jotai",          color: "text-gray-400",   category: "Frontend",   enabled: false },
   { iconKey: "SiRecoil",          name: "Recoil",         color: "text-sky-500",    category: "Frontend",   enabled: false },
   { iconKey: "SiXstate",          name: "XState",         color: "text-gray-200",   category: "Frontend",   enabled: false },
   { iconKey: "SiAxios",           name: "Axios",          color: "text-purple-500", category: "Frontend",   enabled: false },
   { iconKey: "SiSocketdotio",     name: "Socket.io",      color: "text-gray-200",   category: "Frontend",   enabled: false },
-  { iconKey: "SiThreejs",         name: "Three.js",       color: "text-gray-200",   category: "Frontend",   enabled: false },
-  { iconKey: "SiD3Dotjs",         name: "D3.js",          color: "text-orange-500", category: "Frontend",   enabled: false },
+  { iconKey: "SiThreedotjs",         name: "Three.js",       color: "text-gray-200",   category: "Frontend",   enabled: false },
+  { iconKey: "SiD3",         name: "D3.js",          color: "text-orange-500", category: "Frontend",   enabled: false },
   { iconKey: "SiChartdotjs",      name: "Chart.js",       color: "text-pink-500",   category: "Frontend",   enabled: false },
   { iconKey: "TbBrandFramerMotion", name: "Framer Motion", color: "text-pink-500",  category: "Frontend",   enabled: false },
   { iconKey: "SiFramer",          name: "Framer",         color: "text-sky-500",    category: "Frontend",   enabled: false },
   { iconKey: "SiStyledcomponents", name: "Styled Comp.",  color: "text-pink-400",   category: "Frontend",   enabled: false },
-  { iconKey: "SiEmotion",         name: "Emotion",        color: "text-pink-400",   category: "Frontend",   enabled: false },
   { iconKey: "SiChakraui",        name: "Chakra UI",      color: "text-teal-400",   category: "Frontend",   enabled: false },
   { iconKey: "SiMui",             name: "MUI",            color: "text-blue-500",   category: "Frontend",   enabled: false },
   { iconKey: "SiAntdesign",       name: "Ant Design",     color: "text-blue-500",   category: "Frontend",   enabled: false },
@@ -93,6 +90,11 @@ export const SKILLS: Skill[] = [
   { iconKey: "SiLeaflet",         name: "Leaflet",        color: "text-green-600",  category: "Frontend",   enabled: false },
   { iconKey: "SiMapbox",          name: "Mapbox",         color: "text-sky-500",    category: "Frontend",   enabled: false },
   { iconKey: "SiStorybook",       name: "Storybook",      color: "text-pink-500",   category: "Frontend",   enabled: false },
+  { iconKey: "SiPinia",             name: "Pinia",          color: "text-yellow-400",  category: "Frontend",    enabled: false },
+  { iconKey: "SiVuetify",           name: "Vuetify",        color: "text-sky-500",     category: "Frontend",    enabled: false },
+  { iconKey: "SiReactrouter",       name: "React Router",   color: "text-red-500",     category: "Frontend",    enabled: false },
+  { iconKey: "SiLucide",            name: "Lucide",         color: "text-orange-500",  category: "Frontend",    enabled: false },
+  { iconKey: "SiTrpc",              name: "tRPC",           color: "text-sky-500",     category: "Frontend",    enabled: false },
 
   // ── Backend ──────────────────────────────────────────────────
   { iconKey: "IoLogoNodejs",      name: "Node.js",        color: "text-green-600",  category: "Backend",    enabled: true  },
@@ -112,9 +114,14 @@ export const SKILLS: Skill[] = [
   { iconKey: "SiDrizzle",         name: "Drizzle",        color: "text-green-500",  category: "Backend",    enabled: false },
   { iconKey: "TbBrandSocketIo",   name: "Socket.io",      color: "text-gray-200",   category: "Backend",    enabled: false },
   { iconKey: "SiStripe",          name: "Stripe",         color: "text-violet-500", category: "Backend",    enabled: false },
-  { iconKey: "SiTwilio",          name: "Twilio",         color: "text-red-500",    category: "Backend",    enabled: false },
-  { iconKey: "SiSendgrid",        name: "SendGrid",       color: "text-sky-500",    category: "Backend",    enabled: false },
+  { iconKey: "TbBrandTwilio",          name: "Twilio",         color: "text-red-500",    category: "Backend",    enabled: false },
   { iconKey: "SiAuth0",           name: "Auth0",          color: "text-orange-500", category: "Backend",    enabled: false },
+  { iconKey: "SiHono",              name: "Hono",           color: "text-orange-500",  category: "Backend",     enabled: false },
+  { iconKey: "SiZod",               name: "Zod",            color: "text-sky-600",     category: "Backend",     enabled: false },
+  { iconKey: "SiMongoose",          name: "Mongoose",       color: "text-red-600",     category: "Backend",     enabled: false },
+  { iconKey: "SiApollographql",     name: "Apollo",         color: "text-violet-500",  category: "Backend",     enabled: false },
+  { iconKey: "SiClerk",             name: "Clerk",          color: "text-violet-500",  category: "Backend",     enabled: false },
+  { iconKey: "SiAppwrite",          name: "Appwrite",       color: "text-pink-500",    category: "Backend",     enabled: false },
 
   // ── Mobile ───────────────────────────────────────────────────
   { iconKey: "FaReact",           name: "React Native",   color: "text-sky-500",    category: "Mobile",     enabled: true  },
@@ -135,10 +142,13 @@ export const SKILLS: Skill[] = [
   { iconKey: "SiPlanetscale",     name: "PlanetScale",    color: "text-gray-200",   category: "Database",   enabled: false },
   { iconKey: "SiSqlite",          name: "SQLite",         color: "text-sky-500",    category: "Database",   enabled: false },
   { iconKey: "SiMariadb",         name: "MariaDB",        color: "text-amber-700",  category: "Database",   enabled: false },
-  { iconKey: "SiCassandra",       name: "Cassandra",      color: "text-sky-400",    category: "Database",   enabled: false },
+  { iconKey: "SiApachecassandra",       name: "Cassandra",      color: "text-sky-400",    category: "Database",   enabled: false },
   { iconKey: "SiElasticsearch",   name: "Elasticsearch",  color: "text-yellow-500", category: "Database",   enabled: false },
   { iconKey: "SiNeo4J",           name: "Neo4j",          color: "text-sky-500",    category: "Database",   enabled: false },
   { iconKey: "SiInfluxdb",        name: "InfluxDB",       color: "text-violet-500", category: "Database",   enabled: false },
+  { iconKey: "SiNeon",              name: "Neon",           color: "text-emerald-400", category: "Database",    enabled: false },
+  { iconKey: "SiTurso",             name: "Turso",          color: "text-teal-400",    category: "Database",    enabled: false },
+  { iconKey: "SiConvex",            name: "Convex",         color: "text-orange-500",  category: "Database",    enabled: false },
 
   // ── DevOps ───────────────────────────────────────────────────
   { iconKey: "FaGitAlt",          name: "Git",            color: "text-orange-600", category: "DevOps",     enabled: true  },
@@ -168,18 +178,18 @@ export const SKILLS: Skill[] = [
 
   // ── Cloud ────────────────────────────────────────────────────
   { iconKey: "FaAws",             name: "AWS",            color: "text-amber-500",  category: "Cloud",      enabled: false },
-  { iconKey: "SiMicrosoftazure",  name: "Azure",          color: "text-sky-500",    category: "Cloud",      enabled: false },
+  { iconKey: "TbBrandAzure",  name: "Azure",          color: "text-sky-500",    category: "Cloud",      enabled: false },
   { iconKey: "SiGooglecloud",     name: "GCP",            color: "text-sky-400",    category: "Cloud",      enabled: false },
   { iconKey: "SiVercel",          name: "Vercel",         color: "text-gray-200",   category: "Cloud",      enabled: false },
   { iconKey: "SiNetlify",         name: "Netlify",        color: "text-teal-500",   category: "Cloud",      enabled: false },
   { iconKey: "SiCloudflare",      name: "Cloudflare",     color: "text-orange-500", category: "Cloud",      enabled: false },
   { iconKey: "SiDigitalocean",    name: "DigitalOcean",   color: "text-sky-500",    category: "Cloud",      enabled: false },
-  { iconKey: "SiHeroku",          name: "Heroku",         color: "text-violet-500", category: "Cloud",      enabled: false },
   { iconKey: "SiRailway",         name: "Railway",        color: "text-gray-200",   category: "Cloud",      enabled: false },
-  { iconKey: "SiAwsamplify",      name: "Amplify",        color: "text-amber-500",  category: "Cloud",      enabled: false },
+  { iconKey: "IoLogoAmplify",      name: "Amplify",        color: "text-amber-500",  category: "Cloud",      enabled: false },
+  { iconKey: "SiRender",            name: "Render",         color: "text-emerald-500", category: "Cloud",       enabled: false },
 
   // ── AI / ML ──────────────────────────────────────────────────
-  { iconKey: "SiOpenai",          name: "OpenAI",         color: "text-gray-200",   category: "AI/ML",      enabled: false },
+  { iconKey: "TbBrandOpenai",          name: "OpenAI",         color: "text-gray-200",   category: "AI/ML",      enabled: false },
   { iconKey: "SiHuggingface",     name: "HuggingFace",    color: "text-amber-400",  category: "AI/ML",      enabled: false },
   { iconKey: "SiLangchain",       name: "LangChain",      color: "text-green-500",  category: "AI/ML",      enabled: false },
   { iconKey: "SiTensorflow",      name: "TensorFlow",     color: "text-orange-500", category: "AI/ML",      enabled: false },
@@ -188,12 +198,19 @@ export const SKILLS: Skill[] = [
   { iconKey: "SiNumpy",           name: "NumPy",          color: "text-sky-500",    category: "AI/ML",      enabled: false },
   { iconKey: "SiScikitlearn",     name: "Scikit-learn",   color: "text-orange-400", category: "AI/ML",      enabled: false },
   { iconKey: "SiOpencv",          name: "OpenCV",         color: "text-green-600",  category: "AI/ML",      enabled: false },
+  { iconKey: "SiLangchain",         name: "LangGraph",      color: "text-blue-500",   category: "AI/ML",       enabled: true },
+  { iconKey: "SiOllama",            name: "Ollama",         color: "text-gray-500",    category: "AI/ML",       enabled: false },
+  { iconKey: "SiAnthropic",         name: "Anthropic",      color: "text-orange-400",  category: "AI/ML",       enabled: false },
+  { iconKey: "SiClaude",            name: "Claude",         color: "text-orange-500",  category: "AI/ML",       enabled: false },
+  { iconKey: "SiGooglegemini",      name: "Gemini",         color: "text-sky-500",     category: "AI/ML",       enabled: false },
+  { iconKey: "SiMistralai",         name: "Mistral AI",     color: "text-orange-500",  category: "AI/ML",       enabled: false },
+  { iconKey: "SiOpenrouter",        name: "OpenRouter",     color: "text-sky-500",     category: "AI/ML",       enabled: false },
+  { iconKey: "SiStreamlit",         name: "Streamlit",      color: "text-red-500",     category: "AI/ML",       enabled: false },
 
   // ── Testing ──────────────────────────────────────────────────
   { iconKey: "SiJest",            name: "Jest",           color: "text-red-600",    category: "Testing",    enabled: false },
   { iconKey: "SiVitest",          name: "Vitest",         color: "text-green-500",  category: "Testing",    enabled: false },
   { iconKey: "SiCypress",         name: "Cypress",        color: "text-gray-200",   category: "Testing",    enabled: false },
-  { iconKey: "SiPlaywright",      name: "Playwright",     color: "text-green-600",  category: "Testing",    enabled: false },
 
   // ── CMS ──────────────────────────────────────────────────────
   { iconKey: "SiWordpress",       name: "WordPress",      color: "text-sky-600",    category: "CMS",        enabled: false },
@@ -205,9 +222,9 @@ export const SKILLS: Skill[] = [
 
   // ── Design ───────────────────────────────────────────────────
   { iconKey: "SiFigma",           name: "Figma",          color: "text-pink-500",   category: "Design",     enabled: false },
-  { iconKey: "SiAdobexd",         name: "Adobe XD",       color: "text-pink-600",   category: "Design",     enabled: false },
+  { iconKey: "TbBrandAdobeXd",         name: "Adobe XD",       color: "text-pink-600",   category: "Design",     enabled: false },
   { iconKey: "SiSketch",          name: "Sketch",         color: "text-amber-500",  category: "Design",     enabled: false },
-  { iconKey: "SiInvision",        name: "InVision",       color: "text-pink-500",   category: "Design",     enabled: false },
+  { iconKey: "FaInvision",        name: "InVision",       color: "text-pink-500",   category: "Design",     enabled: false },
 
   // ── Tool ─────────────────────────────────────────────────────
   { iconKey: "SiPostman",         name: "Postman",        color: "text-orange-500", category: "Tool",       enabled: false },
@@ -215,15 +232,21 @@ export const SKILLS: Skill[] = [
   { iconKey: "SiNotion",          name: "Notion",         color: "text-gray-200",   category: "Tool",       enabled: false },
   { iconKey: "SiJira",            name: "Jira",           color: "text-sky-500",    category: "Tool",       enabled: false },
   { iconKey: "SiAsana",           name: "Asana",          color: "text-red-500",    category: "Tool",       enabled: false },
-  { iconKey: "SiSlack",           name: "Slack",          color: "text-violet-500", category: "Tool",       enabled: false },
+  { iconKey: "FaSlack",           name: "Slack",          color: "text-violet-500", category: "Tool",       enabled: false },
   { iconKey: "SiObsidian",        name: "Obsidian",       color: "text-violet-600", category: "Tool",       enabled: false },
+  { iconKey: "SiCursor",            name: "Cursor",         color: "text-gray-500",    category: "Tool",        enabled: false },
+  { iconKey: "SiGithubcopilot",     name: "Copilot",        color: "text-gray-500",    category: "Tool",        enabled: false },
+  { iconKey: "SiTelegram",          name: "Telegram",       color: "text-sky-500",     category: "Tool",        enabled: false },
+  { iconKey: "SiGmail",             name: "Gmail",          color: "text-red-500",     category: "Tool",        enabled: false },
+  { iconKey: "SiGooglecalendar",    name: "Google Calendar", color: "text-sky-500",     category: "Tool",        enabled: false },
 
   // ── OS ───────────────────────────────────────────────────────
   { iconKey: "FaUbuntu",          name: "Ubuntu",         color: "text-orange-500", category: "OS",         enabled: true  },
+  { iconKey: "FaWindows",           name: "Windows",        color: "text-sky-500",     category: "OS",          enabled: false },
   { iconKey: "SiDebian",          name: "Debian",         color: "text-red-500",    category: "OS",         enabled: false },
   { iconKey: "SiArchlinux",       name: "Arch Linux",     color: "text-sky-400",    category: "OS",         enabled: false },
   { iconKey: "SiAlpinelinux",     name: "Alpine",         color: "text-sky-500",    category: "OS",         enabled: false },
-  { iconKey: "IoLogoLinux",       name: "Linux",          color: "text-amber-400",  category: "OS",         enabled: false },
+  { iconKey: "FaLinux",       name: "Linux",          color: "text-amber-400",  category: "OS",         enabled: false },
   { iconKey: "IoLogoApple",       name: "macOS",          color: "text-gray-400",   category: "OS",         enabled: false },
 
   // ── Blockchain ───────────────────────────────────────────────
